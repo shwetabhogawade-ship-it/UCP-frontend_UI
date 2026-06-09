@@ -1,0 +1,686 @@
+/* ──────────────────────────────────────────────────────────────
+   XpressBees Sellportal — Dashboard
+   Adapted from "ui-source/screens/dashboard (3).html".
+   The base shell / sidebar / topbar / `.page` / `.card` foundations
+   are owned by sidebar.css + topbar.css + reports.css.
+
+   This file only adds tokens & classes specific to dashboard:
+   chart palette, severity KPI cards, ranked-row charts, heatmaps,
+   funnel widgets, grouped bar charts, and supporting helpers.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Severity / state */
+  --gray:        #6B6A62;
+  --gray-l:      #EEECE9;
+  --purple:      #6A1B9A;
+  --pl:          #F3E8FD;
+
+  /* Chart palette (consistent across all dashboard widgets) */
+  --c-delivered: #B39DDB;
+  --c-transit:   #81D4FA;
+  --c-rto:       #F5C878;
+  --c-lost:      #F2A39A;
+  --c-ontime:    #8DD4A9;
+  --c-late:      #F2A39A;
+  --c-prepaid:   #8EAFF0;
+  --c-cod:       #F5C878;
+  --c-ndr:       #E8520A;
+  --c-resp:      #B39DDB;
+  --c-pos:       #8DD4A9;
+  --c-buyer-resp:#CE93D8;
+  --c-shop:      #8DD4A9;
+  --c-amz:       #81D4FA;
+  --c-insta:     #CE93D8;
+  --c-woo:       #F5C878;
+  --c-whats:     #F2A39A;
+
+  --radius:      10px;
+  --radius-sm:   7px;
+}
+
+/* ── Page header ─────────────────────────────────────────────── */
+.dash-ph {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.dash-ph-title { font-size: 20px; font-weight: 700; letter-spacing: -.4px; color: var(--ink); }
+.dash-ph-sub   { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+
+/* Section label (uppercase divider) */
+.dash-sec-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--ink3);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Date range dropdown (compact, dashboard-local) ───────────
+   Sized to fit alongside the page title; visually mirrors the
+   reports `.date-filter-btn` so the language feels consistent. */
+.dash-df { position: relative; }
+.dash-df-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 500;
+  transition: border-color .15s;
+}
+.dash-df-btn:hover { border-color: var(--border2); }
+.dash-df-btn .arr { font-size: 9px; color: var(--ink3); transition: transform .2s; }
+.dash-df-btn.open .arr { transform: rotate(180deg); }
+.dash-df-dd {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  min-width: 200px;
+  overflow: hidden;
+}
+.dash-df-opt {
+  padding: 10px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background .12s;
+}
+.dash-df-opt:hover { background: var(--s2); }
+.dash-df-opt.on { color: var(--orange); background: var(--ol); font-weight: 600; }
+
+/* ── Notification banner ─────────────────────────────────────── */
+.notif {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--orange);
+  border-radius: 9px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.4;
+}
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+.notif b { font-weight: 700; color: var(--red); }
+.notif-text { flex: 1; }
+.notif-close {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink3);
+  font-size: 11px;
+  font-family: var(--font);
+  transition: all .15s;
+  padding: 0;
+  line-height: 1;
+}
+.notif-close:hover { background: var(--s3); color: var(--ink); }
+
+/* ── Tab strip (dashboard-scoped to avoid clash with .mod-tabs) ─ */
+.d-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 18px;
+}
+.d-tab {
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: all .15s;
+  white-space: nowrap;
+  user-select: none;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: var(--font);
+}
+.d-tab:hover { color: var(--ink2); }
+.d-tab.on { color: var(--ink); border-bottom-color: var(--orange); }
+.d-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.d-tab.on .d-tab-count { background: var(--ol); color: var(--orange); }
+.d-tab:not(.on) .d-tab-count { background: var(--s3); color: var(--ink3); }
+
+/* ── Card primitive (dashboard-scoped) ───────────────────────── */
+.d-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 13px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: border-color .18s;
+  display: flex;
+  flex-direction: column;
+}
+.d-card:hover { border-color: var(--border2); }
+.d-card > .legend { margin-top: auto; }
+
+.w-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.w-sub   { font-size: 11px; color: var(--ink3); }
+
+/* ── Grid rows ───────────────────────────────────────────────
+   `minmax(0, 1fr)` (not bare `1fr`) is required so columns DON'T
+   inflate to fit their min-content. Cards contain wide tables and
+   stacked bars whose intrinsic min-width would otherwise stretch
+   one column wider than the others, breaking edge alignment. */
+.row-2  { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; align-items: stretch; }
+.row-3  { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; align-items: stretch; }
+.row-2w { display: grid; grid-template-columns: 1.4fr 0.6fr;                gap: 14px; margin-bottom: 16px; align-items: stretch; }
+
+/* Multi-row 3-column grid — used when two visual "rows" must share the
+   exact same column tracks and gutter so card edges align column-by-column
+   (e.g. Orders tab fold 1 + fold 2: Pickups spans cols 1–2, Net Revenue
+   sits in col 3 directly above Delivery Performance). */
+.d-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+  align-items: stretch;
+}
+.d-span-2 { grid-column: span 2; }
+.d-span-3 { grid-column: span 3; }
+
+/* ── KPI cards ───────────────────────────────────────────────── */
+.kpi-grid { display: grid; gap: 12px; margin-bottom: 20px; }
+.kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.kpi-grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+.kpi {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 13px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all .18s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+}
+.kpi:hover {
+  border-color: var(--border2);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.kpi-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 13px 0 0 13px; }
+.kpi-content { flex: 1; }
+.kpi-lbl { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; line-height: 1.3; letter-spacing: -.2px; }
+.kpi-n   { font-family: var(--mono); font-size: 34px; font-weight: 700; letter-spacing: -.8px; line-height: 1; color: var(--ink); }
+.kpi-sub { font-size: 11px; color: var(--ink3); margin-top: 8px; line-height: 1.4; }
+.kpi-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.kpi-sev {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.kpi-dot { width: 6px; height: 6px; border-radius: 50%; }
+.kpi-hug { min-height: 0; }
+
+.kpi-high    .kpi-bar { background: var(--red); }
+.kpi-high    .kpi-sev { background: var(--rl);  color: var(--red); }
+.kpi-high    .kpi-dot { background: var(--red); }
+.kpi-med     .kpi-bar { background: var(--amber); }
+.kpi-med     .kpi-sev { background: var(--al);  color: var(--amber); }
+.kpi-med     .kpi-dot { background: var(--amber); }
+.kpi-low     .kpi-bar { background: var(--gray-m); }
+.kpi-low     .kpi-sev { background: var(--gray-l); color: var(--gray); }
+.kpi-low     .kpi-dot { background: var(--gray); }
+.kpi-neutral .kpi-bar { background: var(--border2); }
+.kpi-neutral .kpi-sev { background: var(--s3);  color: var(--ink2); }
+.kpi-neutral .kpi-dot { background: var(--border2); }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+.blink { animation: pulse 2s ease-in-out infinite; }
+
+/* Severity CTA buttons */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  border: none;
+  transition: opacity .15s;
+}
+.cta-p { background: var(--orange); color: #fff; }
+.cta-p:hover { opacity: .88; }
+.cta-s { background: var(--surface); border: 1px solid var(--orange); color: var(--orange); }
+.cta-s:hover { background: var(--ol); }
+
+/* ── Tooltips (KPI info icon) ────────────────────────────────── */
+.tip { position: relative; display: inline-flex; }
+.tip-t {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-bottom: 6px;
+  box-shadow: var(--shadow-md);
+  line-height: 1.5;
+  pointer-events: none;
+  font-weight: 400;
+}
+.tip:hover .tip-t { display: block; }
+
+/* ── Stat delta / value typography ───────────────────────────── */
+.stat-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.stat-delta.up   { background: var(--gl); color: var(--green); }
+.stat-delta.down { background: var(--rl); color: var(--red); }
+
+.val-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--ink3); margin-bottom: 4px; }
+.val-big   { font-family: var(--mono); font-size: 28px; font-weight: 700; letter-spacing: -.6px; line-height: 1; color: var(--ink); }
+.val-big.green { color: var(--green); }
+.val-mid   { font-family: var(--mono); font-size: 18px; font-weight: 700; letter-spacing: -.3px; color: var(--ink); }
+.val-sm    { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--ink); }
+
+/* ── Badges (dashboard-scoped to avoid `.fb` collision) ─────── */
+.d-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.d-badge.bg-green  { background: var(--gl);    color: var(--green); }
+.d-badge.bg-red    { background: var(--rl);    color: var(--red); }
+.d-badge.bg-amber  { background: var(--al);    color: var(--amber); }
+.d-badge.bg-blue   { background: var(--bl);    color: var(--blue); }
+.d-badge.bg-gray   { background: var(--gray-l); color: var(--gray); }
+.d-badge.bg-orange { background: var(--ol);    color: var(--orange); }
+
+/* ── Bars (single & stacked) ─────────────────────────────────── */
+.barx     { width: 100%; height: 8px; background: var(--s3); border-radius: 4px; overflow: hidden; }
+.barx.lg  { height: 10px; border-radius: 5px; }
+.barx-fill{ height: 100%; border-radius: inherit; transition: width .5s ease; }
+
+.stacked  { display: flex; border-radius: 6px; overflow: hidden; width: 100%; }
+.stacked > div { position: relative; transition: width .6s ease; cursor: default; }
+.stacked > div:hover { opacity: .85; }
+.stacked > div:hover .stk-tip { opacity: 1; }
+.stk-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 10;
+}
+
+/* ── Legend ──────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+}
+.leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink2); }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.leg b { color: var(--ink); font-weight: 700; }
+.leg .pct { color: var(--ink3); font-size: 10px; }
+
+/* ── Insight panel ───────────────────────────────────────────── */
+.insight {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--s2);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+.insight b { color: var(--ink); font-weight: 700; }
+.insight .warn { color: var(--amber); font-weight: 600; }
+.insight .good { color: var(--green); font-weight: 600; }
+.insight .bad  { color: var(--red);   font-weight: 600; }
+
+/* ── Plain table (dashboard-local) ───────────────────────────── */
+.dtbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.dtbl th {
+  padding: 8px;
+  text-align: left;
+  color: var(--ink3);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  border-bottom: 1px solid var(--border);
+}
+.dtbl td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+.dtbl tr:last-child td { border-bottom: none; }
+.dtbl tr.overdue { background: var(--rl); }
+.dtbl .fw { font-weight: 600; color: var(--ink); }
+.dtbl .mono { font-family: var(--mono); font-weight: 600; }
+
+/* ── Ranked row chart (label + bar + metric) ─────────────────── */
+.ranked-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.ranked-row:last-child { margin-bottom: 0; }
+.ranked-row .r-name { flex-shrink: 0; width: 130px; min-width: 0; }
+.ranked-row .r-name span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+.ranked-row .r-name .r-badge { margin-top: 2px; }
+.ranked-row .r-bar { flex: 1; min-width: 0; }
+.ranked-row .r-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  min-width: 120px;
+  align-items: center;
+}
+.ranked-row .r-meta .m-dim { color: var(--ink3); }
+.ranked-row .r-meta .m-val { font-weight: 700; color: var(--ink); font-family: var(--mono); }
+
+/* ── Revenue line list (Net Revenue / RTO Impact) ────────────── */
+.rev-line { display: flex; align-items: center; gap: 8px; }
+.rev-dot  { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.rev-lbl  { font-size: 11px; color: var(--ink2); flex: 1; }
+.rev-val  { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.rev-neg  { color: var(--red); }
+.rev-total {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── NDR funnel widgets ──────────────────────────────────────── */
+.funnel-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.funnel-dual .f-col { padding: 16px 20px; }
+.funnel-dual .f-col + .f-col { border-left: 1.5px solid var(--border); }
+.funnel-dual .f-hdr {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+.funnel-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.funnel-step:last-child { margin-bottom: 0; }
+.funnel-n {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.funnel-info { flex: 1; min-width: 0; }
+.funnel-info .f-lbl { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.funnel-info .f-bar { width: 100%; }
+
+.funnel-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+.funnel-3 .f3-col { padding: 12px 16px; }
+.funnel-3 .f3-col + .f3-col { border-left: 1px solid var(--border); }
+.funnel-3 .f3-hdr {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.funnel-3 .f3-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.funnel-3 .f3-row:last-child { border-bottom: none; }
+.funnel-3 .f3-n {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 26px;
+  text-align: center;
+}
+.funnel-3 .f3-lbl { font-size: 11px; color: var(--ink2); }
+
+/* ── Grouped vertical bar chart ──────────────────────────────── */
+.gbar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  width: 100%;
+  padding: 0;
+}
+.gbar-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.gbar-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+}
+.gbar-col {
+  border-radius: 3px 3px 0 0;
+  transition: height .4s ease;
+  flex: 1;
+  min-width: 10px;
+  max-width: 28px;
+}
+.gbar-lbl {
+  font-size: 9px;
+  color: var(--ink3);
+  text-align: center;
+  margin-top: 8px;
+  max-width: 70px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* ── Heatmap table ───────────────────────────────────────────── */
+.ht { width: 100%; border-collapse: collapse; font-size: 11px; }
+.ht th {
+  padding: 6px 8px;
+  text-align: center;
+  color: var(--ink3);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  border-bottom: 1px solid var(--border);
+}
+.ht th:first-child { text-align: left; }
+.ht td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+}
+.ht td:first-child {
+  text-align: left;
+  font-family: var(--font);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 11px;
+}
+.ht tr:last-child td { border-bottom: none; }
+.ht .cell-good { background: var(--gl); color: var(--green); border-radius: 4px; }
+.ht .cell-warn { background: var(--al); color: var(--amber); border-radius: 4px; }
+.ht .cell-bad  { background: var(--rl); color: var(--red);   border-radius: 4px; }
+.ht .cell-neutral { color: var(--ink); }
+
+/* ── Stat tiles (Delivered / In Transit / Failed quick boxes) ─ */
+.stat-tile {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--s2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.stat-tile.good { background: var(--gl); border-color: #b8dfc9; }
+.stat-tile.warn { background: var(--al); border-color: #f0d5a0; }
+.stat-tile.bad  { background: var(--rl); border-color: #f5c6c6; }
+
+/* ── Filter bar (compact pill row) ───────────────────────────── */
+.fbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+.fb-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+.fdiv { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.fc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--s2);
+  border: 1.5px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink2);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: all .15s;
+}
+.fc:hover { border-color: var(--border2); }
+.fc.on { border-color: var(--orange); background: var(--ol); color: var(--orange); }
+
+/* ── Tab fade-in animation reused from base ──────────────────── */
+.d-fade { animation: dFade .3s ease; }
+@keyframes dFade {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

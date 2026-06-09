@@ -15,7 +15,6 @@ export const PerformanceMetricsForm: React.FC<PerformanceMetricsFormProps> = ({
 }) => {
   const rType = watch('rType');
   const perfTypes = watch('perfTypes') || [];
-  const additionalMetrics = watch('additionalMetrics') || {};
 
   if (rType !== 'performance') return null;
 
@@ -30,22 +29,6 @@ export const PerformanceMetricsForm: React.FC<PerformanceMetricsFormProps> = ({
   ];
 
   const isConsolidated = perfTypes.includes('consolidated');
-
-  const handleMetricToggle = (subKey: string, metric: string) => {
-    const subMetrics = additionalMetrics[subKey] || [];
-    let updatedSubMetrics: string[];
-
-    if (subMetrics.includes(metric)) {
-      updatedSubMetrics = subMetrics.filter((m: string) => m !== metric);
-    } else {
-      updatedSubMetrics = [...subMetrics, metric];
-    }
-
-    setValue('additionalMetrics', {
-      ...additionalMetrics,
-      [subKey]: updatedSubMetrics,
-    });
-  };
 
   return (
     <div className="dc">
@@ -88,8 +71,6 @@ export const PerformanceMetricsForm: React.FC<PerformanceMetricsFormProps> = ({
           const config = PERF_OPTIONS[subKey as PerformanceReportType];
           if (!config) return null;
 
-          const currentAddl = additionalMetrics[subKey] || [];
-
           return (
             <div key={subKey} style={{ marginTop: '12px' }}>
               <div className="metrics-zone">
@@ -97,9 +78,25 @@ export const PerformanceMetricsForm: React.FC<PerformanceMetricsFormProps> = ({
                 <div className="mz-body">
                   <div className="mz-section">
                     <div className="mz-section-label">
-                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--orange)', display: 'inline-block' }}></span>{' '}
+                      <span
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: 'var(--orange)',
+                          display: 'inline-block',
+                        }}
+                      />{' '}
                       Default Metrics{' '}
-                      <span style={{ fontSize: '9px', fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: 'var(--ink3)' }}>
+                      <span
+                        style={{
+                          fontSize: '9px',
+                          fontWeight: 400,
+                          textTransform: 'none',
+                          letterSpacing: 0,
+                          color: 'var(--ink3)',
+                        }}
+                      >
                         (always included)
                       </span>
                     </div>
@@ -109,31 +106,6 @@ export const PerformanceMetricsForm: React.FC<PerformanceMetricsFormProps> = ({
                           {m}
                         </span>
                       ))}
-                    </div>
-                  </div>
-
-                  <div className="mz-section" style={{ marginTop: '12px' }}>
-                    <div className="mz-section-label">
-                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--blue)', display: 'inline-block' }}></span>{' '}
-                      Additional Metrics{' '}
-                      <span style={{ fontSize: '9px', fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: 'var(--ink3)' }}>
-                        (click to add)
-                      </span>
-                    </div>
-                    <div className="metrics-chips">
-                      {Object.keys(config.additional).map((m) => {
-                        const isSelected = currentAddl.includes(m);
-                        return (
-                          <span
-                            key={m}
-                            className={`m-chip m-chip-addl ${isSelected ? 'on' : ''}`}
-                            title={config.additional[m]}
-                            onClick={() => handleMetricToggle(subKey, m)}
-                          >
-                            {m}
-                          </span>
-                        );
-                      })}
                     </div>
                   </div>
                 </div>

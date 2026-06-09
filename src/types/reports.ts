@@ -3,7 +3,7 @@ export interface ScheduledReport {
   title: string;
   enabled: boolean;
   recipients: string[];
-  rtype: 'Order Report' | 'NDR Report' | 'Performance Report';
+  rtype: 'Order Report' | 'NDR Report' | 'Product Wise Summary' | 'Performance Report';
   status: string[]; // Selected Order Statuses or Performance Sub-Reports
   sub: string[];    // Selected Order Types (COD, Prepaid, Pick Up) or other options
   freq: 'month' | 'week' | 'day';

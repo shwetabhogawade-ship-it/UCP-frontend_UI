@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useReportsStore } from '../../store/useReportsStore';
 import { reportsApi } from '../../services/reportsApi';
 
@@ -9,14 +9,21 @@ export const SamplePreviewModal: React.FC = () => {
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
+  const previewType = samplePreview?.type;
+
+  useEffect(() => {
+    setActiveTabIdx(0);
+  }, [previewType]);
+
   if (!samplePreview || !samplePreview.open) return null;
 
   const { type: sampleType, title } = samplePreview;
 
   const SAMP_TABS: Record<string, { label: string; key: string }[]> = {
     allorders: [{ label: 'Sample Data', key: 'ao' }],
-    intransit: [{ label: 'Sample Data', key: 'it' }],
+    fwdintransit: [{ label: 'Sample Data', key: 'it' }],
     ndr: [{ label: 'Sample Data', key: 'ndr' }],
+    productwise: [{ label: 'Sample Data', key: 'pw' }],
     performance: [
       { label: 'Overall Delivery', key: 'perf_overall' },
       { label: 'Prepaid / COD', key: 'perf_cod' },
@@ -26,6 +33,15 @@ export const SamplePreviewModal: React.FC = () => {
       { label: 'RTO Reasons', key: 'perf_rto' }
     ]
   };
+
+  const FILENAME_MAP: Record<string, string> = {
+    allorders: 'All_Orders_Sample_Report.xlsx',
+    fwdintransit: 'FWD_InTransit_Orders_Report.xlsx',
+    ndr: 'NDR_Report_Sample.xlsx',
+    productwise: 'Product_Wise_Summary_Report.csv',
+    performance: 'Sample_Performance_Reports.xlsx',
+  };
+  const sampleFilename = FILENAME_MAP[sampleType] || `Sample_${sampleType}_report.xlsx`;
 
   const tabs = SAMP_TABS[sampleType] || [];
   const currentTab = tabs[activeTabIdx] || tabs[0] || { key: 'ao' };
@@ -43,151 +59,184 @@ export const SamplePreviewModal: React.FC = () => {
   const renderTableContent = () => {
     const key = currentTab.key;
     if (key === 'ao') {
+      const aoRows: string[][] = [
+        ['XB666937844', '19/04/2026', 'Rs.1,600', 'PREPAID', 'Amit Verma', 'Pune 411001 to Kolkata 700001', '9188456388', '1.0 kg', 'Pickup Scheduled', 'Rs.91', 'Rs.408', 'Whey Protein Combo'],
+        ['XB999679763', '23/04/2026', 'Rs.4,606', 'COD', 'Karan Patel', 'Delhi 110001 to Hyderabad 500001', '9648036479', '0.5 kg', 'Pickup Not Scheduled', 'Rs.106', 'Rs.461', 'Whey Protein Combo'],
+        ['XB931924341', '15/04/2026', 'Rs.2,353', 'PREPAID', 'Amit Verma', 'Bangalore 560001 to Hyderabad 500001', '9371423823', '4.0 kg', 'In-Transit', 'Rs.53', 'Rs.224', 'Protein Powder 1kg'],
+        ['XB637899121', '16/04/2026', 'Rs.3,655', 'COD', 'Rahul Sharma', 'Bangalore 560001 to Chennai 600001', '9615756698', '2.0 kg', 'Delivered', 'Rs.55', 'Rs.35', 'Protein Powder 1kg'],
+        ['XB185659046', '22/04/2026', 'Rs.3,454', 'COD', 'Sneha Joshi', 'Bangalore 560001 to Kolkata 700001', '9358221973', '4.0 kg', 'RTO', 'Rs.171', 'Rs.396', 'Protein Powder 1kg'],
+        ['XB891115231', '10/04/2026', 'Rs.4,798', 'COD', 'Sneha Joshi', 'Bangalore 560001 to Chennai 600001', '9843130364', '5.0 kg', 'RTO', 'Rs.120', 'Rs.24', 'Mass Gainer 2kg'],
+        ['XB550850041', '10/04/2026', 'Rs.2,308', 'PREPAID', 'Karan Patel', 'Mumbai 400001 to Hyderabad 500001', '9667234179', '3.0 kg', 'In-Transit', 'Rs.163', 'Rs.135', 'Vitamin Gummies'],
+      ];
       return (
         <table className="stbl-s">
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>AWB</th>
-              <th>Status</th>
-              <th>Payment</th>
-              <th>Origin</th>
-              <th>Destination</th>
-              <th>Weight</th>
+              <th>AWB Number</th>
               <th>Order Date</th>
-              <th>Delivery Date</th>
+              <th>Amount</th>
+              <th>Payment</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Contact</th>
+              <th>Weight</th>
+              <th>Status</th>
+              <th>Shipping Chrg.</th>
+              <th>Discount</th>
+              <th>Product</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>ORD-20010</td>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487239</td>
-              <td>Delivered</td>
-              <td>COD</td>
-              <td>Mumbai Hub</td>
-              <td>Delhi</td>
-              <td>1.2 kg</td>
-              <td>01 Apr</td>
-              <td>04 Apr</td>
-            </tr>
-            <tr>
-              <td>ORD-20011</td>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487240</td>
-              <td>RTO</td>
-              <td>Prepaid</td>
-              <td>Pune Hub</td>
-              <td>Bangalore</td>
-              <td>0.8 kg</td>
-              <td>02 Apr</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td>ORD-20012</td>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487241</td>
-              <td>In Transit</td>
-              <td>COD</td>
-              <td>Chennai</td>
-              <td>Hyderabad</td>
-              <td>2.1 kg</td>
-              <td>03 Apr</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td>ORD-20013</td>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487242</td>
-              <td>Delivered</td>
-              <td>Prepaid</td>
-              <td>Delhi Hub</td>
-              <td>Jaipur</td>
-              <td>0.5 kg</td>
-              <td>04 Apr</td>
-              <td>06 Apr</td>
-            </tr>
+            {aoRows.map((row, idx) => (
+              <tr key={idx}>
+                {row.map((cell, j) => (
+                  <td key={j} style={j === 0 ? { fontFamily: 'var(--mono)' } : undefined}>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       );
     } else if (key === 'it') {
+      const itRows: Array<{ awb: string; orderId: string; address: string; status: 'Ontime' | 'Delayed'; edd: string; days: string }> = [
+        { awb: 'XB293321676', orderId: 'ORD94874', address: 'Bangalore 560001 to Kolkata 700001', status: 'Ontime', edd: '26/04/2026', days: '7 days' },
+        { awb: 'XB372161168', orderId: 'ORD39251', address: 'Bangalore 560001 to Ahmedabad 380001', status: 'Delayed', edd: '04/04/2026', days: '7 days' },
+        { awb: 'XB389212598', orderId: 'ORD18382', address: 'Delhi 110001 to Ahmedabad 380001', status: 'Delayed', edd: '25/04/2026', days: '6 days' },
+        { awb: 'XB420063942', orderId: 'ORD52017', address: 'Pune 411001 to Ahmedabad 380001', status: 'Ontime', edd: '07/04/2026', days: '3 days' },
+        { awb: 'XB940076390', orderId: 'ORD38912', address: 'Bangalore 560001 to Ahmedabad 380001', status: 'Ontime', edd: '22/04/2026', days: '7 days' },
+        { awb: 'XB827822276', orderId: 'ORD16674', address: 'Delhi 110001 to Hyderabad 500001', status: 'Ontime', edd: '01/05/2026', days: '2 days' },
+        { awb: 'XB406803674', orderId: 'ORD32487', address: 'Delhi 110001 to Chennai 600001', status: 'Delayed', edd: '08/04/2026', days: '6 days' },
+        { awb: 'XB785898879', orderId: 'ORD25229', address: 'Delhi 110001 to Hyderabad 500001', status: 'Delayed', edd: '19/04/2026', days: '7 days' },
+      ];
       return (
         <table className="stbl-s">
           <thead>
             <tr>
-              <th>AWB</th>
+              <th>AWB No.</th>
               <th>Order ID</th>
-              <th>Last Hub Scan</th>
-              <th>Hub Location</th>
+              <th>Address</th>
+              <th>Status</th>
               <th>EDD</th>
-              <th>SLA Status</th>
-              <th>Days in Transit</th>
+              <th>Days In-Transit</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150488010</td>
-              <td>ORD-21100</td>
-              <td>17 May, 08:42</td>
-              <td>Delhi DC</td>
-              <td>18 May</td>
-              <td><span style={{ color: 'var(--green)', fontWeight: 600 }}>On Time</span></td>
-              <td>3</td>
-            </tr>
-            <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150488011</td>
-              <td>ORD-21101</td>
-              <td>16 May, 15:15</td>
-              <td>Bangalore Sorting</td>
-              <td>17 May</td>
-              <td><span style={{ color: 'var(--red)', fontWeight: 600 }}>Delayed</span></td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150488012</td>
-              <td>ORD-21102</td>
-              <td>17 May, 07:55</td>
-              <td>Hyderabad Hub</td>
-              <td>18 May</td>
-              <td><span style={{ color: 'var(--green)', fontWeight: 600 }}>On Time</span></td>
-              <td>2</td>
-            </tr>
+            {itRows.map((r) => (
+              <tr key={r.awb}>
+                <td style={{ fontFamily: 'var(--mono)' }}>{r.awb}</td>
+                <td>{r.orderId}</td>
+                <td>{r.address}</td>
+                <td>
+                  <span style={{ color: r.status === 'Ontime' ? 'var(--green)' : 'var(--red)', fontWeight: 600 }}>
+                    {r.status}
+                  </span>
+                </td>
+                <td>{r.edd}</td>
+                <td>{r.days}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       );
     } else if (key === 'ndr') {
+      const ndrRows: Array<{
+        orderAwb: string;
+        address: string;
+        shipType: string;
+        attempts: string;
+        reason: string;
+        payment: string;
+        updated: string;
+        actionBy: string;
+        priority: 'Critical Action Required' | 'Action Required' | 'No-Action Required';
+      }> = [
+        { orderAwb: 'ORD59723 / XB199329026', address: 'Mumbai 400001', shipType: 'XPRESSBEES Air', attempts: '5', reason: 'Future Delivery Requested', payment: 'Rs.4,651 - PREPAID', updated: '10/04/2026', actionBy: 'Seller', priority: 'No-Action Required' },
+        { orderAwb: 'ORD70093 / XB414479272', address: 'Delhi 110001', shipType: 'XPRESSBEES Air', attempts: '3', reason: 'Address Incomplete', payment: 'Rs.2,004 - COD', updated: '19/04/2026', actionBy: 'XpressBees', priority: 'Critical Action Required' },
+        { orderAwb: 'ORD58933 / XB917336369', address: 'Hyderabad 500001', shipType: 'XPRESSBEES Air', attempts: '3', reason: 'Customer Refused', payment: 'Rs.2,141 - COD', updated: '26/04/2026', actionBy: 'XpressBees', priority: 'Action Required' },
+        { orderAwb: 'ORD86903 / XB150226877', address: 'Pune 411001', shipType: 'XPRESSBEES Surface', attempts: '3', reason: 'Customer Refused', payment: 'Rs.2,773 - COD', updated: '22/04/2026', actionBy: 'Seller', priority: 'No-Action Required' },
+        { orderAwb: 'ORD25891 / XB891711905', address: 'Delhi 110001', shipType: 'XPRESSBEES Surface', attempts: '1', reason: 'Incorrect Pincode', payment: 'Rs.2,641 - PREPAID', updated: '16/04/2026', actionBy: 'XpressBees', priority: 'Critical Action Required' },
+        { orderAwb: 'ORD69063 / XB845379411', address: 'Pune 411001', shipType: 'XPRESSBEES Air', attempts: '5', reason: 'Customer Not Available', payment: 'Rs.3,182 - PREPAID', updated: '13/04/2026', actionBy: 'Seller', priority: 'Action Required' },
+        { orderAwb: 'ORD22039 / XB502719388', address: 'Mumbai 400001', shipType: 'XPRESSBEES Air', attempts: '4', reason: 'Customer Refused', payment: 'Rs.3,147 - COD', updated: '30/04/2026', actionBy: 'XpressBees', priority: 'No-Action Required' },
+      ];
       return (
         <table className="stbl-s">
           <thead>
             <tr>
-              <th>AWB</th>
-              <th>NDR Reason</th>
+              <th>Order / AWB</th>
+              <th>Delivery Address</th>
+              <th>Shipment Type</th>
               <th>Attempts</th>
-              <th>NDR Date</th>
-              <th>Age (Days)</th>
-              <th>Seller Action</th>
+              <th>NDR Reason</th>
+              <th>Payment</th>
+              <th>Last Updated</th>
+              <th>Last Action By</th>
+              <th>Action Priority</th>
             </tr>
           </thead>
           <tbody>
+            {ndrRows.map((r) => (
+              <tr key={r.orderAwb}>
+                <td>{r.orderAwb}</td>
+                <td>{r.address}</td>
+                <td>{r.shipType}</td>
+                <td>{r.attempts}</td>
+                <td>{r.reason}</td>
+                <td>{r.payment}</td>
+                <td>{r.updated}</td>
+                <td>{r.actionBy}</td>
+                <td>
+                  {r.priority === 'Critical Action Required' ? (
+                    <span style={{ color: 'var(--red)', fontWeight: 600 }}>{r.priority}</span>
+                  ) : (
+                    r.priority
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    } else if (key === 'pw') {
+      const pwRows: Array<[string, string, string, string, string, string, string, string]> = [
+        ['Whey Protein Combo', 'SKU-WPC-001', '42', '8', '6', '12', '14', '2'],
+        ['Protein Powder 1kg', 'SKU-PP1-002', '38', '5', '4', '10', '17', '2'],
+        ['Mass Gainer 2kg', 'SKU-MG2-003', '29', '3', '5', '8', '11', '2'],
+        ['Yoga Mat', 'SKU-YM-004', '24', '2', '3', '6', '11', '2'],
+        ['Vitamin Gummies', 'SKU-VG-005', '18', '1', '2', '5', '8', '2'],
+      ];
+      return (
+        <table className="stbl-s">
+          <thead>
             <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487300</td>
-              <td>Customer Not Available</td>
-              <td>2</td>
-              <td>15 May</td>
-              <td>2</td>
-              <td>Reattempt</td>
+              <th>Product Name</th>
+              <th>Product SKU</th>
+              <th>Total Order Qty</th>
+              <th>Booked</th>
+              <th>Pending Pickup</th>
+              <th>In Transit</th>
+              <th>Delivered</th>
+              <th>RTO</th>
             </tr>
-            <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487301</td>
-              <td>Wrong Address</td>
-              <td>1</td>
-              <td>16 May</td>
-              <td>1</td>
-              <td>Address Update</td>
-            </tr>
-            <tr>
-              <td style={{ fontFamily: 'var(--mono)' }}>XB150487302</td>
-              <td>Customer Refused</td>
-              <td>3</td>
-              <td>14 May</td>
-              <td>3</td>
-              <td>RTO Initiated</td>
+          </thead>
+          <tbody>
+            {pwRows.map((row) => (
+              <tr key={row[1]}>
+                {row.map((cell, idx) => (
+                  <td key={idx}>{idx === 0 ? <b>{cell}</b> : cell}</td>
+                ))}
+              </tr>
+            ))}
+            <tr className="total-row">
+              <td><b>TOTAL</b></td>
+              <td>-</td>
+              <td><b>151</b></td>
+              <td><b>19</b></td>
+              <td><b>20</b></td>
+              <td><b>41</b></td>
+              <td><b>61</b></td>
+              <td><b>10</b></td>
             </tr>
           </tbody>
         </table>
@@ -565,7 +614,7 @@ export const SamplePreviewModal: React.FC = () => {
           <div className="samp-dl-bar">
             <div>
               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--green)' }}>
-                📊 Sample_{sampleType}_report.xlsx
+                📊 {sampleFilename}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--ink3)', marginTop: '1px' }}>
                 Preview only · actual export reflects your date range

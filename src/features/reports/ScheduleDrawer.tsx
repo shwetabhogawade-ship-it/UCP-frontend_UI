@@ -9,7 +9,7 @@ import { PERF_OPTIONS } from './perfConstants';
 import type { PerformanceReportType } from '../../types/reports';
 
 interface FormValues {
-  rType: 'order' | 'ndr' | 'performance' | '';
+  rType: 'order' | 'ndr' | 'productwise' | 'performance' | '';
   rName: string;
   rEmail: string;
   orderTypes: string[];
@@ -54,15 +54,15 @@ export const ScheduleDrawer: React.FC = () => {
   });
 
   const editingReport = drawer.editingId ? reports.find(r => r.id === drawer.editingId) : null;
-  const watchType = watch('rType');
 
   // Sync edit values
   useEffect(() => {
     if (drawer.open) {
       if (editingReport) {
-        const typeMap: Record<string, 'order' | 'ndr' | 'performance'> = {
+        const typeMap: Record<string, 'order' | 'ndr' | 'productwise' | 'performance'> = {
           'Order Report': 'order',
           'NDR Report': 'ndr',
+          'Product Wise Summary': 'productwise',
           'Performance Report': 'performance',
         };
         const rTypeVal = typeMap[editingReport.rtype] || 'order';
@@ -123,6 +123,10 @@ export const ScheduleDrawer: React.FC = () => {
       name = data.rName.trim();
       statusValues = ['Undelivered', 'NDR Raised'];
       subValues = ['COD', 'Prepaid'];
+    } else if (data.rType === 'productwise') {
+      name = data.rName.trim();
+      statusValues = ['All Products'];
+      subValues = ['-'];
     } else if (data.rType === 'performance') {
       if (data.perfTypes.length === 0) {
         showToast('Select at least one report type');
@@ -139,11 +143,13 @@ export const ScheduleDrawer: React.FC = () => {
       subValues = isConsolidated ? ['All types'] : data.perfTypes;
     }
 
-    const typeLabel =
+    const typeLabel: 'Order Report' | 'NDR Report' | 'Product Wise Summary' | 'Performance Report' =
       data.rType === 'order'
         ? 'Order Report'
         : data.rType === 'ndr'
         ? 'NDR Report'
+        : data.rType === 'productwise'
+        ? 'Product Wise Summary'
         : 'Performance Report';
 
     const freqLabel =
@@ -153,7 +159,7 @@ export const ScheduleDrawer: React.FC = () => {
       title: name,
       enabled: editingReport ? editingReport.enabled : true,
       recipients: recipientsList,
-      rtype: typeLabel as any,
+      rtype: typeLabel,
       status: statusValues,
       sub: subValues,
       freq: data.freq,
@@ -209,10 +215,8 @@ export const ScheduleDrawer: React.FC = () => {
             <PerformanceMetricsForm watch={watch} setValue={setValue} />
           </div>
 
-          {/* RIGHT PANEL */}
-          {watchType && (
-            <FrequencyForm watch={watch} setValue={setValue} register={register} />
-          )}
+          {/* RIGHT PANEL — always visible per v2 spec */}
+          <FrequencyForm watch={watch} setValue={setValue} register={register} />
         </div>
 
         <div className="drw-ft">

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1440"/>
+<title>Reports · XpressBees Seller Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--surface:#FFF;--s2:#F8F7F3;--s3:#EEECEA;
+  --border:#E2E0D8;--border2:#C5C3BB;
+  --ink:#1A190F;--ink2:#5C5B52;--ink3:#9B998F;
+  --orange:#E8520A;--ol:#FEF0E8;--om:#F5C09A;
+  --red:#C52E18;--rl:#FDECEA;--rm:#F9B8B0;
+  --green:#1A6B3A;--gl:#E7F5ED;--gm:#8DD4A9;
+  --amber:#9E5A00;--al:#FFF5E5;--am:#F5C878;
+  --blue:#1246A0;--bl:#EAF0FD;--bm:#8EAFF0;
+  --gray-m:#C3C1B8;
+  --shadow:0 1px 3px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.13);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sb{width:54px;background:#0F0E09;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 0 18px;gap:4px}
+.sb-logo{width:34px;height:34px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.sb-logo svg{width:18px;height:18px;fill:#fff}
+.sb-i{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#46443C;transition:all .15s}
+.sb-i:hover{background:#1C1B14;color:#8A8878}.sb-i.on{background:var(--orange);color:#fff}.sb-i svg{width:16px;height:16px}
+.sb-sep{width:26px;height:1px;background:#222118;margin:5px 0}.sb-f{flex:1}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+/* ══ TOPBAR — 2026 refresh: Search · Wallet · Quick Actions · MR avatar ══ */
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tb-srch{flex:1;max-width:420px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;height:34px;padding:0 12px;transition:border-color .15s,box-shadow .15s}
+.tb-srch:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.tb-srch svg{flex-shrink:0;opacity:.6}
+.tb-srch input{border:none;background:transparent;outline:none;font-family:var(--font);font-size:12px;color:var(--ink);width:100%;min-width:0}
+.tb-srch input::placeholder{color:var(--ink3)}
+.tb-r{display:flex;align-items:center;gap:10px;margin-left:auto}
+.tb-wallet{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;cursor:pointer;border:1px solid var(--border);border-radius:8px;background:#fff;font-family:var(--font);white-space:nowrap;transition:background .12s,border-color .12s}
+.tb-wallet:hover{background:#F9F8F5;border-color:#D6D4CC}
+.tb-wallet-ico{display:inline-flex;align-items:center;flex-shrink:0}
+.tb-wallet-ico svg{width:16px;height:16px}
+.tb-wallet-lbl{font-size:12px;font-weight:500;color:#6B6960;line-height:1}
+.tb-wallet-amount{font-size:12.5px;font-weight:700;color:var(--ink);font-family:var(--mono);line-height:1}
+.tb-qa{display:inline-flex;align-items:center;height:34px;padding:0 14px;cursor:pointer;border:1px solid var(--border);border-radius:8px;background:#fff;font-family:var(--font);font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;transition:background .12s,border-color .12s}
+.tb-qa:hover{background:#F9F8F5;border-color:#D6D4CC}
+.tb-av{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--ol);border:1.5px solid var(--om);font-size:11px;font-weight:700;color:var(--orange);cursor:pointer;flex-shrink:0;transition:filter .12s;font-family:var(--font)}
+.tb-av:hover{filter:brightness(.97)}
+.page{flex:1;overflow-y:auto;padding:20px 24px 60px}
+.page::-webkit-scrollbar{width:6px}.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.mod-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.mod-tab{padding:10px 24px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;user-select:none}
+.mod-tab:hover{color:var(--ink2)}.mod-tab.on{color:var(--ink);border-bottom-color:var(--orange)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.btn-p{background:var(--orange);color:#fff}.btn-p:hover{opacity:.88}
+.btn-s{background:var(--surface);color:var(--ink2);border:1.5px solid var(--border)}.btn-s:hover{border-color:var(--border2)}
+.btn-sm{height:30px;padding:0 12px;font-size:12px;border-radius:7px}
+.btn-ghost-blue{background:none;border:1.5px solid var(--bm);color:var(--blue);height:28px;padding:0 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-ghost-blue:hover{background:var(--bl)}
+.page-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.date-filter-wrap{position:relative;display:inline-block}
+.date-filter-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.date-filter-btn:hover{border-color:var(--border2)}.date-filter-btn.open{border-color:var(--orange);background:var(--ol);color:var(--orange)}
+.date-filter-btn .chev{font-size:9px;color:var(--ink3);transition:transform .15s;margin-left:2px}.date-filter-btn.open .chev{transform:rotate(180deg);color:var(--orange)}
+.date-dd{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);min-width:260px;z-index:500;display:none;overflow:hidden}
+.date-dd.sh{display:block}
+.date-dd-opt{padding:10px 16px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;border-bottom:.5px solid var(--border);transition:background .1s;display:flex;align-items:center;justify-content:space-between}
+.date-dd-opt:last-child{border-bottom:none}.date-dd-opt:hover{background:var(--s2)}.date-dd-opt.on{background:var(--ol);color:var(--orange);font-weight:600}
+.date-dd-opt .chk{color:var(--orange);font-size:13px}
+.custom-range{display:none;padding:12px 16px;border-top:1px solid var(--border);background:var(--s2)}
+.custom-range.sh{display:block}
+.cr-label{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.cr-yms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cr-ym-sel{height:32px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font);padding:0 8px;background:var(--surface);color:var(--ink);outline:none;cursor:pointer;width:100%}
+.cr-ym-sel:focus{border-color:var(--orange)}
+.cr-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cr-input-wrap{position:relative}
+.cr-input-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none}
+.cr-input{width:100%;height:34px;border:1.5px solid var(--border);border-radius:6px;padding:0 8px 0 28px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--surface);outline:none;cursor:pointer}
+.cr-input:focus{border-color:var(--orange)}
+.cr-apply{width:100%;height:32px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.ir-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ir-card{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:border-color .15s}
+.ir-card:hover{border-color:var(--border2)}
+.ir-card-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:8px}
+.ir-card-title{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-.2px;margin-bottom:4px}
+.ir-card-desc{font-size:12px;color:var(--ink3);line-height:1.55}
+.ir-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.perf-types-list{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.perf-type-pill{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;background:var(--s3);color:var(--ink2);border:1px solid var(--border)}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ts{overflow-x:auto}
+table.stbl{width:100%;border-collapse:collapse;min-width:1160px}
+.stbl thead tr{background:var(--s2)}
+.stbl th{padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+.stbl td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--ink2);vertical-align:middle}
+.stbl tr:last-child td{border-bottom:none}
+.stbl tr:hover td{background:var(--s2)}
+.row-new td{animation:rowHL 3s ease forwards}
+@keyframes rowHL{0%{background:rgba(26,107,58,.12)}100%{background:transparent}}
+.tog{position:relative;width:36px;height:20px;cursor:pointer;display:inline-block;vertical-align:middle}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-t{display:block;width:36px;height:20px;border-radius:10px;background:var(--gray-m);transition:background .15s;position:relative}
+.tog input:checked+.tog-t{background:var(--gm)}
+.tog-t::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog input:checked+.tog-t::after{transform:translateX(16px)}
+.fb{display:inline-flex;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.fb-m{background:var(--bl);color:var(--blue)}.fb-w{background:var(--al);color:var(--amber)}.fb-d{background:var(--gl);color:var(--green)}
+.mp{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--s3);color:var(--ink2);cursor:default;position:relative;margin-left:4px;vertical-align:middle}
+.mp:hover{background:var(--border)}
+.mp-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:#1A190F;color:#fff;border-radius:9px;padding:10px 14px;font-size:11px;line-height:1.8;min-width:200px;max-width:300px;z-index:600;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;box-shadow:var(--shadow-md);white-space:nowrap}
+.mp-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1A190F}
+.mp:hover .mp-tip{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.mp-emails{display:flex;flex-direction:column;gap:2px}
+.gbl{background:none;border:none;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--font);padding:4px 6px;border-radius:6px;transition:all .12s}
+.gbl:hover{background:var(--bl)}
+.gbr{background:none;border:none;font-size:12px;font-weight:600;color:var(--red);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--font);padding:4px 6px;border-radius:6px;transition:all .12s}
+.gbr:hover{background:var(--rl)}
+.drw-ov{position:fixed;inset:0;background:rgba(10,10,5,.45);z-index:700;display:none;align-items:stretch;justify-content:flex-end}
+.drw-ov.sh{display:flex}
+.drw{background:var(--bg);width:960px;height:100vh;display:flex;flex-direction:column;animation:sIn .24s ease;box-shadow:-2px 0 24px rgba(0,0,0,.14)}
+@keyframes sIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.drw-hdr{height:56px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.drw-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;padding:5px 8px;border-radius:7px;transition:all .14s}
+.drw-back:hover{background:var(--s2);color:var(--ink)}
+.drw-title{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.drw-body{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:start}
+.drw-body::-webkit-scrollbar{width:5px}.drw-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.drw-ft{border-top:1px solid var(--border);background:var(--surface);padding:14px 24px;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.dc{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px}
+.dc:last-child{margin-bottom:0}
+.dc-title{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px;letter-spacing:-.2px}
+.dc-ico{width:30px;height:30px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mf{margin-bottom:16px}.mf:last-child{margin-bottom:0}
+.ml{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.45px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ml-note{font-size:10px;color:var(--ink3);margin-top:3px;font-weight:400}
+.mi{width:100%;height:40px;border:1.5px solid var(--border);border-radius:7px;padding:0 13px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;transition:all .15s;-webkit-appearance:none}
+.mi:focus{border-color:var(--orange);background:var(--surface);box-shadow:0 0 0 3px var(--ol)}
+.mi::placeholder{color:var(--ink3)}
+.mi-sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239B998F' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer}
+.msd{position:relative;width:100%}
+.msd-box{width:100%;min-height:42px;border:1.5px solid var(--border);border-radius:7px;padding:6px 36px 6px 10px;background:var(--s2);display:flex;flex-wrap:wrap;gap:5px;align-items:center;cursor:pointer;transition:all .15s;position:relative}
+.msd-box:hover{border-color:var(--border2)}.msd-box.open{border-color:var(--orange);background:var(--surface);box-shadow:0 0 0 3px var(--ol)}
+.msd-arrow{position:absolute;right:11px;top:50%;transform:translateY(-50%);pointer-events:none;transition:transform .15s;color:var(--ink3)}
+.msd-box.open .msd-arrow{transform:translateY(-50%) rotate(180deg)}
+.msd-ph{font-size:12px;color:var(--ink3);line-height:1}
+.msd-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);z-index:600;max-height:230px;overflow-y:auto;display:none}
+.msd-dd.open{display:block}
+.msd-opt{display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;font-size:12px;color:var(--ink2);border-bottom:.5px solid var(--border);transition:background .1s;user-select:none}
+.msd-opt:last-child{border-bottom:none}.msd-opt:hover{background:var(--s2)}.msd-opt.sel{background:var(--ol)}
+.msd-cb{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.msd-opt.sel .msd-cb{background:var(--orange);border-color:var(--orange)}
+.msd-opt.sel .msd-cb::after{content:'';display:block;width:8px;height:8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 6'%3E%3Cpath d='M1 3l2 2 4-4' stroke='%23fff' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-size:contain;background-repeat:no-repeat}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 7px 3px 9px;border-radius:5px;background:var(--surface);border:1px solid var(--border2);font-size:11px;font-weight:500;color:var(--ink);white-space:nowrap;line-height:1.4}
+.tag-x{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:9px;flex-shrink:0;transition:all .12px;line-height:1}
+.tag-x:hover{background:var(--border2);color:var(--ink)}
+.ftabs{display:flex;gap:8px;flex-wrap:wrap}
+.ftab{padding:7px 18px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;user-select:none}
+.ftab:hover{border-color:var(--border2)}.ftab.on{border-color:var(--orange);background:var(--ol);color:var(--orange)}.ftab.dis{opacity:.4;cursor:not-allowed;pointer-events:none}
+.date-input-wrap{position:relative;width:100%}
+.date-input-wrap input[type="date"]{width:100%;height:40px;border:1.5px solid var(--border);border-radius:7px;padding:0 12px 0 38px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;transition:all .15s;cursor:pointer;-webkit-appearance:none}
+.date-input-wrap input[type="date"]:focus{border-color:var(--orange);background:var(--surface);box-shadow:0 0 0 3px var(--ol)}
+.date-cal-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink3)}
+.ibar{display:flex;align-items:flex-start;gap:8px;padding:10px 13px;border-radius:8px;font-size:12px;line-height:1.6}
+.ibar-blue{background:var(--bl);border:1px solid var(--bm);color:var(--blue)}
+.ndr-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--amber);font-weight:500;margin-top:8px;padding:8px 12px;background:var(--al);border:1px solid var(--am);border-radius:7px}
+.fsumm{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--ink2);line-height:1.8;margin-top:14px}
+.fsumm b{color:var(--ink);font-weight:700}
+.view-sample-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;padding:6px 0;border:none;background:none;font-family:var(--font);text-decoration:underline;text-underline-offset:2px}
+.view-sample-link:hover{opacity:.75}
+/* Metric chips */
+.metrics-chips{display:flex;flex-wrap:wrap;gap:6px}
+.m-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px 4px 10px;border-radius:6px;font-size:11px;font-weight:500;border:1.5px solid var(--border2);background:var(--surface);color:var(--ink);user-select:none;line-height:1.4;transition:all .14s}
+.m-chip-def{background:var(--surface);border-color:var(--border2);color:var(--ink);cursor:default}
+.m-chip-addl{background:var(--s2);border-color:var(--border);color:var(--ink3);cursor:pointer}
+.m-chip-addl:hover{border-color:var(--border2);background:var(--surface);color:var(--ink2)}
+.m-chip-addl.on{background:var(--surface);border-color:var(--border2);color:var(--ink)}
+.m-chip-x{width:14px;height:14px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:9px;flex-shrink:0;transition:all .12s;line-height:1;margin-left:1px}
+.m-chip-x:hover{background:var(--border2);color:var(--ink)}
+.mz-section-label{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.45px;margin-bottom:8px;margin-top:14px}
+.mz-section-label:first-child{margin-top:0}
+/* Modals */
+.mo-ov{position:fixed;inset:0;background:rgba(10,10,5,.45);z-index:800;display:none;align-items:center;justify-content:center}
+.mo-ov.sh{display:flex}
+.mo{background:#fff;border-radius:16px;width:460px;padding:36px 36px 32px;text-align:center;box-shadow:var(--shadow-lg);animation:mpop .22s cubic-bezier(.34,1.56,.64,1);position:relative}
+@keyframes mpop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.mo-ring{width:70px;height:70px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 0 10px rgba(26,107,58,.1),0 0 0 20px rgba(26,107,58,.05)}
+.mo-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin-bottom:6px}
+.mo-sub{font-size:12px;color:var(--ink3);line-height:1.7}
+.mo-detail{margin-top:14px;background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;text-align:left;font-size:12px;color:var(--ink2);line-height:1.7}
+.mo-detail b{color:var(--ink);font-weight:600}
+.mo-x{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--ink3)}
+.mo-x:hover{background:var(--s3)}
+.del-mo{background:#fff;border-radius:14px;width:420px;padding:28px;position:relative;box-shadow:var(--shadow-lg);animation:mpop .22s cubic-bezier(.34,1.56,.64,1)}
+.del-mo-ico{width:48px;height:48px;border-radius:12px;background:var(--rl);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.del-mo-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.del-mo-sub{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:16px}
+.del-mo-card{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:20px}
+.del-mo-card-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:.5px solid var(--border)}
+.del-mo-card-row:last-child{border-bottom:none}
+.del-mo-card-lbl{color:var(--ink3)}.del-mo-card-val{color:var(--ink);font-weight:600;text-align:right}
+.del-mo-btns{display:flex;gap:10px;justify-content:flex-end}
+.samp-mo{background:#fff;border-radius:16px;width:780px;max-height:86vh;overflow-y:auto;padding:28px;position:relative;box-shadow:var(--shadow-lg);animation:mpop .22s cubic-bezier(.34,1.56,.64,1)}
+.samp-mo::-webkit-scrollbar{width:4px}.samp-mo::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.samp-mo-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.samp-mo-title{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.samp-mo-sub{font-size:12px;color:var(--ink3);margin-top:3px}
+.samp-tabs{display:flex;gap:0;border-bottom:1.5px solid var(--border);margin-bottom:14px;overflow-x:auto}
+.samp-tab{padding:7px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all .14s;white-space:nowrap;user-select:none}
+.samp-tab.on{color:var(--orange);border-bottom-color:var(--orange)}
+.samp-tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:9px;margin-bottom:14px}
+table.stbl-s{width:100%;border-collapse:collapse;min-width:500px}
+.stbl-s thead tr{background:var(--s2)}
+.stbl-s th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.stbl-s td{padding:10px 12px;border-bottom:.5px solid var(--border);font-size:12px;color:var(--ink2);white-space:nowrap}
+.stbl-s tr:last-child td{border-bottom:none}
+.stbl-s .total-row td{font-weight:700;color:var(--ink);background:var(--s2)}
+.samp-dl-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--gl);border:1px solid var(--gm);border-radius:9px}
+.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.2)}
+.toast-el.sh{transform:translateX(-50%) translateY(0)}
+.fade{animation:fi .25s ease}@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+
+<body>
+<div class="shell">
+<nav class="sb">
+  <div class="sb-logo"><svg viewBox="0 0 20 20"><path d="M3 10L10 3l7 7M5 8.5v9h4v-5h2v5h4v-9"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12M4 8h8M4 12h10M4 16h6" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15l4-4 3 3 4-5 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18h14" stroke-linecap="round"/></svg></div>
+  <div class="sb-sep"></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L2 7v6l8 5 8-5V7L10 2z" stroke-linejoin="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7 9a3 3 0 015.5 1.5c0 1.5-2 2-2 3M10 15.5h.01" stroke-linecap="round"/></svg></div>
+  <div class="sb-f"></div><div class="sb-sep"></div>
+  <div class="sb-i on"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="4" rx="1.5"/><rect x="3" y="9" width="14" height="4" rx="1.5"/><rect x="3" y="15" width="8" height="2" rx="1"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2" stroke-linecap="round"/></svg></div>
+</nav>
+<div class="main">
+<div class="topbar" role="banner">
+  <div class="tb-srch" role="search">
+    <svg viewBox="0 0 16 16" fill="none" stroke="var(--ink3)" stroke-width="1.5" width="14" height="14"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Search orders, AWB, customer..." aria-label="Search"/>
+  </div>
+  <div class="tb-r" role="toolbar" aria-label="Top bar actions">
+    <button type="button" class="tb-wallet" title="Wallet balance">
+      <span class="tb-wallet-ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" stroke-width="1.22"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M1.5 7.5H14.5" stroke-linecap="round"/><path d="M11.5 6.5H12.5" stroke-linecap="round"/></svg>
+      </span>
+      <span class="tb-wallet-lbl">Wallet:</span>
+      <span class="tb-wallet-amount">&#8377;1,741.32</span>
+    </button>
+    <button type="button" class="tb-qa" aria-label="Quick Actions">Quick Actions</button>
+    <button type="button" class="tb-av" aria-label="Account menu">MR</button>
+  </div>
+</div>
+<div class="page fade">
+  <div style="margin-bottom:20px"><div style="font-size:20px;font-weight:700;letter-spacing:-.4px">Reports</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Download instant reports or manage automated scheduled delivery</div></div>
+  <div class="mod-tabs">
+    <div class="mod-tab on" id="tabInstant" onclick="switchModTab('instant')">Instant Reports</div>
+    <div class="mod-tab" id="tabScheduled" onclick="switchModTab('scheduled')">Scheduled Reports</div>
+  </div>
+
+  <!-- INSTANT REPORTS -->
+  <div id="panelInstant">
+    <div class="page-topbar">
+      <div class="date-filter-wrap">
+        <div class="date-filter-btn" id="dateFilterBtn" onclick="toggleDateDD()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 7h12M5 2v2M11 2v2" stroke-linecap="round"/></svg>
+          <span id="dateFilterLabel">Last 30 Days</span><span class="chev">&#9660;</span>
+        </div>
+        <div class="date-dd" id="dateDd">
+          <div class="date-dd-opt" onclick="setDateRange('last7','Last 7 Days',this)">Last 7 Days</div>
+          <div class="date-dd-opt on" onclick="setDateRange('last30','Last 30 Days',this)">Last 30 Days<span class="chk">&#10003;</span></div>
+          <div class="date-dd-opt" onclick="setDateRange('thismonth','This Month',this)">This Month</div>
+          <div class="date-dd-opt" onclick="setDateRange('lastmonth','Last Month',this)">Last Month</div>
+          <div class="date-dd-opt" onclick="toggleCustomRange()">Custom Range <span style="font-size:10px;color:var(--ink3)">&#8594;</span></div>
+          <div class="custom-range" id="customRange">
+            <div class="cr-label">Jump to Month / Year</div>
+            <div class="cr-yms">
+              <select class="cr-ym-sel" id="crYear" onchange="updateCustomFromYM()"><option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option></select>
+              <select class="cr-ym-sel" id="crMonth" onchange="updateCustomFromYM()"><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05" selected>May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>
+            </div>
+            <div class="cr-label">Or select exact dates</div>
+            <div class="cr-row">
+              <div class="cr-input-wrap"><svg viewBox="0 0 14 14" fill="none" stroke="var(--ink3)" stroke-width="1.3" width="12" height="12"><rect x="1" y="2" width="12" height="11" rx="1.5"/><path d="M1 6h12M4 1v2M10 1v2" stroke-linecap="round"/></svg><input class="cr-input" type="date" id="crFrom" value="2026-04-25" oninput="updateCustomLabel()"/></div>
+              <div class="cr-input-wrap"><svg viewBox="0 0 14 14" fill="none" stroke="var(--ink3)" stroke-width="1.3" width="12" height="12"><rect x="1" y="2" width="12" height="11" rx="1.5"/><path d="M1 6h12M4 1v2M10 1v2" stroke-linecap="round"/></svg><input class="cr-input" type="date" id="crTo" value="2026-05-25" oninput="updateCustomLabel()"/></div>
+            </div>
+            <button class="cr-apply" onclick="applyCustomRange()">Apply Range</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ir-grid">
+      <!-- All Orders -->
+      <div class="ir-card"><div><div class="ir-card-ico" style="background:var(--bl)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--blue)" stroke-width="1.5" width="18" height="18"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 7h6M7 10h6M7 13h4" stroke-linecap="round"/></svg></div><div class="ir-card-title">All Orders</div><div class="ir-card-desc">Complete order-level export including AWB, order date, amount, payment type, customer name, address, contact, weight, shipment status, shipping charges, discount, and product details.</div></div><div class="ir-actions"><button class="btn btn-p btn-sm" onclick="dlReport('All Orders')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Report</button><button class="btn-ghost-blue" onclick="showSample('allorders','All Orders')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div></div>
+      <!-- FWD In-Transit Orders -->
+      <div class="ir-card"><div><div class="ir-card-ico" style="background:var(--al)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--amber)" stroke-width="1.5" width="18" height="18"><path d="M2 10h12M10 6l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 5v10" stroke-linecap="round"/></svg></div><div class="ir-card-title">FWD In-Transit Orders</div><div class="ir-card-desc">Live view of all forward shipments currently moving in the XpressBees network — includes AWB, Order ID, pickup-to-delivery address, SLA status (Ontime / Delayed), EDD, and days in transit.</div></div><div class="ir-actions"><button class="btn btn-p btn-sm" onclick="dlReport('FWD In-Transit Orders')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Report</button><button class="btn-ghost-blue" onclick="showSample('fwdintransit','FWD In-Transit Orders')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div></div>
+      <!-- NDR Report -->
+      <div class="ir-card"><div><div class="ir-card-ico" style="background:var(--rl)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--red)" stroke-width="1.5" width="18" height="18"><circle cx="10" cy="10" r="8"/><path d="M10 6v4M10 13.5h.01" stroke-linecap="round"/></svg></div><div class="ir-card-title">NDR Report</div><div class="ir-card-desc">Non-delivery report with order/AWB, delivery address, shipment type, attempt count, NDR reason, payment details, last updated date, action by, and action priority per undelivered shipment.</div></div><div class="ir-actions"><button class="btn btn-p btn-sm" onclick="dlReport('NDR Report')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Report</button><button class="btn-ghost-blue" onclick="showSample('ndr','NDR Report')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div></div>
+      <!-- Product Wise Summary -->
+      <div class="ir-card"><div><div class="ir-card-ico" style="background:var(--al)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--amber)" stroke-width="1.5" width="18" height="18"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16M6 7v10M10 7v10" stroke-linecap="round"/></svg></div><div class="ir-card-title">Product Wise Summary</div><div class="ir-card-desc">Product-level order summary showing product name, SKU, total order quantity, booked, pending pickup, in-transit, delivered, and RTO counts — one row per product.</div></div><div class="ir-actions"><button class="btn btn-p btn-sm" onclick="dlReport('Product Wise Summary')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Report</button><button class="btn-ghost-blue" onclick="showSample('productwise','Product Wise Summary')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div></div>
+      <!-- Performance Report - full width -->
+      <div class="ir-card" style="grid-column:1/-1"><div><div class="ir-card-ico" style="background:var(--gl)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--green)" stroke-width="1.5" width="18" height="18"><path d="M3 15l4-4 3 3 4-5 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18h14" stroke-linecap="round"/></svg></div><div class="ir-card-title">Performance Report</div><div class="ir-card-desc">Multi-dimensional logistics analytics with 6 focused report types:</div><div class="perf-types-list"><span class="perf-type-pill">Overall Delivery</span><span class="perf-type-pill">Prepaid / COD</span><span class="perf-type-pill">SLA Performance</span><span class="perf-type-pill">Attemptwise</span><span class="perf-type-pill">Statewise</span><span class="perf-type-pill">RTO Reasons</span></div></div><div class="ir-actions"><button class="btn btn-p btn-sm" onclick="dlReport('Performance Report')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Report</button><button class="btn-ghost-blue" onclick="showSample('performance','Performance Report')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULED REPORTS -->
+  <div id="panelScheduled" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:16px"><button class="btn btn-p" onclick="openDrawer()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg> Schedule Report</button></div>
+    <div class="tw">
+      <div class="ts"><table class="stbl"><thead><tr><th>Report Title</th><th>Status</th><th>Recipients</th><th>Report Type</th><th>Order Status</th><th>Order Sub-Status</th><th>Frequency</th><th>Actions</th></tr></thead><tbody id="rTbody"></tbody></table></div>
+      <div style="padding:10px 16px;background:var(--s2);border-top:1px solid var(--border);font-size:11px;color:var(--ink3)">Showing <b id="rCount" style="color:var(--ink)">4</b> scheduled reports</div>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- SCHEDULE DRAWER -->
+<div class="drw-ov" id="drwOv" onclick="if(event.target===this)closeDrw()">
+<div class="drw">
+  <div class="drw-hdr"><div class="drw-back" onclick="closeDrw()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg> Back</div><div class="drw-title" id="drwTitle">Schedule Report</div></div>
+  <div class="drw-body">
+    <div>
+      <div class="dc">
+        <div class="dc-title"><div class="dc-ico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--ink2)" stroke-width="1.5" width="14" height="14"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 5h6M5 8h4" stroke-linecap="round"/></svg></div>Report Details</div>
+        <div class="mf"><div class="ml">Select Report Type</div><select class="mi mi-sel" id="rType" onchange="onTypeChange(this.value)"><option value="">Select report type</option><option value="order">Order Report</option><option value="ndr">NDR Report</option><option value="productwise">Product Wise Summary</option><option value="performance">Performance Report</option></select></div>
+        <div id="viewSampleRow" style="display:none;margin-bottom:16px"><button class="view-sample-link" onclick="showSampleFromDrawer()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M2 7c2-4 8-4 10 0s-8 4-10 0z"/><circle cx="7" cy="7" r="2"/></svg> View Sample Report</button></div>
+        <!-- Order fields -->
+        <div id="orderFields" style="display:none"><div class="mf"><div class="ml">Report Name</div><input class="mi" type="text" id="rName" placeholder="e.g. Weekly Order Summary"/></div><div class="mf"><div class="ml">Recipients Email IDs</div><input class="mi" type="email" id="rEmail" placeholder="Enter email address"/><div class="ml-note">Reports will be sent to the recipients' email addresses</div></div></div>
+        <!-- NDR fields -->
+        <div id="ndrFields" style="display:none"><div class="mf"><div class="ml">Report Name</div><input class="mi" type="text" id="rNameNdr" placeholder="e.g. NDR Escalation Report"/></div><div class="mf"><div class="ml">Recipients Email IDs</div><input class="mi" type="email" id="rEmailNdr" placeholder="Enter email address"/><div class="ml-note">Reports will be sent to the recipients' email addresses</div></div></div>
+        <!-- Product Wise fields -->
+        <div id="productwiseFields" style="display:none"><div class="mf"><div class="ml">Report Name</div><input class="mi" type="text" id="rNamePw" placeholder="e.g. Weekly Product Summary"/></div><div class="mf"><div class="ml">Recipients Email IDs</div><input class="mi" type="email" id="rEmailPw" placeholder="Enter email address"/><div class="ml-note">Reports will be sent to the recipients' email addresses</div></div></div>
+        <!-- Performance fields -->
+        <div id="perfFields" style="display:none">
+          <div class="mf"><div class="ml">Performance Report Type</div><div class="msd" id="msdPerfType"><div class="msd-box" id="msdPerfTypeBox" onclick="toggleMSD('msdPerfType')"><span class="msd-ph" id="msdPerfTypePH">Select report types</span><svg class="msd-arrow" viewBox="0 0 10 6" width="10" height="6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="msd-dd" id="msdPerfTypeDD"><div class="msd-opt" data-val="overall" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>Overall Delivery Performance</div><div class="msd-opt" data-val="codprepaid" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>Prepaid / COD Delivery Performance</div><div class="msd-opt" data-val="sla" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>SLA Performance</div><div class="msd-opt" data-val="attempt" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>Attemptwise Delivery Performance</div><div class="msd-opt" data-val="statewise" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>Statewise Delivery Performance</div><div class="msd-opt" data-val="rto" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()"><div class="msd-cb"></div>RTO Reasons</div><div class="msd-opt" data-val="consolidated" onclick="toggleOpt(this,'msdPerfType');onPerfTypeChange()" style="border-top:2px solid var(--border);margin-top:2px"><div class="msd-cb"></div>Consolidated Performance Report <span style="font-size:10px;color:var(--blue);margin-left:4px;font-weight:700">ALL IN ONE</span></div></div></div><div class="ml-note">Select one or more. Consolidated includes all 6 types in one Excel file.</div></div>
+          <div id="metricsZoneWrap"></div>
+        </div>
+      </div>
+      <!-- Order Report Content card -->
+      <div id="orderContentCard" style="display:none">
+        <div class="dc">
+          <div class="dc-title"><div class="dc-ico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--ink2)" stroke-width="1.5" width="14" height="14"><path d="M2 4h12M2 8h8M2 12h5" stroke-linecap="round"/></svg></div>Report Content</div>
+          <div class="mf"><div class="ml">Order Type</div><div class="msd" id="msdOrderType"><div class="msd-box" id="msdOrderTypeBox" onclick="toggleMSD('msdOrderType')"><span class="msd-ph" id="msdOrderTypePH" style="display:none">Select order types</span><svg class="msd-arrow" viewBox="0 0 10 6" width="10" height="6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="msd-dd" id="msdOrderTypeDD"><div class="msd-opt sel" data-val="COD" onclick="toggleOpt(this,'msdOrderType')"><div class="msd-cb"></div>COD</div><div class="msd-opt sel" data-val="Prepaid" onclick="toggleOpt(this,'msdOrderType')"><div class="msd-cb"></div>Prepaid</div><div class="msd-opt sel" data-val="Pick Up" onclick="toggleOpt(this,'msdOrderType')"><div class="msd-cb"></div>Pick Up</div></div></div></div>
+          <div class="mf"><div class="ml">Order Status</div><div class="msd" id="msdOrderStatus"><div class="msd-box" id="msdOrderStatusBox" onclick="toggleMSD('msdOrderStatus')"><span class="msd-ph" id="msdOrderStatusPH" style="display:none">Select statuses</span><svg class="msd-arrow" viewBox="0 0 10 6" width="10" height="6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="msd-dd" id="msdOrderStatusDD"><div class="msd-opt sel" data-val="Pending" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Pending</div><div class="msd-opt sel" data-val="Ready to Ship" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Ready to Ship</div><div class="msd-opt sel" data-val="In Transit" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>In Transit</div><div class="msd-opt sel" data-val="Delivered" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Delivered</div><div class="msd-opt sel" data-val="RTO" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>RTO</div><div class="msd-opt sel" data-val="Pick Up in Reattempt" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Pick Up in Reattempt</div><div class="msd-opt sel" data-val="Awaiting Pickup" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Awaiting Pickup</div><div class="msd-opt sel" data-val="Out for Delivery" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Out for Delivery</div><div class="msd-opt" data-val="Reattempted Successfully" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Reattempted Successfully</div><div class="msd-opt" data-val="Not Picked Up" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Not Picked Up</div><div class="msd-opt" data-val="Lost" onclick="toggleOpt(this,'msdOrderStatus')"><div class="msd-cb"></div>Lost</div></div></div></div>
+          <div class="mf" style="margin-bottom:0"><div class="ml">Order Sub-Status</div><div class="msd" id="msdSubStatus"><div class="msd-box" id="msdSubStatusBox" onclick="toggleMSD('msdSubStatus')"><span class="msd-ph" id="msdSubStatusPH" style="display:none">Select sub-statuses</span><svg class="msd-arrow" viewBox="0 0 10 6" width="10" height="6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="msd-dd" id="msdSubStatusDD"><div class="msd-opt sel" data-val="Returned" onclick="toggleOpt(this,'msdSubStatus')"><div class="msd-cb"></div>Returned</div><div class="msd-opt sel" data-val="Undelivered" onclick="toggleOpt(this,'msdSubStatus')"><div class="msd-cb"></div>Undelivered</div><div class="msd-opt sel" data-val="Delivered" onclick="toggleOpt(this,'msdSubStatus')"><div class="msd-cb"></div>Delivered</div><div class="msd-opt sel" data-val="Lost" onclick="toggleOpt(this,'msdSubStatus')"><div class="msd-cb"></div>Lost</div><div class="msd-opt" data-val="Pick-up Pending" onclick="toggleOpt(this,'msdSubStatus')"><div class="msd-cb"></div>Pick-up Pending</div></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="dc" style="margin-bottom:0">
+        <div class="dc-title"><div class="dc-ico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--ink2)" stroke-width="1.5" width="14" height="14"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5" stroke-linecap="round"/></svg></div>Frequency Details</div>
+        <div class="mf"><div class="ml">Send Reports</div><div class="ftabs" id="freqTabs"><div class="ftab on" id="ft-month" onclick="setFreq('month')">Every Month</div><div class="ftab" id="ft-week" onclick="setFreq('week')">Every Week</div><div class="ftab" id="ft-day" onclick="setFreq('day')">Every Day</div></div><div class="ndr-note" id="ndrNote" style="display:none"><svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" fill="var(--al)" stroke="var(--am)"/><path d="M8 5.5v3.5M8 10.5h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>NDR reports can only be generated on a monthly basis</div></div>
+        <div class="mf" id="dateField"><div class="ml">Select Date for Sending</div><div class="date-input-wrap"><svg class="date-cal-ico" viewBox="0 0 16 16" fill="none" stroke="var(--ink3)" stroke-width="1.5" width="15" height="15"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 7h12M5 2v2M11 2v2" stroke-linecap="round"/></svg><input type="date" id="rDate" value="2026-05-19"/></div></div>
+        <div class="mf" id="weekField" style="display:none"><div class="ml">Select Day of Week</div><select class="mi mi-sel"><option>Monday</option><option>Tuesday</option><option selected>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
+        <div class="mf"><div class="ml">Select Time</div><input class="mi" type="time" value="06:12" id="rTime" onchange="updateSumm()"/></div>
+        <div class="mf"><div class="ml">Get Data for the Last</div><div style="display:grid;grid-template-columns:80px 1fr;gap:10px"><input class="mi" type="number" id="dataLastNum" value="1" min="1" max="90" style="text-align:center" onchange="updateSumm()"/><select class="mi mi-sel" id="dataLastUnit" onchange="updateSumm()"><option selected>Days</option><option>Weeks</option><option>Months</option></select></div></div>
+        <div class="ibar ibar-blue" style="margin-bottom:0"><svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" fill="var(--bl)" stroke="var(--bm)"/><path d="M8 7.5v4M8 5.5h.01" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"/></svg><span>It can take up to 24 hrs in sending your first report</span></div>
+        <div class="fsumm" id="fSumm">We'll send reports every month on <b>19th</b> with the last <b>1 day data</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="drw-ft"><button class="btn btn-s" onclick="closeDrw()">Cancel</button><button class="btn btn-p" id="drwSubmitBtn" onclick="doSchedule()">Schedule Report</button></div>
+</div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="mo-ov" id="moSuc" onclick="if(event.target===this)closeSuc()"><div class="mo"><div class="mo-x" onclick="closeSuc()">&#x2715;</div><div class="mo-ring"><svg viewBox="0 0 34 34" fill="none" width="32" height="32"><path d="M8 17l6 6 12-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mo-title" id="moTitle">Report Scheduled!</div><div class="mo-sub" id="moSub"></div><div class="mo-detail" id="moDetail"></div><button class="btn btn-p" style="width:100%;margin-top:18px;justify-content:center" onclick="closeSuc()">View Scheduled Reports</button></div></div>
+<!-- DELETE MODAL -->
+<div class="mo-ov" id="moDelOv" onclick="if(event.target===this)closeDelMo()"><div class="del-mo"><div class="del-mo-ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" width="22" height="22"><path d="M3 6h18M8 6V4h8v2M19 6l-1.5 14a2 2 0 01-2 1.8H10.5a2 2 0 01-2-1.8L7 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="del-mo-title">Delete this report?</div><div class="del-mo-sub">This action cannot be undone.</div><div class="del-mo-card" id="delMoCard"></div><div class="del-mo-btns"><button class="btn btn-s" onclick="closeDelMo()">Cancel</button><button class="btn" style="background:var(--red);color:#fff" onclick="confirmDel()">Yes, Delete</button></div></div></div>
+<!-- SAMPLE MODAL -->
+<div class="mo-ov" id="sampMoOv" onclick="if(event.target===this)closeSample()"><div class="samp-mo" id="sampMo"><div class="samp-mo-hdr"><div><div class="samp-mo-title" id="sampMoTitle">Sample Report</div><div class="samp-mo-sub" id="sampMoSub"></div></div><div class="mo-x" onclick="closeSample()">&#x2715;</div></div><div id="sampMoBody"></div></div></div>
+<div class="toast-el" id="toastEl"></div>
+
+<script>
+// ── PERF METRICS DATA ──────────────────────────────────────────
+var PERF={
+  overall:{label:'Overall Delivery Performance',purpose:'High-level shipment outcome monitoring',
+    defaults:['Delivered','LOST','RTO','Shipped','STD','Grand Total','Delivered %','LOST %','RTO %','Shipped %','STD %'],
+    additional:{'Avg Delivery TAT':'Adds delivery speed visibility','In Transit Count':'Shows pending exposure','NDR Count':'Adds failed delivery visibility','SLA Breach %':'Highlights delayed exposure','First Attempt Delivery %':'Measures delivery efficiency','Delayed Shipment Count':'Tracks delay volume'}},
+  codprepaid:{label:'Prepaid / COD Delivery Performance',purpose:'Payment-mode operational comparison',
+    defaults:['Payment Mode','Delivered','LOST','RTO','Shipped','Grand Total','Delivered %','RTO %'],
+    additional:{'COD Success %':'Measures COD reliability','COD Conversion %':'Shows COD conversion quality','Avg COD Delivery TAT':'Tracks COD delivery speed','Avg Prepaid Delivery TAT':'Tracks prepaid delivery speed','COD NDR %':'Highlights COD failure risk','High Value COD Orders':'Flags high-value risk'}},
+  sla:{label:'SLA Performance',purpose:'Delivery timeliness and SLA compliance',
+    defaults:['Ontime','Beyond SLA','RTO/UD','Grand Total','Ontime %','Beyond SLA %','RTO/UD %'],
+    additional:{'Pickup SLA %':'Tracks pickup SLA compliance','Delivery SLA %':'Measures delivery SLA adherence','Avg Delivery Delay Days':'Quantifies delays','Avg Dispatch Delay':'Tracks dispatch lag','Aging Buckets':'Segments delayed shipments','SLA Breach Count':'Volume of SLA failures'}},
+  attempt:{label:'Attemptwise Delivery Performance',purpose:'Delivery attempt efficiency analysis',
+    defaults:['1st Attempt','2nd Attempt','3rd Attempt','>3 Attempts','RTO/UD','Grand Total'],
+    additional:{'First Attempt Delivery %':'First-attempt efficiency','Reattempt Success %':'Retry effectiveness','Avg Attempts per Shipment':'Delivery effort','Fake Attempt %':'Fake attempt risk','Reattempt RTO %':'Retry failure rate','Attempt Aging':'Aging by attempt count'}},
+  statewise:{label:'Statewise Delivery Performance',purpose:'Geography-wise delivery analysis',
+    defaults:['State','Delivered','LOST','RTO','Shipped','Grand Total','Delivered %','RTO %','S2A','S2D','FAD'],
+    additional:{'Avg State TAT':'State delivery speed','Zone':'Regional grouping','Hub':'Hub-level visibility','Pincode Cluster':'Pincode segmentation','Metro / Non-Metro':'Urban vs rural split','State SLA %':'SLA by geography','Regional RTO %':'Regional failure rate'}},
+  rto:{label:'RTO Reasons',purpose:'Root-cause analysis of failed deliveries',
+    defaults:['NDR Reason','0 Attempts','1 Attempt','2 Attempts','3 Attempts','4 Attempts','>5 Attempts','Grand Total','Contribution %'],
+    additional:{'OTP Failure %':'OTP-related failures','Customer Refusal %':'Refusal-driven RTO','Address Issue %':'Address quality issues','Retry Trend %':'Retry effectiveness','RTO Recovery %':'Recovery success','Reason-wise Aging':'Aging by NDR reason','Repeat NDR %':'Repeated failures'}}
+};
+var activeAddl={};Object.keys(PERF).forEach(function(k){activeAddl[k]={};});
+
+// ── SAMPLE DATA ───────────────────────────────────────────────
+var SAMP_TABS={
+  allorders:[{label:'Sample Data',key:'ao'}],
+  fwdintransit:[{label:'Sample Data',key:'it'}],
+  ndr:[{label:'Sample Data',key:'ndr'}],
+  productwise:[{label:'Sample Data',key:'pw'}],
+  performance:[{label:'Overall Delivery',key:'perf_overall'},{label:'Prepaid / COD',key:'perf_cod'},{label:'SLA Performance',key:'perf_sla'},{label:'Attemptwise',key:'perf_attempt'},{label:'Statewise',key:'perf_state'},{label:'RTO Reasons',key:'perf_rto'}]
+};
+
+// ── STATE ─────────────────────────────────────────────────────
+var curModTab='instant',curFreq='month',editingId=null,pendingDelId=null,curSampType=null,curSampTabIdx=0;
+window._perfInScheduledDrawer=false;
+
+// ── MODULE TABS ───────────────────────────────────────────────
+function switchModTab(id){
+  curModTab=id;
+  ['instant','scheduled'].forEach(function(t){
+    var cap=t.charAt(0).toUpperCase()+t.slice(1);
+    document.getElementById('tab'+cap).classList.toggle('on',t===id);
+    document.getElementById('panel'+cap).style.display=t===id?'block':'none';
+  });
+}
+
+// ── DATE FILTER ───────────────────────────────────────────────
+function toggleDateDD(){var btn=document.getElementById('dateFilterBtn'),dd=document.getElementById('dateDd');var open=dd.classList.toggle('sh');btn.classList.toggle('open',open);}
+document.addEventListener('click',function(e){if(!e.target.closest('.date-filter-wrap')){document.getElementById('dateDd').classList.remove('sh');document.getElementById('dateFilterBtn').classList.remove('open');}if(!e.target.closest('.msd')){document.querySelectorAll('.msd-dd.open').forEach(function(d){d.classList.remove('open');var b=d.closest('.msd').querySelector('.msd-box');if(b)b.classList.remove('open');});}});
+function setDateRange(id,label,el){document.getElementById('dateFilterLabel').textContent=label;document.querySelectorAll('.date-dd-opt').forEach(function(o){o.classList.remove('on');var c=o.querySelector('.chk');if(c)c.remove();});el.classList.add('on');var chk=document.createElement('span');chk.className='chk';chk.textContent=String.fromCharCode(10003);el.appendChild(chk);if(id!=='custom'){document.getElementById('customRange').classList.remove('sh');document.getElementById('dateDd').classList.remove('sh');document.getElementById('dateFilterBtn').classList.remove('open');}toast('Date range: '+label);}
+function toggleCustomRange(){document.getElementById('customRange').classList.toggle('sh');}
+function updateCustomFromYM(){var y=document.getElementById('crYear').value,m=document.getElementById('crMonth').value;var last=new Date(parseInt(y),parseInt(m),0).getDate();document.getElementById('crFrom').value=y+'-'+m+'-01';document.getElementById('crTo').value=y+'-'+m+'-'+String(last).padStart(2,'0');updateCustomLabel();}
+function updateCustomLabel(){var f=document.getElementById('crFrom').value,t=document.getElementById('crTo').value;if(f&&t)document.getElementById('dateFilterLabel').textContent=fmt(f)+' \u2013 '+fmt(t);}
+function fmt(d){if(!d)return '';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function applyCustomRange(){var f=document.getElementById('crFrom').value,t=document.getElementById('crTo').value;if(!f||!t){toast('Please select start and end dates');return;}document.getElementById('dateFilterLabel').textContent=fmt(f)+' \u2013 '+fmt(t);document.getElementById('dateDd').classList.remove('sh');document.getElementById('dateFilterBtn').classList.remove('open');toast('Custom range applied');}
+function dlReport(name){toast('\u2b07 Preparing "'+name+'"...');setTimeout(function(){toast('\u2713 "'+name+'" downloaded');},1400);}
+
+// ── SAMPLE MODAL ──────────────────────────────────────────────
+function showSample(type,title){curSampType=type;curSampTabIdx=0;document.getElementById('sampMoTitle').textContent=title+' \u2014 Sample Preview';document.getElementById('sampMoSub').textContent='Representative sample data. Actual export reflects your selected date range.';renderSampBody();document.getElementById('sampMoOv').classList.add('sh');}
+function showSampleFromDrawer(){var typeVal=document.getElementById('rType').value;var map={order:'allorders',ndr:'ndr',productwise:'productwise',performance:'performance'};var titles={order:'Order Report',ndr:'NDR Report',productwise:'Product Wise Summary',performance:'Performance Report'};var t=map[typeVal];if(!t)return;showSample(t,titles[typeVal]);}
+function closeSample(){document.getElementById('sampMoOv').classList.remove('sh');}
+function renderSampBody(){
+  var tabs=SAMP_TABS[curSampType];var html='';
+  if(tabs.length>1){html+='<div class="samp-tabs">';tabs.forEach(function(t,i){html+='<div class="samp-tab'+(i===curSampTabIdx?' on':'')+'" onclick="switchSampTab('+i+')">'+t.label+'</div>';});html+='</div>';}
+  html+=buildSampContent(tabs[curSampTabIdx].key);
+  var fnMap={allorders:'All_Orders_Sample_Report.xlsx',fwdintransit:'FWD_InTransit_Orders_Report.xlsx',ndr:'NDR_Report_Sample.xlsx',productwise:'Product_Wise_Summary_Report.csv',performance:'Sample_Performance_Reports.xlsx'};
+  var fname=fnMap[curSampType]||('Sample_'+curSampType+'_report.xlsx');
+  html+='<div class="samp-dl-bar"><div><div style="font-size:12px;font-weight:600;color:var(--green)">&#128202; '+fname+'</div><div style="font-size:11px;color:var(--ink3);margin-top:1px">Preview only &middot; actual export reflects your date range</div></div><button class="btn btn-p btn-sm" onclick="dlReport(\'Sample Report\')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" width="12" height="12"><path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg> Download Sample</button></div>';
+  document.getElementById('sampMoBody').innerHTML=html;
+}
+function switchSampTab(idx){curSampTabIdx=idx;renderSampBody();}
+function buildSampContent(key){
+  var h='<div class="samp-tbl-wrap">';
+  if(key==='ao'){
+    h+='<table class="stbl-s"><thead><tr><th>AWB Number</th><th>Order Date</th><th>Amount</th><th>Payment</th><th>Name</th><th>Address</th><th>Contact</th><th>Weight</th><th>Status</th><th>Shipping Chrg.</th><th>Discount</th><th>Product</th></tr></thead><tbody>';
+    [['XB666937844','19/04/2026','Rs.1,600','PREPAID','Amit Verma','Pune 411001 to Kolkata 700001','9188456388','1.0 kg','Pickup Scheduled','Rs.91','Rs.408','Whey Protein Combo'],
+     ['XB999679763','23/04/2026','Rs.4,606','COD','Karan Patel','Delhi 110001 to Hyderabad 500001','9648036479','0.5 kg','Pickup Not Scheduled','Rs.106','Rs.461','Whey Protein Combo'],
+     ['XB931924341','15/04/2026','Rs.2,353','PREPAID','Amit Verma','Bangalore 560001 to Hyderabad 500001','9371423823','4.0 kg','In-Transit','Rs.53','Rs.224','Protein Powder 1kg'],
+     ['XB637899121','16/04/2026','Rs.3,655','COD','Rahul Sharma','Bangalore 560001 to Chennai 600001','9615756698','2.0 kg','Delivered','Rs.55','Rs.35','Protein Powder 1kg'],
+     ['XB185659046','22/04/2026','Rs.3,454','COD','Sneha Joshi','Bangalore 560001 to Kolkata 700001','9358221973','4.0 kg','RTO','Rs.171','Rs.396','Protein Powder 1kg'],
+     ['XB891115231','10/04/2026','Rs.4,798','COD','Sneha Joshi','Bangalore 560001 to Chennai 600001','9843130364','5.0 kg','RTO','Rs.120','Rs.24','Mass Gainer 2kg'],
+     ['XB550850041','10/04/2026','Rs.2,308','PREPAID','Karan Patel','Mumbai 400001 to Hyderabad 500001','9667234179','3.0 kg','In-Transit','Rs.163','Rs.135','Vitamin Gummies']
+    ].forEach(function(r){h+='<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';});
+    h+='</tbody></table>';
+  } else if(key==='it'){
+    h+='<table class="stbl-s"><thead><tr><th>AWB No.</th><th>Order ID</th><th>Address</th><th>Status</th><th>EDD</th><th>Days In-Transit</th></tr></thead><tbody>';
+    [['XB293321676','ORD94874','Bangalore 560001 to Kolkata 700001','<span style="color:var(--green);font-weight:600">Ontime</span>','26/04/2026','7 days'],
+     ['XB372161168','ORD39251','Bangalore 560001 to Ahmedabad 380001','<span style="color:var(--red);font-weight:600">Delayed</span>','04/04/2026','7 days'],
+     ['XB389212598','ORD18382','Delhi 110001 to Ahmedabad 380001','<span style="color:var(--red);font-weight:600">Delayed</span>','25/04/2026','6 days'],
+     ['XB420063942','ORD52017','Pune 411001 to Ahmedabad 380001','<span style="color:var(--green);font-weight:600">Ontime</span>','07/04/2026','3 days'],
+     ['XB940076390','ORD38912','Bangalore 560001 to Ahmedabad 380001','<span style="color:var(--green);font-weight:600">Ontime</span>','22/04/2026','7 days'],
+     ['XB827822276','ORD16674','Delhi 110001 to Hyderabad 500001','<span style="color:var(--green);font-weight:600">Ontime</span>','01/05/2026','2 days'],
+     ['XB406803674','ORD32487','Delhi 110001 to Chennai 600001','<span style="color:var(--red);font-weight:600">Delayed</span>','08/04/2026','6 days'],
+     ['XB785898879','ORD25229','Delhi 110001 to Hyderabad 500001','<span style="color:var(--red);font-weight:600">Delayed</span>','19/04/2026','7 days']
+    ].forEach(function(r){h+='<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';});
+    h+='</tbody></table>';
+  } else if(key==='ndr'){
+    h+='<table class="stbl-s"><thead><tr><th>Order / AWB</th><th>Delivery Address</th><th>Shipment Type</th><th>Attempts</th><th>NDR Reason</th><th>Payment</th><th>Last Updated</th><th>Last Action By</th><th>Action Priority</th></tr></thead><tbody>';
+    [['ORD59723 / XB199329026','Mumbai 400001','XPRESSBEES Air','5','Future Delivery Requested','Rs.4,651 - PREPAID','10/04/2026','Seller','No-Action Required'],
+     ['ORD70093 / XB414479272','Delhi 110001','XPRESSBEES Air','3','Address Incomplete','Rs.2,004 - COD','19/04/2026','XpressBees','<span style="color:var(--red);font-weight:600">Critical Action Required</span>'],
+     ['ORD58933 / XB917336369','Hyderabad 500001','XPRESSBEES Air','3','Customer Refused','Rs.2,141 - COD','26/04/2026','XpressBees','Action Required'],
+     ['ORD86903 / XB150226877','Pune 411001','XPRESSBEES Surface','3','Customer Refused','Rs.2,773 - COD','22/04/2026','Seller','No-Action Required'],
+     ['ORD25891 / XB891711905','Delhi 110001','XPRESSBEES Surface','1','Incorrect Pincode','Rs.2,641 - PREPAID','16/04/2026','XpressBees','<span style="color:var(--red);font-weight:600">Critical Action Required</span>'],
+     ['ORD69063 / XB845379411','Pune 411001','XPRESSBEES Air','5','Customer Not Available','Rs.3,182 - PREPAID','13/04/2026','Seller','Action Required'],
+     ['ORD22039 / XB502719388','Mumbai 400001','XPRESSBEES Air','4','Customer Refused','Rs.3,147 - COD','30/04/2026','XpressBees','No-Action Required']
+    ].forEach(function(r){h+='<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';});
+    h+='</tbody></table>';
+  } else if(key==='pw'){
+    h+='<table class="stbl-s"><thead><tr><th>Product Name</th><th>Product SKU</th><th>Total Order Qty</th><th>Booked</th><th>Pending Pickup</th><th>In Transit</th><th>Delivered</th><th>RTO</th></tr></thead><tbody>';
+    [['Whey Protein Combo','SKU-WPC-001','42','8','6','12','14','2'],
+     ['Protein Powder 1kg','SKU-PP1-002','38','5','4','10','17','2'],
+     ['Mass Gainer 2kg','SKU-MG2-003','29','3','5','8','11','2'],
+     ['Yoga Mat','SKU-YM-004','24','2','3','6','11','2'],
+     ['Vitamin Gummies','SKU-VG-005','18','1','2','5','8','2']
+    ].forEach(function(r){h+='<tr>'+r.map(function(c,i){return '<td>'+(i===0?'<b>'+c+'</b>':c)+'</td>';}).join('')+'</tr>';});
+    h+='<tr class="total-row"><td><b>TOTAL</b></td><td>-</td><td><b>151</b></td><td><b>19</b></td><td><b>20</b></td><td><b>41</b></td><td><b>61</b></td><td><b>10</b></td></tr>';
+    h+='</tbody></table>';
+  } else if(key==='perf_overall'){
+    h+='<table class="stbl-s"><thead><tr><th>Zone</th><th>Delivered</th><th>LOST</th><th>RTO</th><th>Shipped</th><th>STD</th><th>Grand Total</th><th>Delivered %</th><th>RTO %</th></tr></thead><tbody><tr><td>Rest Of India</td><td>2,150</td><td>10</td><td>610</td><td>95</td><td>5</td><td>2,870</td><td>75%</td><td>21%</td></tr><tr><td>Regional</td><td>920</td><td>5</td><td>220</td><td>45</td><td>1</td><td>1,191</td><td>77%</td><td>18%</td></tr><tr><td>Within City</td><td>225</td><td>1</td><td>25</td><td>5</td><td>0</td><td>256</td><td>88%</td><td>10%</td></tr><tr class="total-row"><td>TOTAL</td><td>3,825</td><td>18</td><td>925</td><td>163</td><td>6</td><td>4,937</td><td>77%</td><td>19%</td></tr></tbody></table>';
+  } else if(key==='perf_cod'){
+    h+='<table class="stbl-s"><thead><tr><th>Payment Mode</th><th>Delivered</th><th>LOST</th><th>RTO</th><th>Grand Total</th><th>Delivered %</th><th>RTO %</th></tr></thead><tbody><tr><td>COD</td><td>2,100</td><td>18</td><td>860</td><td>3,098</td><td>68%</td><td>28%</td></tr><tr><td>PREPAID</td><td>1,725</td><td>2</td><td>65</td><td>1,902</td><td>91%</td><td>3%</td></tr><tr class="total-row"><td>TOTAL</td><td>3,825</td><td>20</td><td>925</td><td>5,000</td><td>76.5%</td><td>18.5%</td></tr></tbody></table>';
+  } else if(key==='perf_sla'){
+    h+='<table class="stbl-s"><thead><tr><th>Zone</th><th>Ontime</th><th>Beyond SLA</th><th>RTO/UD</th><th>Grand Total</th><th>Ontime %</th><th>Beyond SLA %</th></tr></thead><tbody><tr><td>Rest Of India</td><td>1,820</td><td>410</td><td>640</td><td>2,870</td><td>63%</td><td>14%</td></tr><tr><td>Regional</td><td>780</td><td>160</td><td>251</td><td>1,191</td><td>65%</td><td>13%</td></tr><tr class="total-row"><td>TOTAL</td><td>3,070</td><td>630</td><td>981</td><td>4,681</td><td>65%</td><td>13%</td></tr></tbody></table>';
+  } else if(key==='perf_attempt'){
+    h+='<table class="stbl-s"><thead><tr><th>Zone</th><th>1st Attempt</th><th>2nd Attempt</th><th>3rd Attempt</th><th>&gt;3 Attempts</th><th>RTO/UD</th><th>Grand Total</th></tr></thead><tbody><tr><td>Rest Of India</td><td>1,700</td><td>320</td><td>95</td><td>25</td><td>730</td><td>2,870</td></tr><tr><td>Regional</td><td>690</td><td>135</td><td>42</td><td>9</td><td>315</td><td>1,191</td></tr><tr class="total-row"><td>TOTAL</td><td>2,810</td><td>510</td><td>149</td><td>36</td><td>1,176</td><td>4,681</td></tr></tbody></table>';
+  } else if(key==='perf_state'){
+    h+='<table class="stbl-s"><thead><tr><th>State</th><th>Delivered</th><th>LOST</th><th>RTO</th><th>Grand Total</th><th>Delivered %</th><th>S2A</th><th>S2D</th><th>FAD</th></tr></thead><tbody><tr><td>MAHARASHTRA</td><td>820</td><td>2</td><td>180</td><td>1,022</td><td>80%</td><td>95%</td><td>74%</td><td>72%</td></tr><tr><td>KARNATAKA</td><td>520</td><td>3</td><td>130</td><td>668</td><td>78%</td><td>94%</td><td>72%</td><td>70%</td></tr><tr><td>DELHI</td><td>465</td><td>1</td><td>95</td><td>571</td><td>81%</td><td>97%</td><td>75%</td><td>74%</td></tr><tr class="total-row"><td>TOTAL</td><td>2,195</td><td>10</td><td>555</td><td>2,817</td><td>78%</td><td>94%</td><td>72%</td><td>69%</td></tr></tbody></table>';
+  } else if(key==='perf_rto'){
+    h+='<table class="stbl-s"><thead><tr><th>NDR Reason</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>&gt;5</th><th>Grand Total</th><th>Contribution %</th></tr></thead><tbody><tr><td>OTP Verified</td><td>40</td><td>160</td><td>420</td><td>140</td><td>30</td><td>5</td><td>795</td><td>35%</td></tr><tr><td>Customer Not Available</td><td>20</td><td>110</td><td>310</td><td>90</td><td>15</td><td>3</td><td>548</td><td>24%</td></tr><tr><td>Customer Refused</td><td>5</td><td>25</td><td>110</td><td>40</td><td>10</td><td>1</td><td>191</td><td>8%</td></tr><tr class="total-row"><td>TOTAL</td><td>68</td><td>313</td><td>915</td><td>294</td><td>59</td><td>9</td><td>1,658</td><td>72%</td></tr></tbody></table>';
+  }
+  h+='</div>';
+  return h;
+}
+
+// ── PERF TYPE CHANGE (instant = shows additional metrics; scheduled = default only) ──
+function onPerfTypeChange(){
+  var selected=getSelectedMSD('msdPerfType');
+  var isConsolidated=selected.indexOf('consolidated')>-1;
+  var wrap=document.getElementById('metricsZoneWrap');
+  wrap.innerHTML='';
+  if(isConsolidated){
+    var info=document.createElement('div');info.className='ibar ibar-blue';info.style.marginTop='4px';
+    info.innerHTML='<svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" fill="var(--bl)" stroke="var(--bm)"/><path d="M8 7.5v4M8 5.5h.01" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Consolidated report includes all 6 performance reports in one Excel file with default metrics for each.</span>';
+    wrap.appendChild(info);return;
+  }
+  if(selected.length===0)return;
+  selected.forEach(function(subKey){
+    if(subKey==='consolidated')return;
+    var d=PERF[subKey];if(!d)return;
+    if(!activeAddl[subKey])activeAddl[subKey]={};
+    var card=document.createElement('div');card.className='dc';card.style.marginTop='0';
+    var title=document.createElement('div');title.className='dc-title';
+    title.innerHTML='<div class="dc-ico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--ink2)" stroke-width="1.5" width="14" height="14"><path d="M2 4h12M2 8h8M2 12h5" stroke-linecap="round"/></svg></div>'+d.label;
+    card.appendChild(title);
+    // Default metrics
+    var defLabel=document.createElement('div');defLabel.className='mz-section-label';defLabel.style.marginTop='0';
+    defLabel.innerHTML='Default Metrics <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink3)">(always included)</span>';
+    card.appendChild(defLabel);
+    var defChips=document.createElement('div');defChips.className='metrics-chips';
+    d.defaults.forEach(function(m){var chip=document.createElement('span');chip.className='m-chip m-chip-def';chip.textContent=m;defChips.appendChild(chip);});
+    card.appendChild(defChips);
+    // Additional metrics — only in instant/non-scheduled context
+    if(!window._perfInScheduledDrawer){
+      var addlLabel=document.createElement('div');addlLabel.className='mz-section-label';
+      addlLabel.innerHTML='Additional Metrics <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink3)">(click + to include)</span>';
+      card.appendChild(addlLabel);
+      var addlChips=document.createElement('div');addlChips.className='metrics-chips';
+      Object.keys(d.additional).forEach(function(m){
+        var isOn=!!activeAddl[subKey][m];
+        var chip=document.createElement('span');chip.className='m-chip m-chip-addl'+(isOn?' on':'');chip.title=d.additional[m];chip.setAttribute('data-sub',subKey);chip.setAttribute('data-metric',m);
+        chip.appendChild(document.createTextNode(m));
+        var btn=document.createElement('span');btn.className='m-chip-x';btn.innerHTML=isOn?'&#x2715;':'+';
+        btn.addEventListener('click',function(e){e.stopPropagation();activeAddl[subKey][m]=!activeAddl[subKey][m];onPerfTypeChange();});
+        chip.appendChild(btn);
+        chip.addEventListener('click',function(){activeAddl[subKey][m]=!activeAddl[subKey][m];onPerfTypeChange();});
+        addlChips.appendChild(chip);
+      });
+      card.appendChild(addlChips);
+    }
+    var wrapper=document.createElement('div');wrapper.style.marginTop='12px';wrapper.appendChild(card);wrap.appendChild(wrapper);
+  });
+}
+
+// ── DRAWER ────────────────────────────────────────────────────
+function openDrawer(){
+  window._perfInScheduledDrawer=true;
+  editingId=null;document.getElementById('drwTitle').textContent='Schedule Report';document.getElementById('drwSubmitBtn').textContent='Schedule Report';
+  document.getElementById('rType').value='';
+  document.getElementById('rName').value='';document.getElementById('rEmail').value='';
+  document.getElementById('rNameNdr').value='';document.getElementById('rEmailNdr').value='';
+  document.getElementById('rNamePw').value='';document.getElementById('rEmailPw').value='';
+  ['orderFields','ndrFields','productwiseFields','perfFields','orderContentCard'].forEach(function(id){document.getElementById(id).style.display='none';});
+  document.getElementById('viewSampleRow').style.display='none';
+  resetMSD('msdPerfType',[]);document.getElementById('metricsZoneWrap').innerHTML='';
+  resetMSD('msdOrderType',['COD','Prepaid','Pick Up']);
+  resetMSD('msdOrderStatus',['Pending','Ready to Ship','In Transit','Delivered','RTO','Pick Up in Reattempt','Awaiting Pickup','Out for Delivery']);
+  resetMSD('msdSubStatus',['Returned','Undelivered','Delivered','Lost']);
+  setFreq('month');document.getElementById('ndrNote').style.display='none';
+  document.getElementById('ft-week').classList.remove('dis');document.getElementById('ft-day').classList.remove('dis');
+  document.getElementById('drwOv').classList.add('sh');
+}
+function closeDrw(){window._perfInScheduledDrawer=false;document.getElementById('drwOv').classList.remove('sh');editingId=null;document.querySelectorAll('.msd-dd.open').forEach(function(d){d.classList.remove('open');var b=d.closest('.msd').querySelector('.msd-box');if(b)b.classList.remove('open');});}
+
+function onTypeChange(val){
+  document.getElementById('orderFields').style.display=val==='order'?'block':'none';
+  document.getElementById('orderContentCard').style.display=val==='order'?'block':'none';
+  document.getElementById('ndrFields').style.display=val==='ndr'?'block':'none';
+  document.getElementById('productwiseFields').style.display=val==='productwise'?'block':'none';
+  document.getElementById('perfFields').style.display=val==='performance'?'block':'none';
+  document.getElementById('viewSampleRow').style.display=val?'flex':'none';
+  var isNDR=val==='ndr';
+  document.getElementById('ft-week').classList.toggle('dis',isNDR);
+  document.getElementById('ft-day').classList.toggle('dis',isNDR);
+  document.getElementById('ndrNote').style.display=isNDR?'flex':'none';
+  if(isNDR)setFreq('month');
+  if(val==='performance'){resetMSD('msdPerfType',[]);document.getElementById('metricsZoneWrap').innerHTML='';}
+  updateSumm();
+}
+
+// ── FREQ ─────────────────────────────────────────────────────
+function setFreq(f){curFreq=f;['month','week','day'].forEach(function(t){var el=document.getElementById('ft-'+t);if(el)el.classList.remove('on');});var a=document.getElementById('ft-'+f);if(a)a.classList.add('on');document.getElementById('dateField').style.display=f==='month'?'block':'none';document.getElementById('weekField').style.display=f==='week'?'block':'none';updateSumm();}
+function updateSumm(){var s=document.getElementById('fSumm');if(!s)return;var num=(document.getElementById('dataLastNum')||{}).value||'1';var unit=((document.getElementById('dataLastUnit')||{}).value||'Days').toLowerCase();var dateEl=document.getElementById('rDate');var day=dateEl&&dateEl.value?new Date(dateEl.value).getDate():'19';if(curFreq==='month')s.innerHTML="We'll send reports every month on <b>"+day+"th</b> with the last <b>"+num+" "+unit+" data</b>";else if(curFreq==='week')s.innerHTML="We'll send reports every <b>Wednesday</b> with the last <b>"+num+" "+unit+" data</b>";else{var t=(document.getElementById('rTime')||{}).value||'06:12';s.innerHTML="We'll send reports <b>every day at "+t+"</b> with the last <b>"+num+" "+unit+" data</b>";}}
+
+// ── MSD ──────────────────────────────────────────────────────
+function toggleMSD(msdId){var box=document.getElementById(msdId+'Box'),dd=document.getElementById(msdId+'DD');var isOpen=dd.classList.contains('open');document.querySelectorAll('.msd-dd.open').forEach(function(d){d.classList.remove('open');var b=d.closest('.msd').querySelector('.msd-box');if(b)b.classList.remove('open');});if(!isOpen){dd.classList.add('open');box.classList.add('open');}}
+function toggleOpt(optEl,msdId){
+  if(msdId==='msdPerfType'){var val=optEl.getAttribute('data-val');if(val==='consolidated'){document.querySelectorAll('#msdPerfTypeDD .msd-opt').forEach(function(o){o.classList.remove('sel');});optEl.classList.add('sel');}else{var c=document.querySelector('#msdPerfTypeDD [data-val="consolidated"]');if(c)c.classList.remove('sel');optEl.classList.toggle('sel');}}
+  else{optEl.classList.toggle('sel');}
+  syncMSDChips(msdId);updateSumm();
+}
+function syncMSDChips(msdId){
+  var box=document.getElementById(msdId+'Box'),dd=document.getElementById(msdId+'DD'),ph=document.getElementById(msdId+'PH'),arrow=box.querySelector('.msd-arrow');
+  Array.from(box.children).forEach(function(c){if(!c.classList.contains('msd-arrow')&&!c.classList.contains('msd-ph'))c.remove();});
+  var selected=[];dd.querySelectorAll('.msd-opt.sel').forEach(function(o){selected.push({val:o.getAttribute('data-val'),text:o.textContent.trim().replace('ALL IN ONE','').trim()});});
+  if(selected.length===0){if(ph)ph.style.display='inline';}
+  else{if(ph)ph.style.display='none';selected.forEach(function(s){var chip=document.createElement('span');chip.className='tag';chip.setAttribute('data-msd',msdId);chip.setAttribute('data-val',s.val);var short=s.text.length>28?s.text.substring(0,26)+'\u2026':s.text;var x=document.createElement('span');x.className='tag-x';x.textContent='\u2715';x.onclick=function(e){e.stopPropagation();var p=this.parentElement;removeMSDChip(p.getAttribute('data-msd'),p.getAttribute('data-val'));};chip.appendChild(document.createTextNode(short));chip.appendChild(x);box.insertBefore(chip,arrow);});}
+}
+function removeMSDChip(msdId,val){var dd=document.getElementById(msdId+'DD');var opt=dd&&dd.querySelector('[data-val="'+val+'"]');if(opt)opt.classList.remove('sel');syncMSDChips(msdId);if(msdId==='msdPerfType')onPerfTypeChange();updateSumm();}
+function resetMSD(msdId,preselected){var dd=document.getElementById(msdId+'DD');if(!dd)return;dd.querySelectorAll('.msd-opt').forEach(function(o){o.classList.toggle('sel',preselected.indexOf(o.getAttribute('data-val'))>-1);});syncMSDChips(msdId);}
+function getSelectedMSD(msdId){var dd=document.getElementById(msdId+'DD');var vals=[];dd.querySelectorAll('.msd-opt.sel').forEach(function(o){vals.push(o.getAttribute('data-val'));});return vals;}
+
+// ── SCHEDULED TABLE ──────────────────────────────────────────
+var reports=[
+  {id:1,title:'Weekly Shipment Overview',enabled:true,recipients:['ops@xpressbees.com','manager@mystore.com'],rtype:'Order Report',status:['Pending','In Transit','Delivered','RTO'],sub:['COD','Prepaid','Pick Up'],freq:'month',isNew:false},
+  {id:2,title:'NDR Escalation Report',enabled:true,recipients:['ndr@mystore.com'],rtype:'NDR Report',status:['Undelivered','NDR Raised'],sub:['COD','Prepaid'],freq:'month',isNew:false},
+  {id:3,title:'Monthly Product Summary',enabled:true,recipients:['product@mystore.com'],rtype:'Product Wise Summary',status:['All Products'],sub:['-'],freq:'month',isNew:false},
+  {id:4,title:'Monthly Performance Digest',enabled:false,recipients:['ops@mystore.com'],rtype:'Performance Report',status:['Overall Delivery','SLA Performance'],sub:['All Report Types'],freq:'month',isNew:false}
+];
+function renderTable(){
+  var tbody=document.getElementById('rTbody');
+  tbody.innerHTML=reports.map(function(r){
+    var fc=r.freq==='month'?'fb-m':r.freq==='week'?'fb-w':'fb-d';var fl=r.freq==='month'?'Monthly':r.freq==='week'?'Weekly':'Daily';
+    var r1=r.recipients[0],re=r.recipients.length-1,r2=r.recipients.slice(1);
+    var s1=r.status[0],se=r.status.length-1,s2=r.status.slice(1);
+    var b1=r.sub[0],be=r.sub.length-1,b2=r.sub.slice(1);
+    return '<tr class="'+(r.isNew?'row-new':'')+'">'
+      +'<td><span style="font-size:13px;font-weight:600;color:var(--ink)">'+r.title+'</span></td>'
+      +'<td><div style="display:flex;align-items:center;gap:7px"><label class="tog"><input type="checkbox"'+(r.enabled?' checked':'')+' onchange="toggleR('+r.id+',this)"/><span class="tog-t"></span></label><span style="font-size:11px;font-weight:500;color:'+(r.enabled?'var(--green)':'var(--ink3)')+'">'+( r.enabled?'Enabled':'Disabled')+'</span></div></td>'
+      +'<td><span style="font-size:12px">'+r1+'</span>'+(re>0?'<span class="mp">+'+re+' more<div class="mp-tip"><div class="mp-emails">'+r2.map(function(e){return '<div>'+e+'</div>';}).join('')+'</div></div></span>':'')+'</td>'
+      +'<td><span style="font-size:12px;font-weight:500;color:var(--ink)">'+r.rtype+'</span></td>'
+      +'<td><span style="font-size:12px">'+s1+'</span>'+(se>0?'<span class="mp">+'+se+' more<div class="mp-tip"><div class="mp-emails">'+s2.map(function(x){return '<div>'+x+'</div>';}).join('')+'</div></div></span>':'')+'</td>'
+      +'<td><span style="font-size:12px">'+b1+'</span>'+(be>0?'<span class="mp">+'+be+' more<div class="mp-tip"><div class="mp-emails">'+b2.map(function(x){return '<div>'+x+'</div>';}).join('')+'</div></div></span>':'')+'</td>'
+      +'<td><span class="fb '+fc+'">'+fl+'</span></td>'
+      +'<td><div style="display:flex;gap:2px"><button class="gbl" onclick="editReport('+r.id+')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M9.5 1.5l3 3-9 9H.5v-3l9-9z" stroke-linecap="round" stroke-linejoin="round"/></svg>Edit</button><button class="gbr" onclick="askDel('+r.id+')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 4h10M5 4V2h4v2M11 4l-.9 8H3.9L3 4" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete</button></div></td>'
+    +'</tr>';
+  }).join('');
+  document.getElementById('rCount').textContent=reports.length;
+  reports.forEach(function(r){r.isNew=false;});
+}
+function toggleR(id,el){var r=reports.find(function(x){return x.id===id;});if(r){r.enabled=el.checked;renderTable();toast((el.checked?'Enabled':'Disabled')+': '+r.title);}}
+function askDel(id){var r=reports.find(function(x){return x.id===id;});if(!r)return;pendingDelId=id;var fc=r.freq==='month'?'Monthly':r.freq==='week'?'Weekly':'Daily';document.getElementById('delMoCard').innerHTML='<div class="del-mo-card-row"><span class="del-mo-card-lbl">Name</span><span class="del-mo-card-val">'+r.title+'</span></div><div class="del-mo-card-row"><span class="del-mo-card-lbl">Type</span><span class="del-mo-card-val">'+r.rtype+'</span></div><div class="del-mo-card-row"><span class="del-mo-card-lbl">Frequency</span><span class="del-mo-card-val">'+fc+'</span></div>';document.getElementById('moDelOv').classList.add('sh');}
+function closeDelMo(){document.getElementById('moDelOv').classList.remove('sh');pendingDelId=null;}
+function confirmDel(){if(!pendingDelId)return;reports=reports.filter(function(r){return r.id!==pendingDelId;});closeDelMo();renderTable();toast('Deleted');}
+function editReport(id){var r=reports.find(function(x){return x.id===id;});if(!r)return;editingId=id;window._perfInScheduledDrawer=true;document.getElementById('drwTitle').textContent='Edit Report';document.getElementById('drwSubmitBtn').textContent='Save Changes';var tm={'Order Report':'order','NDR Report':'ndr','Product Wise Summary':'productwise','Performance Report':'performance'};var tv=tm[r.rtype]||'order';document.getElementById('rType').value=tv;onTypeChange(tv);if(tv==='order'){document.getElementById('rName').value=r.title;document.getElementById('rEmail').value=r.recipients[0]||'';}else if(tv==='ndr'){document.getElementById('rNameNdr').value=r.title;document.getElementById('rEmailNdr').value=r.recipients[0]||'';}else if(tv==='productwise'){document.getElementById('rNamePw').value=r.title;document.getElementById('rEmailPw').value=r.recipients[0]||'';}setFreq(r.freq);document.getElementById('drwOv').classList.add('sh');}
+
+function doSchedule(){
+  var tv=document.getElementById('rType').value;if(!tv){toast('Please select a report type');return;}
+  var name='',email='';
+  if(tv==='order'){name=document.getElementById('rName').value.trim();email=document.getElementById('rEmail').value.trim();}
+  else if(tv==='ndr'){name=document.getElementById('rNameNdr').value.trim();email=document.getElementById('rEmailNdr').value.trim();}
+  else if(tv==='productwise'){name=document.getElementById('rNamePw').value.trim();email=document.getElementById('rEmailPw').value.trim();}
+  else if(tv==='performance'){var sel=getSelectedMSD('msdPerfType');if(sel.length===0){toast('Select at least one performance report type');return;}var isC=sel.indexOf('consolidated')>-1;name=isC?'Consolidated Performance Report':(sel.length===1?PERF[sel[0]].label:'Performance Report ('+sel.length+' types)');email='reports@store.com';}
+  if(!name&&tv!=='performance'){toast('Please enter a report name');return;}
+  var tl=tv==='order'?'Order Report':tv==='ndr'?'NDR Report':tv==='productwise'?'Product Wise Summary':'Performance Report';
+  var fl=curFreq==='month'?'monthly':curFreq==='week'?'weekly':'daily';
+  if(editingId){var r=reports.find(function(x){return x.id===editingId;});if(r){r.title=name;r.rtype=tl;if(email)r.recipients=[email];r.freq=curFreq;}closeDrw();renderTable();toast('Report updated');return;}
+  reports.unshift({id:Date.now(),title:name,enabled:true,recipients:[email||'reports@store.com'],rtype:tl,status:['Per selection'],sub:['Configured'],freq:curFreq,isNew:true});
+  closeDrw();
+  document.getElementById('moTitle').textContent='Report Scheduled!';
+  document.getElementById('moSub').textContent='"'+name+'" scheduled as '+fl+'.';
+  document.getElementById('moDetail').innerHTML='<b>Report:</b> '+name+'<br><b>Type:</b> '+tl+'<br><b>Frequency:</b> '+(curFreq==='month'?'Every Month':curFreq==='week'?'Every Week':'Every Day');
+  document.getElementById('moSuc').classList.add('sh');
+}
+function closeSuc(){document.getElementById('moSuc').classList.remove('sh');renderTable();}
+function toast(msg){var t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('sh');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('sh')},2800);}
+
+renderTable();setFreq('month');
+</script>
+</body>
+</html>

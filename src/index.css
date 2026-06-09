@@ -1,3 +1,9 @@
 @import "tailwindcss";
 @import "./styles/reports.css";
+@import "./styles/sidebar.css";
+@import "./styles/topbar.css";
+@import "./styles/dashboard.css";
+@import "./styles/support.css";
+@import "./styles/orders.css";
+@import "./styles/ndr.css";
 

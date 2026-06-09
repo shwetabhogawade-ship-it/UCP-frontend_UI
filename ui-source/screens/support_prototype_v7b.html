@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1440"/>
+<title>Support · XpressBees Seller Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--surface:#FFF;--s2:#F8F7F3;--s3:#EEECEA;
+  --border:#E2E0D8;--border2:#C5C3BB;
+  --ink:#1A190F;--ink2:#5C5B52;--ink3:#9B998F;
+  --orange:#E8520A;--ol:#FEF0E8;--om:#F5C09A;
+  --red:#C52E18;--rl:#FDECEA;--rm:#F9B8B0;
+  --green:#1A6B3A;--gl:#E7F5ED;--gm:#8DD4A9;
+  --amber:#9E5A00;--al:#FFF5E5;--am:#F5C878;
+  --blue:#1246A0;--bl:#EAF0FD;--bm:#8EAFF0;
+  --radius:10px;--radius-sm:7px;
+  --shadow:0 1px 3px rgba(0,0,0,.04);--shadow-md:0 2px 8px rgba(0,0,0,.09);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sb{width:54px;background:#0F0E09;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 0 18px;gap:4px}
+.sb-logo{width:34px;height:34px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}.sb-logo svg{width:18px;height:18px;fill:#fff}
+.sb-i{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#46443C;transition:all .15s}.sb-i:hover{background:#1C1B14;color:#8A8878}.sb-i.on{background:var(--orange);color:#fff}.sb-i svg{width:16px;height:16px}
+.sb-sep{width:26px;height:1px;background:#222118;margin:5px 0}.sb-f{flex:1}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;flex-shrink:0;z-index:200}
+.page{flex:1;overflow-y:auto;padding:20px 22px 60px}.page::-webkit-scrollbar{width:6px}.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.ph-title{font-size:20px;font-weight:700;letter-spacing:-.4px}.ph-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.tbtn{display:inline-flex;align-items:center;gap:5px;padding:0 13px;height:32px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:var(--font);transition:all .15s;white-space:nowrap}.tbtn:hover{border-color:var(--border2)}
+.tbtn-p{background:var(--orange);color:#fff;border-color:var(--orange)}.tbtn-p:hover{opacity:.88}
+.mfb{padding:0 20px;height:38px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.mfb-c{border:1px solid var(--border);background:var(--surface);color:var(--ink2)}.mfb-c:hover{border-color:var(--border2)}
+.mfb-p{border:none;background:var(--orange);color:#fff}.mfb-p:hover{opacity:.88}
+.mfb-p:disabled{background:var(--border2);cursor:not-allowed;opacity:.5}
+.mfb-green{border:1.5px solid var(--gm);background:var(--surface);color:var(--green);font-size:12px}.mfb-green:hover{background:var(--gl)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kc{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:18px 20px 16px;position:relative;overflow:hidden;transition:all .18s}.kc:hover{border-color:var(--border2)}
+.kc-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:13px 0 0 13px}
+.kc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.kc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);max-width:140px;line-height:1.4}
+.kc-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.kc-ico svg{width:15px;height:15px}
+.kc-n{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.7px;line-height:1;color:var(--ink)}
+.kc-sub{font-size:11px;color:var(--ink3);margin-top:5px}
+.s-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
+.s-tab{padding:10px 22px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;user-select:none}.s-tab:hover{color:var(--ink2)}.s-tab.on{color:var(--ink);border-bottom-color:var(--orange)}
+.s-tab .t-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.s-tab.on .t-count{background:var(--ol);color:var(--orange)}.s-tab:not(.on) .t-count{background:var(--s3);color:var(--ink3)}
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}
+.fb-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.fdiv{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.fc{display:flex;align-items:center;gap:6px;padding:0 11px;height:30px;border-radius:8px;background:var(--s2);border:1.5px solid var(--border);font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;white-space:nowrap;user-select:none;transition:all .15s;position:relative}
+.fc:hover{border-color:var(--border2)}.fc.on{border-color:var(--orange);background:var(--ol);color:var(--orange)}
+.fc-r{margin-left:auto}.fc-chev{font-size:9px;color:var(--ink3);margin-left:2px}
+.fc-dd{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);min-width:260px;z-index:500;display:none;overflow:hidden}
+.fc-dd.sh{display:block}
+.fc-dd-search{padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2}
+.fc-dd-search input{width:100%;height:30px;border:1.5px solid var(--border);border-radius:6px;padding:0 10px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none}.fc-dd-search input:focus{border-color:var(--orange)}
+.fc-dd-body{max-height:240px;overflow-y:auto}
+.fc-dd-i{padding:9px 14px;font-size:12px;color:var(--ink2);cursor:pointer;border-bottom:.5px solid var(--border);transition:background .1s;display:flex;align-items:center;gap:8px}.fc-dd-i:last-child{border-bottom:none}.fc-dd-i:hover{background:var(--s2);color:var(--ink)}.fc-dd-i.on{background:var(--ol);color:var(--orange);font-weight:600}
+.fc-dd-empty{padding:14px;font-size:12px;color:var(--ink3);text-align:center}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ts{overflow:hidden}
+table.stbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.stbl thead tr{background:var(--s2)}
+.stbl th{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.45px;padding:11px 14px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stbl td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--ink2);vertical-align:top;overflow:hidden}
+.stbl tr:last-child td{border-bottom:none}
+.stbl tr:hover td{background:var(--s2)}
+.stbl th:nth-child(1),.stbl td:nth-child(1){width:14%}
+.stbl th:nth-child(2),.stbl td:nth-child(2){width:13%}
+.stbl th:nth-child(3),.stbl td:nth-child(3){width:20%}
+.stbl th:nth-child(4),.stbl td:nth-child(4){width:11%}
+.stbl th:nth-child(5),.stbl td:nth-child(5){width:16%}
+.stbl th:nth-child(6),.stbl td:nth-child(6){width:14%}
+.stbl th:nth-child(7),.stbl td:nth-child(7){width:12%;overflow:visible}
+.td-id{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink)}
+.td-date{font-size:11px;color:var(--ink3);margin-top:2px}
+.td-awb{font-family:var(--mono);font-size:11px;color:var(--blue);cursor:pointer}.td-awb:hover{text-decoration:underline}
+.st-badge{display:inline-flex;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.st-open{background:var(--al);color:var(--amber)}.st-wip{background:var(--bl);color:var(--blue)}.st-closed{background:var(--s3);color:var(--ink3)}.st-awaiting{background:var(--ol);color:var(--orange)}.st-resolved{background:var(--gl);color:var(--green)}
+.sla-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;margin-top:4px;letter-spacing:.2px}
+.sla-ok{background:var(--gl);color:var(--green)}.sla-breach{background:var(--rl);color:var(--red)}
+.act-col{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.ab{display:inline-flex;align-items:center;gap:4px;padding:0 12px;height:28px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;border:none;white-space:nowrap}
+.ab-p{background:var(--orange);color:#fff}.ab-p:hover{opacity:.88}
+.ab-ghost{background:none;border:1.5px solid var(--border);color:var(--ink2);font-size:11px;font-weight:600;height:28px;padding:0 12px;border-radius:6px;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s}.ab-ghost:hover{border-color:var(--border2);background:var(--s2)}
+.ab-link{background:none;border:none;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;padding:1px 0;font-family:var(--font);line-height:1.4}.ab-link:hover{text-decoration:underline}
+/* REOPEN BUTTON */
+.ab-reopen{background:none;border:1.5px solid var(--gm);color:var(--green);font-size:11px;font-weight:700;height:28px;padding:0 12px;border-radius:6px;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s}.ab-reopen:hover{background:var(--gl)}
+.ab-reopen-exp{background:none;border:1.5px solid var(--border);color:var(--ink3);font-size:11px;font-weight:600;height:28px;padding:0 12px;border-radius:6px;cursor:default;font-family:var(--font);white-space:nowrap}
+/* REOPEN TIMER BADGE */
+.reopen-timer{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:var(--gl);color:var(--green);margin-top:3px}
+.reopen-timer.exp{background:var(--s3);color:var(--ink3)}
+.kebab{position:relative;display:inline-block}
+.kb-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:14px;letter-spacing:-1px;transition:all .12s}.kb-btn:hover{border-color:var(--border2);background:var(--s2)}
+.kb-menu{position:absolute;right:0;top:32px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);min-width:200px;z-index:400;display:none;overflow:hidden}.kb-menu.sh{display:block}
+.kb-item{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;color:var(--ink2);cursor:pointer;transition:background .1s}.kb-item:hover{background:var(--s2);color:var(--ink)}
+.sup-pop{position:absolute;right:0;top:32px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);width:280px;z-index:450;display:none;padding:16px}.sup-pop.sh{display:block}
+.sup-pop-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.sup-pop-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}.sup-pop-row:last-child{border-bottom:none}
+.sup-pop-lbl{color:var(--ink3);font-weight:500}.sup-pop-val{color:var(--ink);font-weight:600;text-align:right}
+.tf{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--s2);border-top:1px solid var(--border)}
+.tf-info{font-size:11px;color:var(--ink3)}.tf-info b{color:var(--ink);font-weight:600}
+.pgw{display:flex;align-items:center;gap:5px}
+.pgb{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--ink2);transition:all .12s}.pgb:hover{border-color:var(--border2)}.pgb.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.pp-sel{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink2)}.pp-sel select{border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-size:11px;font-family:var(--font);color:var(--ink);background:var(--surface);outline:none}
+.tk-count{font-size:12px;color:var(--orange);font-weight:600;margin-bottom:12px}
+/* ── OVERLAYS ── */
+.mo-ov{position:fixed;inset:0;background:rgba(10,10,5,.5);z-index:700;display:none;align-items:flex-start;justify-content:flex-end}.mo-ov.sh{display:flex}
+.mo-panel{background:var(--surface);width:700px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .22s ease}
+.mo-panel::-webkit-scrollbar{width:5px}.mo-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.mo-hdr{padding:22px 28px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2}
+.mo-hdr-t{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.mo-title{font-size:18px;font-weight:700;letter-spacing:-.3px}.mo-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.mo-x{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--ink2);flex-shrink:0;transition:all .12s}.mo-x:hover{background:var(--s3)}
+.mo-body{flex:1;padding:22px 28px}
+.mo-ft{padding:14px 28px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--surface);display:flex;justify-content:flex-end;gap:10px}
+/* ── STEP INDICATOR ── */
+.steps{display:flex;align-items:center;gap:0;margin-top:14px}
+.step-node{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--ink3)}
+.step-node.done{color:var(--green)}.step-node.active{color:var(--orange)}
+.step-c{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.step-node.done .step-c{border-color:var(--green);background:var(--gl);color:var(--green)}
+.step-node.active .step-c{border-color:var(--orange);background:var(--ol);color:var(--orange)}
+.step-line{flex:1;height:1.5px;background:var(--border);margin:0 8px}.step-line.done{background:var(--gm)}
+/* ── FORMS ── */
+.mo-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mf{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.ml{font-size:12px;font-weight:600;color:var(--ink2)}.ml-hint{font-size:11px;color:var(--ink3);font-weight:400}
+.mi{width:100%;height:40px;border:1.5px solid var(--border);border-radius:7px;padding:0 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none}
+.mi:focus{background:var(--surface);border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}.mi::placeholder{color:var(--ink3)}
+.mi-ta{width:100%;min-height:80px;border:1.5px solid var(--border);border-radius:7px;padding:10px 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;resize:vertical;line-height:1.5;transition:border-color .15s}
+.mi-ta:focus{background:var(--surface);border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}.mi-ta::placeholder{color:var(--ink3)}
+.radio-row{display:flex;gap:20px;margin-bottom:14px}
+.radio-opt{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink2)}.radio-opt input{width:15px;height:15px;accent-color:var(--orange)}
+.note-bar{display:flex;align-items:flex-start;gap:8px;padding:8px 14px;background:var(--al);border:1px solid var(--am);border-radius:7px;font-size:12px;color:var(--amber);font-weight:500;margin-bottom:14px;line-height:1.5}
+/* ── CDD ── */
+.cdd{position:relative}
+.cdd-btn{width:100%;height:40px;border:1.5px solid var(--border);border-radius:7px;padding:0 34px 0 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;cursor:pointer;text-align:left;transition:border-color .15s;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdd-btn::after{content:"\25BC";position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--ink3);pointer-events:none}
+.cdd-btn.placeholder{color:var(--ink3)}
+.cdd-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);z-index:600;display:none;overflow:hidden}.cdd-list.sh{display:block}
+.cdd-search{padding:8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
+.cdd-search input{width:100%;height:30px;border:1.5px solid var(--border);border-radius:6px;padding:0 10px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none}.cdd-search input:focus{border-color:var(--orange)}
+.cdd-items{max-height:260px;overflow-y:auto}
+.cdd-item{padding:10px 13px;cursor:pointer;transition:background .1s;border-bottom:.5px solid var(--border)}.cdd-item:last-child{border-bottom:none}.cdd-item:hover{background:var(--s2)}.cdd-item.on{background:var(--ol)}
+.cdd-item .cdd-main{font-size:13px;font-weight:600;color:var(--ink)}.cdd-item .cdd-desc{font-size:11px;color:var(--ink3);margin-top:2px}
+.cdd-empty{padding:12px 13px;font-size:12px;color:var(--ink3)}
+/* ── UPLOAD ZONE ── */
+.uz{border:2px dashed var(--bm);border-radius:9px;padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:#F7FBFF}.uz:hover{border-color:var(--blue);background:var(--bl)}
+.uz-t{font-size:12px;color:var(--blue);font-weight:500}.uz-s{font-size:11px;color:var(--ink3);margin-top:3px}
+.uz-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+/* UPLOADED FILE STATE */
+.file-uploaded{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--gl);border:1px solid var(--gm);border-radius:9px;margin-bottom:14px}
+.file-icon{width:36px;height:36px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;color:#fff}
+.file-name{font-size:13px;font-weight:700;color:var(--ink)}
+.file-meta{font-size:11px;color:var(--ink3);margin-top:1px}
+.file-check{margin-left:auto;color:var(--green);font-size:18px}
+/* PROGRESS BAR */
+.upload-progress{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px}
+.upload-progress-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin:8px 0}
+.upload-progress-fill{height:100%;background:var(--orange);border-radius:3px;transition:width .4s ease}
+/* ── AWB LOOKUP ── */
+.awb-row{display:flex;gap:0;align-items:stretch}
+.awb-row .mi{border-radius:7px 0 0 7px;border-right:none;font-family:var(--mono);letter-spacing:.4px}
+.awb-row .mi:focus{z-index:1;border-right:none}
+.awb-validate-btn{height:40px;padding:0 16px;background:var(--orange);color:#fff;border:1.5px solid var(--orange);border-radius:0 7px 7px 0;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:opacity .15s;flex-shrink:0}.awb-validate-btn:hover{opacity:.88}
+.field-hint{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px}
+.field-hint.ok{color:var(--green)}.field-hint.err{color:var(--red)}.field-hint.info{color:var(--blue)}
+/* ── SHIPMENT / ELIGIBILITY CARDS ── */
+.shp-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.shp-card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.shp-card-title{font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.4px}
+.shp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.shp-f{padding:9px 11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.shp-f-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.shp-f-val{font-size:12px;font-weight:600;color:var(--ink)}
+.shp-f.elig-ok{background:var(--gl);border-color:var(--gm)}.shp-f.elig-block{background:var(--rl);border-color:var(--rm)}
+.elig-box{border:1.5px solid var(--gm);border-radius:10px;padding:14px;margin-bottom:14px;background:var(--gl)}
+.elig-box.block{background:var(--rl);border-color:var(--rm)}.elig-box.warn{background:var(--al);border-color:var(--am)}
+.elig-box-title{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--green)}
+.elig-box.block .elig-box-title{color:var(--red)}.elig-box.warn .elig-box-title{color:var(--amber)}
+.elig-box-body{font-size:12px;line-height:1.6;color:var(--green)}
+.elig-box.block .elig-box-body{color:var(--red)}.elig-box.warn .elig-box-body{color:var(--amber)}
+.awb-detail-row{display:grid;grid-template-columns:2fr 1.5fr 1.5fr 1.5fr;gap:0;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface);margin-top:10px}
+.awb-detail-cell{padding:9px 12px;border-right:1px solid var(--border);font-size:12px}.awb-detail-cell:last-child{border-right:none}
+.awb-detail-hdr{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.awb-detail-val{font-weight:600;color:var(--blue);font-family:var(--mono)}.awb-detail-val.ink{color:var(--ink)}
+/* ── SLA TIMELINE ── */
+.sla-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.sla-block-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.sla-bar-wrap{height:7px;border-radius:4px;background:var(--border);overflow:hidden;margin-bottom:6px}
+.sla-bar-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s ease}
+.sla-bar-fill.warn{background:var(--amber)}.sla-bar-fill.over{background:var(--red)}
+.sla-bar-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-bottom:12px}
+.mvmt-list{display:flex;flex-direction:column;gap:0}
+.mvmt-item{display:flex;align-items:flex-start;gap:11px;padding:8px 0;border-bottom:.5px solid var(--border)}.mvmt-item:last-child{border-bottom:none}
+.mvmt-dot{width:8px;height:8px;border-radius:50%;background:var(--gm);flex-shrink:0;margin-top:4px}.mvmt-dot.cur{background:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.mvmt-loc{font-size:12px;font-weight:600;color:var(--ink)}.mvmt-time{font-size:11px;color:var(--ink3);margin-top:1px}
+.mvmt-st{display:inline-flex;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;margin-top:3px}
+/* ── DUPLICATE ── */
+.dup-notice{background:var(--al);border:1.5px solid var(--am);border-radius:10px;padding:14px;margin-bottom:14px}
+.dup-notice-title{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.dup-notice-body{font-size:12px;color:var(--amber);line-height:1.6;margin-bottom:12px}
+.exist-tk-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px}
+.exist-tk-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.exist-tk-id{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink)}
+.exist-tk-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chip{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--s3);color:var(--ink2)}
+.exist-tk-desc{font-size:12px;color:var(--ink2);margin-bottom:10px}
+.exist-tk-awb-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+.exist-tk-awb-num{font-family:var(--mono);color:var(--blue);font-weight:600}
+.exist-tk-meta{font-size:11px;color:var(--ink3)}
+.view-tk-btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:var(--font);white-space:nowrap;transition:all .15s;flex-shrink:0}.view-tk-btn:hover{border-color:var(--border2);background:var(--s2)}
+/* ── RESTRICT / INFO BARS ── */
+.restrict-banner{background:var(--rl);border:1.5px solid var(--rm);border-radius:10px;padding:14px;margin-bottom:14px}
+.restrict-title{font-size:13px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.restrict-body{font-size:12px;color:var(--red);line-height:1.6;opacity:.9}
+.info-bar{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;background:var(--bl);border:1px solid var(--bm);border-radius:8px;font-size:12px;color:var(--blue);margin-bottom:14px;line-height:1.5}
+.warn-bar{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;background:var(--al);border:1px solid var(--am);border-radius:8px;font-size:12px;color:var(--amber);margin-bottom:14px;line-height:1.5}
+.success-bar{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;background:var(--gl);border:1px solid var(--gm);border-radius:8px;font-size:12px;color:var(--green);margin-bottom:14px;line-height:1.5}
+.err-bar{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;background:var(--rl);border:1px solid var(--rm);border-radius:8px;font-size:12px;color:var(--red);margin-bottom:14px;line-height:1.5}
+/* ── SUCCESS SCREEN ── */
+.success-screen{padding:32px 0 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.success-icon-wrap{width:64px;height:64px;border-radius:50%;background:var(--green);border:3px solid var(--gm);display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative}
+.success-icon-wrap::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--gm);opacity:.35}
+.success-icon-wrap svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.success-h{font-size:20px;font-weight:800;letter-spacing:-.4px;color:var(--ink);margin-bottom:6px}
+.success-p{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:20px;max-width:360px}
+.success-tk-wrap{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:left;margin-bottom:16px}
+.success-tk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.success-tk-id-line{display:flex;align-items:center;gap:8px}
+.success-tk-id{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--blue)}
+.success-tk-orders{font-size:12px;color:var(--ink3);font-style:italic}
+.success-tk-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.success-tk-desc{font-size:12px;color:var(--ink2);margin-bottom:10px}
+.success-tk-awb-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink2);flex-wrap:wrap;gap:8px}
+.success-tk-awb-left{display:flex;align-items:center;gap:8px}
+.success-tk-awb-num{font-family:var(--mono);color:var(--blue);font-size:12px;font-weight:600}
+.success-track-note{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:16px}
+/* ── CSAT ── */
+.csat-box{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center}
+.csat-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.csat-faces{display:flex;justify-content:center;gap:16px;margin-bottom:14px}
+.csat-face{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px 10px;border-radius:9px;transition:background .15s;border:1.5px solid transparent}
+.csat-face:hover{background:var(--s2)}.csat-face.picked{background:var(--ol);border-color:var(--om)}
+.csat-face svg{width:32px;height:32px;stroke:var(--ink3);fill:none;stroke-width:1.4;transition:stroke .15s}
+.csat-face.picked svg{stroke:var(--orange)}
+.csat-face-lbl{font-size:10px;font-weight:600;color:var(--ink3);text-align:center;line-height:1.3;max-width:60px}.csat-face.picked .csat-face-lbl{color:var(--orange)}
+.csat-submit{height:36px;padding:0 28px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--ink2);transition:all .15s}
+.csat-submit.active{background:var(--orange);color:#fff;border-color:var(--orange)}.csat-submit.active:hover{opacity:.88}
+/* ── TICKET DETAIL PANEL ── */
+.sp-ov{position:fixed;inset:0;background:rgba(10,10,5,.5);z-index:700;display:none;align-items:flex-start;justify-content:flex-end}.sp-ov.sh{display:flex}
+.sp{background:var(--surface);width:660px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .22s ease}.sp::-webkit-scrollbar{width:5px}.sp::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.sp-hdr{padding:22px 24px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2}
+.sp-hdr-t{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sp-title{font-size:18px;font-weight:700;letter-spacing:-.3px}.sp-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.sp-x{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--ink2);flex-shrink:0;transition:all .12s}.sp-x:hover{background:var(--s3)}
+.sp-body{flex:1;padding:22px 24px}
+.sp-ft{padding:14px 24px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--surface);display:flex;justify-content:flex-end;gap:10px}
+.sp-sec-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.sp-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.tk-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.tk-field{padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.tk-field-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.tk-field-val{font-size:12px;font-weight:600;color:var(--ink)}
+.tl{padding-left:22px;position:relative}
+.tl::before{content:"";position:absolute;left:6px;top:12px;bottom:12px;width:1.5px;background:var(--border);border-style:dashed}
+.tli{position:relative;padding-bottom:18px}.tli:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-22px;top:5px;width:13px;height:13px;border-radius:50%;border:2px solid var(--border);background:var(--surface);z-index:1}
+.tl-dot.active{border-color:var(--blue);background:var(--blue)}.tl-dot.done{border-color:var(--green);background:var(--green)}
+.tl-hdr{font-size:12px;font-weight:700;color:var(--ink)}.tl-time{font-size:11px;color:var(--ink3);margin-top:1px}
+.tl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px}
+.tl-grid-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.tl-grid-val{font-size:12px;color:var(--ink2)}
+/* ── SUPPORT CONVERSATION VIEW (matches view_ticket.png) ── */
+.conv-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.conv-tk-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.conv-tk-id{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink)}
+.conv-tk-sub{font-size:11px;color:var(--ink3)}
+.conv-meta-chips{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.conv-meta-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;background:var(--s2);border:1px solid var(--border);color:var(--ink2)}
+.mark-resolved-btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:8px;border:1.5px solid var(--gm);background:var(--surface);font-size:12px;font-weight:700;cursor:pointer;color:var(--green);font-family:var(--font);white-space:nowrap;transition:all .15s;flex-shrink:0}.mark-resolved-btn:hover{background:var(--gl)}
+.conv-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.conv-box-hdr{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--ink)}
+.conv-msg-list{padding:14px 16px;display:flex;flex-direction:column;gap:14px;min-height:120px}
+.conv-msg{display:flex;align-items:flex-start;gap:10px}
+.conv-msg.seller{flex-direction:row-reverse}
+.conv-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.conv-avatar.support{background:#2C2C3A;color:#fff}
+.conv-avatar.seller{background:var(--blue);color:#fff}
+.conv-bubble{max-width:420px;padding:10px 13px;border-radius:10px;font-size:12px;line-height:1.6}
+.conv-bubble.support{background:var(--surface);border:1px solid var(--border);color:var(--ink2);border-radius:0 10px 10px 10px}
+.conv-bubble.seller{background:var(--bl);border:1px solid var(--bm);color:var(--ink);border-radius:10px 0 10px 10px}
+.conv-ts{font-size:10px;color:var(--ink3);margin-top:3px}
+.conv-reply-hint{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bl);font-size:11px;color:var(--blue);font-weight:500}
+.conv-input-area{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface)}
+.conv-input{flex:1;height:38px;border:1.5px solid var(--border);border-radius:7px;padding:0 12px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none}.conv-input:focus{border-color:var(--orange)}
+.conv-send{width:34px;height:34px;border-radius:7px;border:none;background:var(--orange);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.conv-attach{width:34px;height:34px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* ── BULK TICKET REQUEST STATUS (matches Bulk_ticket_creation.png) ── */
+.bulk-ov{position:fixed;inset:0;background:rgba(10,10,5,.5);z-index:800;display:none;align-items:flex-start;justify-content:flex-end}.bulk-ov.sh{display:flex}
+.bulk-panel{background:var(--surface);width:820px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .22s ease}.bulk-panel::-webkit-scrollbar{width:5px}.bulk-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.bulk-hdr{padding:20px 28px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2;display:flex;align-items:center;gap:12px}
+.bulk-hdr-back{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);transition:all .12s;flex-shrink:0}.bulk-hdr-back:hover{background:var(--s3)}
+.bulk-hdr-title{font-size:16px;font-weight:700;color:var(--ink)}
+.bulk-created-banner{background:var(--bl);border:1px solid var(--bm);border-radius:10px;padding:14px 16px;margin:20px 28px 0;display:flex;align-items:flex-start;gap:10px}
+.bulk-created-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.bulk-created-desc{font-size:12px;color:var(--ink2);margin-top:5px}
+.bulk-body{padding:20px 28px}
+/* Bulk status tabs */
+.bulk-status-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.bulk-status-ico{width:28px;height:28px;background:var(--s2);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bulk-status-title{font-size:14px;font-weight:700;color:var(--ink)}
+.bulk-tabs{display:flex;align-items:center;gap:0;border-bottom:1.5px solid var(--border);margin-bottom:16px}
+.bulk-tab{padding:8px 18px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all .14s;white-space:nowrap;user-select:none;display:flex;align-items:center;gap:6px}
+.bulk-tab:hover{color:var(--ink2)}.bulk-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.bulk-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:11px;font-weight:700;background:var(--blue);color:#fff}
+.bulk-tab.on:nth-child(1) .bulk-tab-count{background:var(--green)}.bulk-tab.on:nth-child(3) .bulk-tab-count{background:var(--amber)}.bulk-tab.on:nth-child(5) .bulk-tab-count{background:var(--amber)}
+/* Bulk search */
+.bulk-search{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.bulk-search input{height:34px;border:1.5px solid var(--border);border-radius:7px;padding:0 12px 0 34px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;width:260px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239B998F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}.bulk-search input:focus{border-color:var(--orange)}
+/* Bulk table */
+table.btbl{width:100%;border-collapse:collapse}
+.btbl thead tr{background:var(--s2)}
+.btbl th{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.btbl td{padding:12px 14px;border-bottom:.5px solid var(--border);font-size:12px;color:var(--ink2);vertical-align:middle}
+.btbl tr:last-child td{border-bottom:none}
+.btbl tr:hover td{background:var(--s2)}
+.btbl .order-id{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--blue)}
+.btbl .awb-num{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:1px}
+/* Bulk address col */
+.addr-col{display:flex;flex-direction:column;gap:1px;font-size:11px;color:var(--ink2);line-height:1.5}
+.addr-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.addr-dot.origin{background:var(--ink3)}.addr-dot.dest{background:var(--orange)}
+.addr-row-item{display:flex;align-items:flex-start;gap:7px}
+/* Bulk status badge */
+.bst{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2px}
+.bst-created{background:var(--gl);color:var(--green)}.bst-ineligible{background:var(--al);color:var(--amber)}.bst-exists{background:var(--bl);color:var(--blue)}
+/* ── SHIMMER ── */
+.shimmer{background:linear-gradient(90deg,var(--border) 25%,var(--s3) 50%,var(--border) 75%);background-size:200% 100%;animation:shimAnim 1.3s infinite;border-radius:5px}
+@keyframes shimAnim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* ── NEW ROW ── */
+.new-row td{background:var(--gl)!important;animation:rowFade 4s ease forwards}
+@keyframes rowFade{0%{background-color:#d2f4e2}100%{background-color:transparent}}
+/* ── GUIDE LIST ── */
+.guide-list{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:14px}
+.guide-list-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:9px}
+.guide-item{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--ink2);margin-bottom:7px;line-height:1.5}.guide-item:last-child{margin-bottom:0}
+.guide-arrow{color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.2)}.toast.sh{transform:translateX(-50%) translateY(0)}
+.fade{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="sb">
+  <div class="sb-logo"><svg viewBox="0 0 20 20"><path d="M3 10L10 3l7 7M5 8.5v9h4v-5h2v5h4v-9"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12M4 8h8M4 12h10M4 16h6" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15l4-4 3 3 4-5 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18h14" stroke-linecap="round"/></svg></div>
+  <div class="sb-sep"></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L2 7v6l8 5 8-5V7L10 2z" stroke-linejoin="round"/></svg></div>
+  <div class="sb-i on"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7 9a3 3 0 015.5 1.5c0 1.5-2 2-2 3M10 15.5h.01" stroke-linecap="round"/></svg></div>
+  <div class="sb-f"></div><div class="sb-sep"></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.9 3.9l1.4 1.4M14.7 14.7l1.4 1.4M3.9 16.1l1.4-1.4M14.7 5.3l1.4-1.4" stroke-linecap="round"/></svg></div>
+</nav>
+<div class="main">
+<div class="topbar"></div>
+<div class="page fade">
+  <div class="ph">
+    <div><div class="ph-title">Support</div><div class="ph-sub">Get help by creating a ticket or reading help articles</div></div>
+    <button class="tbtn tbtn-p" onclick="openCreate()">+ Create Ticket</button>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 20px;margin-bottom:20px">
+    <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:14px">Last 30-Days Data Overview</div>
+    <div class="kpi-row">
+      <div class="kc"><div class="kc-bar" style="background:var(--orange)"></div><div class="kc-top"><div class="kc-lbl">Open Tickets</div><div class="kc-ico" style="background:var(--ol)"><svg viewBox="0 0 16 16" fill="none" stroke="var(--orange)" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M8 5v6" stroke-linecap="round"/></svg></div></div><div class="kc-n" id="kpiOpen">10</div></div>
+      <div class="kc"><div class="kc-bar" style="background:var(--amber)"></div><div class="kc-top"><div class="kc-lbl">Work In Progress</div><div class="kc-ico" style="background:var(--al)"><svg viewBox="0 0 16 16" fill="none" stroke="var(--amber)" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.5v4l2.5 1.5" stroke-linecap="round"/></svg></div></div><div class="kc-n">5</div></div>
+      <div class="kc"><div class="kc-bar" style="background:var(--blue)"></div><div class="kc-top"><div class="kc-lbl">Awaiting Your Response</div><div class="kc-ico" style="background:var(--bl)"><svg viewBox="0 0 16 16" fill="none" stroke="var(--blue)" stroke-width="1.5"><path d="M2 4h12v8H2z" stroke-linejoin="round"/><path d="M2 4l6 5 6-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div><div class="kc-n">2</div></div>
+      <div class="kc"><div class="kc-bar" style="background:var(--green)"></div><div class="kc-top"><div class="kc-lbl">Resolved Within SLA</div><div class="kc-ico" style="background:var(--gl)"><svg viewBox="0 0 16 16" fill="none" stroke="var(--green)" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div><div class="kc-n">28</div><div class="kc-sub">Avg resolution: 4h 32m</div></div>
+    </div>
+  </div>
+  <div class="s-tabs">
+    <div class="s-tab on" onclick="switchTab('open',this)">Open<span class="t-count" id="cntOpen">10</span></div>
+    <div class="s-tab" onclick="switchTab('resolved',this)">Resolved<span class="t-count" id="cntResolved">5</span></div>
+    <div class="s-tab" onclick="switchTab('closed',this)">Closed<span class="t-count" id="cntClosed">6</span></div>
+  </div>
+  <div class="fbar">
+    <div class="fb-lbl">Filters</div><div class="fdiv"></div>
+    <!-- DATE FILTER -->
+    <div class="fc on" onclick="toggleFDD('fddDate',event)" id="fddDateBtn">
+      Last 30 days <span class="fc-chev">▾</span>
+      <div class="fc-dd" id="fddDate" onclick="event.stopPropagation()" style="min-width:200px">
+        <div class="fc-dd-body">
+          <div class="fc-dd-i on" onclick="pickDateFilter(this,'Last 30 days')">Last 30 days</div>
+          <div class="fc-dd-i" onclick="pickDateFilter(this,'Custom date range')">Custom date range</div>
+        </div>
+      </div>
+    </div>
+    <!-- CUSTOM DATE RANGE INPUTS (hidden until selected) -->
+    <div id="customDateInputs" style="display:none;display:flex;gap:6px;align-items:center">
+      <input type="date" id="dateFrom" class="mi" style="height:30px;width:130px;font-size:11px;padding:0 8px"/>
+      <span style="font-size:11px;color:var(--ink3)">to</span>
+      <input type="date" id="dateTo" class="mi" style="height:30px;width:130px;font-size:11px;padding:0 8px"/>
+    </div>
+    <!-- SUB CATEGORY FILTER -->
+    <div class="fc" onclick="toggleFDD('fddSub',event)" id="fddSubBtn">Sub Category <span class="fc-chev">▾</span>
+      <div class="fc-dd" id="fddSub" onclick="event.stopPropagation()">
+        <div class="fc-dd-search"><input type="text" placeholder="Search subcategory..." oninput="filterFDD('fddSub',this.value)"/></div>
+        <div class="fc-dd-body" id="fddSubBody"></div>
+      </div>
+    </div>
+    <!-- STATUS FILTER -->
+    <div class="fc" onclick="toggleFDD('fddSt',event)">Select Status <span class="fc-chev">▾</span>
+      <div class="fc-dd" id="fddSt" onclick="event.stopPropagation()">
+        <div class="fc-dd-search"><input type="text" placeholder="Search..." oninput="filterFDD('fddSt',this.value)"/></div>
+        <div class="fc-dd-body" id="fddStBody">
+          <div class="fc-dd-i" onclick="pickFDD(this,'fddSt')">Open</div>
+          <div class="fc-dd-i" onclick="pickFDD(this,'fddSt')">In Progress</div>
+          <div class="fc-dd-i" onclick="pickFDD(this,'fddSt')">Awaiting</div>
+          <div class="fc-dd-i" onclick="pickFDD(this,'fddSt')">Resolved</div>
+          <div class="fc-dd-i" onclick="pickFDD(this,'fddSt')">Closed</div>
+        </div>
+      </div>
+    </div>
+    <!-- SORT -->
+    <div class="fc-r">
+      <div class="fc" onclick="toggleFDD('fddSort',event)" id="fddSortBtn">
+        <span id="sortLabel">Sort: New to Old</span> <span class="fc-chev">▾</span>
+        <div class="fc-dd" id="fddSort" onclick="event.stopPropagation()" style="min-width:170px;right:0;left:auto">
+          <div class="fc-dd-body">
+            <div class="fc-dd-i on" onclick="pickSort(this,'New to Old')">New to Old</div>
+            <div class="fc-dd-i" onclick="pickSort(this,'Old to New')">Old to New</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tw"><div class="ts"><table class="stbl"><thead><tr><th>Ticket ID</th><th>AWB(s)</th><th>Subcategory</th><th>Ticket Status</th><th>Resolution Due By</th><th>Last Updated</th><th>Action</th></tr></thead><tbody id="tkBody"></tbody></table></div>
+    <div class="tf"><div class="tf-info" id="tfInfo">Showing <b>1–10</b> of <b>10</b></div><div class="pgw"><div class="pgb">←</div><div class="pgb on">1</div><div class="pgb">→</div></div></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- CREATE TICKET PANEL -->
+<div class="mo-ov" id="moCreate" onclick="if(event.target===this)closeCreate()">
+<div class="mo-panel">
+  <div class="mo-hdr">
+    <div class="mo-hdr-t"><div><div class="mo-title">Create Ticket</div><div class="mo-sub">Select category, subcategory, and enter details</div></div><div class="mo-x" onclick="closeCreate()">✕</div></div>
+  </div>
+  <div class="mo-body" id="moBody"></div>
+  <div class="mo-ft" id="moFt"><button class="mfb mfb-c" onclick="closeCreate()">Cancel</button><button class="mfb mfb-p" id="createBtn" onclick="doCreateTicket()" disabled>Create Ticket</button></div>
+</div>
+</div>
+
+<!-- TICKET DETAIL PANEL -->
+<div class="sp-ov" id="spPanel" onclick="if(event.target===this)closeSP()">
+<div class="sp">
+  <div class="sp-hdr"><div class="sp-hdr-t"><div><div class="sp-title" id="spTitle">Ticket Details</div><div class="sp-sub" id="spSubLine"></div></div><div class="sp-x" onclick="closeSP()">✕</div></div></div>
+  <div class="sp-body" id="spBody"></div>
+  <div class="sp-ft" id="spFt"><button class="mfb mfb-c" onclick="closeSP()">Close</button></div>
+</div>
+</div>
+
+<!-- BULK TICKET REQUEST STATUS PANEL -->
+<div class="bulk-ov" id="bulkPanel" onclick="if(event.target===this)closeBulk()">
+<div class="bulk-panel">
+  <div class="bulk-hdr"><div class="bulk-hdr-back" onclick="closeBulk()">←</div><div class="bulk-hdr-title">Ticket Requests</div></div>
+  <div id="bulkBody"></div>
+</div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ─── CATEGORY DATA ────────────────────────────────────
+// Updated 6-category structure (only Shipment & Pickup changes active in this build)
+var CATS={
+  "Shipment Related Issues":{desc:"NDR, RTO, delivery, shipment requests & complaints",subs:[]},
+  "Pickup Related Issues":{desc:"Pickup delays, missed pickups, pickup complaints",subs:[]},
+  "Billing & Remittance":{desc:"COD remittance, wallet, invoices, recharge",subs:[]},
+  "Weight Related Issues":{desc:"Weight discrepancy, billing disputes",subs:[]},
+  "Tech Related Issues":{desc:"API, channel integration, order management",subs:[]},
+  "General Enquiry":{desc:"Any other question or general support need",subs:[]}
+};
+
+// RTO sub-type options (used when issue type = RTO Cancellation Request)
+var RTO_SUBTYPES=[
+  "RTO as per Client",
+  "RTO as per 3 Attempt",
+  "RTO as per Permanent NDR",
+  "RTO due to High Ageing",
+  "RTO due to ODA",
+  "RTO due to Bulk Order / Fake Customer",
+  "RTO due to Service Failure",
+  "RTO due to Force Majeure",
+  "RTO due to CC Validation",
+  "RTO due to Wrong"
+];
+
+var AWB_SUBS=["Issue Over Undelivered Shipment","Request to Mark Shipment as RTO","Delay in Forward Delivery","Delay in RTO Delivery","Delay in Pickup","Shipment Showing as Lost/Damaged in Tracking","Issue with Shipment Issue","Issue Over Weight Discrepancy","Amount Not Received for Lost Shipment","Request Claim for Secure Shipment","Order/Shipment Cancellation"];
+var AWB_DB={
+  "1234567890":{eligible:true,duplicate:false,awb:"1234567890",courier:"XpressBees",origin:"Mumbai Hub",destination:"Delhi Hub",weight:"1.20 kg",status:"Out for Delivery",lastScan:"17 May 2026, 08:42 AM",lastLoc:"Delhi Distribution Center",edd:"17 May 2026",slaPercent:72,movements:[{loc:"Mumbai Origin Hub",time:"14 May, 10:15 AM",status:"Picked Up",cur:false},{loc:"Mumbai Sorting Center",time:"14 May, 06:30 PM",status:"In Transit",cur:false},{loc:"Delhi Hub (In-Scan)",time:"16 May, 09:18 AM",status:"Arrived at Hub",cur:false},{loc:"Delhi Distribution Center",time:"17 May, 08:42 AM",status:"Out for Delivery",cur:true}]},
+  "0987654321":{eligible:false,duplicate:true,awb:"0987654321",courier:"XpressBees",origin:"Pune Hub",destination:"Bangalore Hub",weight:"0.85 kg",status:"Pending Delivery Attempt",lastScan:"16 May 2026, 03:15 PM",lastLoc:"Bangalore Distribution Center",edd:"17 May 2026",existingTicket:{id:"TK-4892240",date:"15 May 2026",status:"open",cat:"Shipment, NDR & RTO",sub:"Issue Over Undelivered Shipment",due:"19 May 2026, 10:00 AM",updated:"16 May 2026, 04:22 PM",desc:"Delayed Delivery"}},
+  "2345678901":{eligible:false,duplicate:false,ineligible:true,awb:"2345678901",courier:"XpressBees",origin:"Chennai Hub",destination:"Hyderabad Hub",weight:"2.10 kg",status:"In Transit",lastScan:"17 May 2026, 07:55 AM",lastLoc:"Hyderabad Sorting Facility",edd:"18 May 2026",orderDate:"16 May 2026",slaPercent:45,slaDue:"18 May 2026, 06:00 PM",hoursElapsed:21,slaWindowHours:48,movements:[{loc:"Chennai Origin Hub",time:"16 May, 08:10 AM",status:"Picked Up",cur:false},{loc:"Chennai Sorting Center",time:"16 May, 02:44 PM",status:"In Transit",cur:false},{loc:"Hyderabad Sorting Facility",time:"17 May, 07:55 AM",status:"Arrived at Hub",cur:true}]}
+};
+// Resolved tickets: first two are within 48hr window, rest expired
+var TICKETS=[
+  {id:"TK-4892178",date:"08 May 2026",time:"02:15 PM",awb:"XB150487239",sub:"Delay in Forward Delivery",cat:"Pickup & Delivery",status:"open",due:"10 May 2026, 02:15 PM",updated:"08 May 2026, 02:15 PM",sla:"ok"},
+  {id:"TK-4892165",date:"07 May 2026",time:"11:30 AM",awb:"XB150487228",sub:"Issue Over Weight Discrepancy",cat:"Shipment Dispute",status:"open",due:"09 May 2026, 11:30 AM",updated:"08 May 2026, 09:45 AM",sla:"ok"},
+  {id:"TK-4892140",date:"06 May 2026",time:"04:42 PM",awb:"XB150487215",sub:"Issue Over Undelivered Shipment",cat:"Shipment, NDR & RTO",status:"wip",due:"08 May 2026, 04:42 PM",updated:"07 May 2026, 03:10 PM",sla:"ok"},
+  {id:"TK-4892128",date:"05 May 2026",time:"09:18 AM",awb:"XB150487201",sub:"Delay in COD Remittance",cat:"Finance",status:"awaiting",due:"07 May 2026, 09:18 AM",updated:"06 May 2026, 11:00 AM",sla:"ok"},
+  {id:"TK-4892112",date:"04 May 2026",time:"03:55 PM",awb:"N/A",sub:"Issue with KYC Verification",cat:"KYC & Bank Verification",status:"open",due:"06 May 2026, 03:55 PM",updated:"05 May 2026, 10:20 AM",sla:"breach"},
+  {id:"TK-4892098",date:"03 May 2026",time:"01:21 PM",awb:"XB150487189",sub:"Shipment Showing as Lost/Damaged in Tracking",cat:"Pickup & Delivery",status:"open",due:"05 May 2026, 01:21 PM",updated:"04 May 2026, 08:30 AM",sla:"breach"},
+  {id:"TK-4892085",date:"02 May 2026",time:"10:45 AM",awb:"XB150487176",sub:"Issue in Managing Orders",cat:"Technical Support",status:"wip",due:"04 May 2026, 10:45 AM",updated:"03 May 2026, 02:15 PM",sla:"ok"},
+  {id:"TK-4892070",date:"01 May 2026",time:"08:30 AM",awb:"XB150487160",sub:"Delay in Pickup",cat:"Pickup & Delivery",status:"open",due:"03 May 2026, 08:30 AM",updated:"02 May 2026, 09:00 AM",sla:"breach"},
+  {id:"TK-4892055",date:"30 Apr 2026",time:"02:10 PM",awb:"XB150487148",sub:"Request to Mark Shipment as RTO",cat:"Shipment, NDR & RTO",status:"open",due:"02 May 2026, 02:10 PM",updated:"01 May 2026, 11:30 AM",sla:"breach"},
+  {id:"TK-4892042",date:"29 Apr 2026",time:"09:55 AM",awb:"N/A",sub:"Issue with Channel and API Integration",cat:"Technical Support",status:"wip",due:"01 May 2026, 09:55 AM",updated:"30 Apr 2026, 03:40 PM",sla:"ok"},
+  // RESOLVED — first two within 48hr window, rest expired
+  {id:"TK-4891920",date:"17 May 2026",time:"10:30 AM",awb:"XB150487092",sub:"Delay in Forward Delivery",cat:"Pickup & Delivery",status:"resolved",due:"19 May 2026, 10:30 AM",updated:"17 May 2026, 04:15 PM",sla:"ok",reopenHrsLeft:38},
+  {id:"TK-4891905",date:"17 May 2026",time:"03:45 PM",awb:"XB150487079",sub:"Delay in COD Remittance",cat:"Finance",status:"resolved",due:"19 May 2026, 03:45 PM",updated:"17 May 2026, 02:00 PM",sla:"ok",reopenHrsLeft:11},
+  {id:"TK-4891888",date:"14 Apr 2026",time:"11:20 AM",awb:"N/A",sub:"Issue with Invoice",cat:"Billing & Taxation",status:"resolved",due:"16 Apr 2026, 11:20 AM",updated:"15 Apr 2026, 10:45 AM",sla:"ok",reopenHrsLeft:0},
+  {id:"TK-4891870",date:"12 Apr 2026",time:"08:15 AM",awb:"XB150487061",sub:"Issue Over Weight Discrepancy",cat:"Shipment Dispute",status:"resolved",due:"14 Apr 2026, 08:15 AM",updated:"13 Apr 2026, 03:30 PM",sla:"breach",reopenHrsLeft:0},
+  {id:"TK-4891852",date:"10 Apr 2026",time:"01:00 PM",awb:"XB150487044",sub:"Issue Over Undelivered Shipment",cat:"Shipment, NDR & RTO",status:"resolved",due:"12 Apr 2026, 01:00 PM",updated:"11 Apr 2026, 11:20 AM",sla:"ok",reopenHrsLeft:0},
+  // CLOSED (6)
+  {id:"TK-4891800",date:"10 Apr 2026",time:"02:30 PM",awb:"XB150487020",sub:"Delay in Pickup",cat:"Pickup & Delivery",status:"closed",due:"12 Apr 2026, 02:30 PM",updated:"11 Apr 2026, 05:00 PM",sla:"ok"},
+  {id:"TK-4891780",date:"08 Apr 2026",time:"09:45 AM",awb:"N/A",sub:"Profile Update",cat:"Others",status:"closed",due:"10 Apr 2026, 09:45 AM",updated:"09 Apr 2026, 01:30 PM",sla:"ok"},
+  {id:"TK-4891762",date:"06 Apr 2026",time:"11:00 AM",awb:"XB150487008",sub:"Upgrade/Downgrade XpressBees Plan",cat:"Finance",status:"closed",due:"08 Apr 2026, 11:00 AM",updated:"07 Apr 2026, 04:22 PM",sla:"ok"},
+  {id:"TK-4891745",date:"04 Apr 2026",time:"03:20 PM",awb:"XB150486996",sub:"Issue with KYC Verification",cat:"KYC & Bank Verification",status:"closed",due:"06 Apr 2026, 03:20 PM",updated:"05 Apr 2026, 02:15 PM",sla:"ok"},
+  {id:"TK-4891728",date:"02 Apr 2026",time:"08:00 AM",awb:"XB150486982",sub:"Amount Not Received for Lost Shipment",cat:"Claims",status:"closed",due:"04 Apr 2026, 08:00 AM",updated:"03 Apr 2026, 09:30 AM",sla:"breach"},
+  {id:"TK-4891710",date:"31 Mar 2026",time:"05:15 PM",awb:"XB150486970",sub:"Issue in Recharging Wallet",cat:"Finance",status:"closed",due:"02 Apr 2026, 05:15 PM",updated:"01 Apr 2026, 11:00 AM",sla:"ok"}
+];
+var ST_MAP={open:["OPEN","st-open"],wip:["IN PROGRESS","st-wip"],awaiting:["AWAITING","st-awaiting"],resolved:["RESOLVED","st-resolved"],closed:["CLOSED","st-closed"]};
+var curTab="open";
+
+// ─── RENDER ───────────────────────────────────────────
+function renderTickets(){
+  var list=TICKETS.filter(function(t){
+    if(curTab==="open") return t.status==="open"||t.status==="wip"||t.status==="awaiting";
+    if(curTab==="resolved") return t.status==="resolved";
+    return t.status==="closed";
+  });
+  document.getElementById("tkBody").innerHTML=list.map(function(t,i){
+    var st=ST_MAP[t.status];
+    var newBadge=t._isNew?'<span style="margin-left:6px;display:inline-flex;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--green);color:#fff;vertical-align:middle">NEW</span>':'';
+    var cls=t._isNew?' class="new-row"':'';
+    var actionHtml='';
+    if(curTab==="closed"){
+      actionHtml='<div class="act-col"><button class="ab-link" onclick="openConvPanel(\''+t.id+'\',\''+t.cat+'\',\''+t.sub+'\',\''+t.awb+'\',\'CLOSED\',\''+t.date+'\',true)">View History</button></div>';
+    } else if(curTab==="resolved"){
+      var reopenHtml='';
+      if(typeof t.reopenHrsLeft!=='undefined'&&t.reopenHrsLeft>0){
+        reopenHtml='<button class="ab-reopen" onclick="doReopen(\''+t.id+'\')">↩ Reopen</button><div class="reopen-timer">⏱ '+t.reopenHrsLeft+' hrs left</div>';
+      } else {
+        reopenHtml='<button class="ab-reopen-exp" disabled>↩ Reopen</button><div class="reopen-timer exp">Window expired</div>';
+      }
+      actionHtml='<div class="act-col">'+reopenHtml+'<button class="ab-link" onclick="openConvPanel(\''+t.id+'\',\''+t.cat+'\',\''+t.sub+'\',\''+t.awb+'\',\'RESOLVED\',\''+t.date+'\',true)">View History</button></div>';
+    } else {
+      actionHtml='<div class="act-col"><button class="ab ab-p" style="margin-bottom:2px" onclick="openConvPanel(\''+t.id+'\',\''+t.cat+'\',\''+t.sub+'\',\''+t.awb+'\',\''+st[0]+'\',\''+t.date+'\',false)">Update</button><button class="ab-link" onclick="openConvPanel(\''+t.id+'\',\''+t.cat+'\',\''+t.sub+'\',\''+t.awb+'\',\''+st[0]+'\',\''+t.date+'\',false)">View History</button></div>';
+    }
+    return '<tr'+cls+'><td><div class="td-id">'+t.id+newBadge+'</div><div class="td-date">'+t.date+', '+t.time+'</div></td><td><span class="td-awb">'+t.awb+'</span></td><td>'+t.sub+'</td><td><span class="st-badge '+st[1]+'">'+st[0]+'</span></td><td>'+t.due+'<div><span class="sla-badge '+(t.sla==="ok"?"sla-ok":"sla-breach")+'">'+(t.sla==="ok"?"WITHIN SLA":"SLA BREACHED")+'</span></div></td><td>'+t.updated+'</td><td>'+actionHtml+'</td></tr>';
+  }).join("");
+  updateCounts();
+}
+function updateCounts(){
+  var o=TICKETS.filter(function(t){return t.status==="open"||t.status==="wip"||t.status==="awaiting";}).length;
+  var r=TICKETS.filter(function(t){return t.status==="resolved";}).length;
+  var c=TICKETS.filter(function(t){return t.status==="closed";}).length;
+  document.getElementById("cntOpen").textContent=o;
+  document.getElementById("cntResolved").textContent=r;
+  document.getElementById("cntClosed").textContent=c;
+  document.getElementById("kpiOpen").textContent=o;
+  var shown=curTab==="open"?o:curTab==="resolved"?r:c;
+  document.getElementById("tfInfo").innerHTML="Showing <b>1–"+shown+"</b> of <b>"+shown+"</b> &nbsp;|&nbsp; <span class='pp-sel'>Items per page: <select><option>15</option><option>25</option></select></span>";
+}
+renderTickets();
+function switchTab(id,el){curTab=id;document.querySelectorAll(".s-tab").forEach(function(t){t.classList.remove("on");});el.classList.add("on");renderTickets();}
+
+// ─── REOPEN LOGIC ────────────────────────────────────
+function doReopen(id){
+  var tk=TICKETS.find(function(t){return t.id===id;});
+  if(!tk||!tk.reopenHrsLeft)return;
+  tk.status="open";tk._isNew=true;tk.updated="17 May 2026, Now";
+  // Move to top of TICKETS array
+  TICKETS.splice(TICKETS.indexOf(tk),1);TICKETS.unshift(tk);
+  curTab="open";document.querySelectorAll(".s-tab").forEach(function(t){t.classList.remove("on");});document.querySelectorAll(".s-tab")[0].classList.add("on");
+  renderTickets();toast("↩ Ticket "+id+" reopened — moved to top of Open tab");
+}
+
+// ─── FILTER ───────────────────────────────────────────
+// Filter bar — sub category dropdown uses new category names
+var allSubs=Object.keys(CATS);
+document.getElementById("fddSubBody").innerHTML=allSubs.map(function(s){return '<div class="fc-dd-i" onclick="pickFDD(this,\'fddSub\')">'+s+'</div>';}).join("");
+function toggleFDD(id,e){e.stopPropagation();var el=document.getElementById(id);var was=el.classList.contains("sh");document.querySelectorAll(".fc-dd").forEach(function(d){d.classList.remove("sh");});if(!was)el.classList.add("sh");}
+function pickFDD(el,ddId){document.querySelectorAll("#"+ddId+" .fc-dd-i").forEach(function(i){i.classList.remove("on");});el.classList.add("on");toast("Filter: "+el.textContent.trim());}
+function filterFDD(ddId,val){var body=document.getElementById(ddId).querySelector(".fc-dd-body");if(!body)return;var items=body.querySelectorAll(".fc-dd-i");var found=0;items.forEach(function(i){var m=i.textContent.toLowerCase().indexOf(val.toLowerCase())!==-1;i.style.display=m?"":"none";if(m)found++;});var empty=body.querySelector(".fc-dd-empty");if(!empty){empty=document.createElement("div");empty.className="fc-dd-empty";empty.textContent="No results";body.appendChild(empty);}empty.style.display=found===0?"":"none";}
+function pickDateFilter(el,val){
+  document.querySelectorAll("#fddDate .fc-dd-i").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  document.getElementById("fddDate").classList.remove("sh");
+  var btn=document.getElementById("fddDateBtn");
+  // Update chip label
+  btn.childNodes[0].textContent=val+" ";
+  var customRow=document.getElementById("customDateInputs");
+  if(val==="Custom date range"){
+    customRow.style.display="flex";
+    btn.classList.remove("on");
+    btn.style.background="var(--bl)";btn.style.borderColor="var(--bm)";btn.style.color="var(--blue)";
+  } else {
+    customRow.style.display="none";
+    btn.classList.add("on");
+    btn.style.background="";btn.style.borderColor="";btn.style.color="";
+    toast("Date filter: "+val);
+  }
+}
+function pickSort(el,val){
+  document.querySelectorAll("#fddSort .fc-dd-i").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  document.getElementById("fddSort").classList.remove("sh");
+  var lbl=document.getElementById("sortLabel");
+  if(lbl)lbl.textContent="Sort: "+val;
+  toast("Sort: "+val);
+}
+document.addEventListener("click",function(e){if(!e.target.closest(".fc")&&!e.target.closest(".fc-dd"))document.querySelectorAll(".fc-dd").forEach(function(d){d.classList.remove("sh");});if(!e.target.closest(".cdd"))document.querySelectorAll(".cdd-list").forEach(function(l){l.classList.remove("sh");});document.querySelectorAll(".kb-menu,.sup-pop").forEach(function(m){m.classList.remove("sh");});});
+function togKB(id,e){e.stopPropagation();document.querySelectorAll(".kb-menu,.sup-pop").forEach(function(m){if(m.id!==id)m.classList.remove("sh");});document.getElementById(id).classList.toggle("sh");}
+function showSup(id,e){e.stopPropagation();document.querySelectorAll(".sup-pop,.kb-menu").forEach(function(m){m.classList.remove("sh");});document.getElementById(id).classList.toggle("sh");}
+function toast(msg){var t=document.getElementById("toastEl");t.textContent=msg;t.classList.add("sh");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("sh");},2800);}
+
+// ─── CONVERSATION PANEL (view_ticket.png reference) ───
+function openConvPanel(id,cat,sub,awb,status,date,viewOnly){
+  document.getElementById("spTitle").textContent=id;
+  document.getElementById("spSubLine").textContent="Ticket ID";
+  var statusKey=status.toLowerCase().replace(" ","");
+  if(statusKey==="inprogress")statusKey="wip";
+  var stCls=ST_MAP[statusKey]?ST_MAP[statusKey][1]:"st-open";
+  var markResolvedBtn=(!viewOnly&&status!=="RESOLVED"&&status!=="CLOSED")?'<button class="mark-resolved-btn" onclick="markResolved(\''+id+'\')"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg> Mark as Resolved</button>':'';
+  var body='<div class="conv-hdr"><div><div class="conv-tk-id">'+id+'</div><div class="conv-tk-sub">Ticket ID</div><div class="conv-meta-chips"><span class="conv-meta-chip"><span class="st-badge '+stCls+'">'+status+'</span></span><span class="conv-meta-chip">📅 Last Update: '+date+' - 2:36 pm</span><span class="conv-meta-chip">👤 Seller Account</span></div></div>'+markResolvedBtn+'</div>';
+  body+='<div class="conv-box"><div class="conv-box-hdr"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h12v10H2z" stroke-linejoin="round"/><path d="M5 6h6M5 8h4" stroke-linecap="round"/></svg> Support Conversations</div><div class="conv-msg-list"><div class="conv-msg seller"><div class="conv-avatar seller">You</div><div><div class="conv-bubble seller">Delayed delivery Object ID: '+awb+'</div><div class="conv-ts" style="text-align:right">'+date+', 2:36 pm</div></div></div><div class="conv-msg"><div class="conv-avatar support" style="font-size:9px">XB</div><div><div class="conv-bubble support">Dear Customer,<br>Your response has been registered with the reference number: <b>'+id+'</b>. We will get back to you within 24hrs.<br><br>Team XpressBees</div><div class="conv-ts">'+date+', 2:36 pm</div></div></div></div><div class="conv-reply-hint"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1" stroke-linecap="round"/></svg> You can expect a response within 1 business day</div>';
+  if(!viewOnly){
+    body+='<div class="conv-input-area"><input class="conv-input" type="text" placeholder="Enter your message"/><div class="conv-send" onclick="toast(\'✓ Message sent\')"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#fff" stroke-width="1.8"><path d="M14 2L2 7l5 2m7-7L9 14l-2-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="conv-attach" onclick="toast(\'📎 Attach file\')"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="2"/><path d="M5 5h6M5 7h6M5 9h4" stroke-linecap="round"/></svg></div></div>';
+  }
+  body+='</div>';
+  document.getElementById("spBody").innerHTML=body;
+  document.getElementById("spFt").innerHTML=viewOnly?'<button class="mfb mfb-c" onclick="closeSP()">Close</button>':'<button class="mfb mfb-c" onclick="closeSP()">Close</button><button class="mfb mfb-p" onclick="toast(\'✓ Update submitted\');closeSP()">Submit Update</button>';
+  document.getElementById("spPanel").classList.add("sh");
+}
+function closeSP(){document.getElementById("spPanel").classList.remove("sh");}
+function markResolved(id){
+  var tk=TICKETS.find(function(t){return t.id===id;});
+  if(tk){tk.status="resolved";tk.reopenHrsLeft=48;}
+  closeSP();
+  curTab="resolved";document.querySelectorAll(".s-tab").forEach(function(t){t.classList.remove("on");});document.querySelectorAll(".s-tab")[1].classList.add("on");
+  renderTickets();toast("✓ Ticket "+id+" marked as resolved");
+}
+
+// ─── CREATE TICKET PANEL ──────────────────────────────
+var selCat=null,selSub=null,awbVal=null,awbSc=null,awbValidated=false;
+
+function openCreate(){
+  selCat=null;selSub=null;awbVal=null;awbSc=null;awbValidated=false;
+  document.getElementById("moFt").innerHTML='<button class="mfb mfb-c" onclick="closeCreate()">Cancel</button><button style="background:none;border:none;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;padding:0 10px;font-family:var(--font);text-decoration:underline;text-underline-offset:2px" onclick="clearCreate()">Clear</button><button class="mfb mfb-p" id="createBtn" onclick="doCreateTicket()" disabled>Create Ticket</button>';
+  document.getElementById("moBody").innerHTML=buildStep1();
+  document.getElementById("moCreate").classList.add("sh");
+}
+function clearCreate(){
+  selCat=null;selSub=null;awbVal=null;awbSc=null;awbValidated=false;
+  document.getElementById("createBtn").disabled=true;
+  document.getElementById("moBody").innerHTML=buildStep1();
+  toast("Selections cleared");
+}
+function closeCreate(){document.getElementById("moCreate").classList.remove("sh");}
+// setSteps is kept as no-op — step progress bar has been removed from UI
+function setSteps(a){/* step bar removed */}
+
+// ─── BUILD STEP 1 ─────────────────────────────────────
+function buildStep1(){
+  var catHtml=Object.keys(CATS).map(function(k){
+    return '<div class="cdd-item" onclick="pickCat(this,\''+k+'\')"><div class="cdd-main">'+k+'</div><div class="cdd-desc">'+CATS[k].desc+'</div></div>';
+  }).join("");
+  return '<div class="mo-row" id="catSubRow">'+
+    '<div class="mf"><div class="ml">Select Category</div><div class="cdd"><div class="cdd-btn placeholder" id="catBtn" onclick="toggleCDD(\'catList\')">Select category</div><div class="cdd-list" id="catList"><div class="cdd-search"><input type="text" placeholder="Search category..." oninput="filterCDD(\'catList\',this.value)"/></div><div class="cdd-items">'+catHtml+'</div></div></div></div>'+
+    '<div class="mf" id="issueTypeCol" style="opacity:.35;pointer-events:none"><div class="ml">Select Sub-category</div><div class="cdd"><div class="cdd-btn placeholder" id="issueCatBtn" onclick="toggleCDD(\'issueCatList\')">Select sub-category</div><div class="cdd-list" id="issueCatList"></div></div></div>'+
+  '</div>'+
+  '<div id="issueTypeRow" style="display:none"></div>'+
+  '<div id="dynamicFormZone"></div>'+
+  '<div id="awbResultZone"></div>';
+}
+
+function toggleCDD(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var was=el.classList.contains("sh");
+  document.querySelectorAll(".cdd-list").forEach(function(l){l.classList.remove("sh");});
+  if(!was)el.classList.add("sh");
+}
+function filterCDD(listId,val){
+  var list=document.getElementById(listId);if(!list)return;
+  var items=list.querySelectorAll(".cdd-item");var found=0;
+  items.forEach(function(i){var m=i.textContent.toLowerCase().indexOf(val.toLowerCase())!==-1;i.style.display=m?"":"none";if(m)found++;});
+  var empty=list.querySelector(".cdd-empty");
+  if(empty)empty.style.display=found===0?"":"none";
+}
+
+// ─── PICK CATEGORY ────────────────────────────────────
+function pickCat(el,cat){
+  document.querySelectorAll("#catList .cdd-item").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");selCat=cat;
+  var btn=document.getElementById("catBtn");btn.textContent=cat;btn.classList.remove("placeholder");
+  document.getElementById("catList").classList.remove("sh");
+  // Reset downstream
+  awbValidated=false;awbSc=null;
+  document.getElementById("awbResultZone").innerHTML="";
+  document.getElementById("dynamicFormZone").innerHTML="";
+  var itr=document.getElementById("issueTypeRow");if(itr)itr.innerHTML="";if(itr)itr.style.display="none";
+  setCreateBtnDisabled(true);
+  setSteps(2);
+
+  // ── SHIPMENT RELATED ISSUES ──────────────────────────
+  if(cat==="Shipment Related Issues"){
+    // Unlock sub-category column and populate it
+    var col=document.getElementById("issueTypeCol");
+    col.style.opacity="1";col.style.pointerEvents="auto";
+    document.getElementById("issueCatBtn").textContent="Select sub-category";
+    document.getElementById("issueCatBtn").classList.add("placeholder");
+    document.getElementById("issueCatList").innerHTML=[
+      {v:"Request",d:"RTO, callback, contact update requests"},
+      {v:"Complaint",d:"Behavioural or non-behavioural complaints"},
+      {v:"Enquiry",d:"General enquiry about a shipment"}
+    ].map(function(o){
+      return '<div class="cdd-item" onclick="pickIssueCat(this,\''+o.v+'\')"><div class="cdd-main">'+o.v+'</div><div class="cdd-desc">'+o.d+'</div></div>';
+    }).join("");
+    // Pre-render the Issue Type (3rd dropdown) row as empty/inactive
+    document.getElementById("issueTypeRow").style.display="block";
+    document.getElementById("issueTypeRow").innerHTML=
+      '<div class="mf" style="opacity:.35;pointer-events:none" id="issueTypeField">'+
+        '<div class="ml">Issue Type</div>'+
+        '<div class="cdd"><div class="cdd-btn placeholder" id="issueTypeBtn">Select issue type</div></div>'+
+      '</div>';
+  }
+  // ── PICKUP RELATED ISSUES ────────────────────────────
+  else if(cat==="Pickup Related Issues"){
+    var col2=document.getElementById("issueTypeCol");
+    col2.style.opacity="0";col2.style.pointerEvents="none";
+    document.getElementById("dynamicFormZone").innerHTML=buildPickupForm();
+    if(document.getElementById("issueTypeRow"))document.getElementById("issueTypeRow").style.display="none";
+  }
+  // ── OTHER CATEGORIES (unified simple form) ──────────
+  else {
+    var col3=document.getElementById("issueTypeCol");
+    col3.style.opacity="0";col3.style.pointerEvents="none";
+    var isTech=(cat==="Tech Related Issues");
+    document.getElementById("dynamicFormZone").innerHTML=
+      '<div style="padding-top:16px;margin-top:4px">'+buildCommonFields(isTech)+'</div>';
+    if(document.getElementById("issueTypeRow"))document.getElementById("issueTypeRow").style.display="none";
+    // Remark field enables submit, AWB validate enables submit for non-tech
+    setCreateBtnDisabled(true);
+  }
+}
+
+// ─── PICKUP FORM (unified) ────────────────────────────
+function buildPickupForm(){
+  return '<div style="padding-top:16px;margin-top:4px">'+buildCommonFields(false)+'</div>';
+}
+function checkPickupForm(){
+  var ta=document.querySelector("#dynamicFormZone .mi-ta");
+  if(!ta)return;
+  var len=ta.value.length;
+  var counter=document.getElementById("pickupCharCount");
+  if(counter)counter.textContent=(300-len)+" characters remaining";
+  setCreateBtnDisabled(len===0);
+}
+
+// ─── PICK ISSUE CATEGORY (Shipment) ──────────────────
+function pickIssueCat(el,issueCategory){
+  document.querySelectorAll("#issueCatList .cdd-item").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  var btn=document.getElementById("issueCatBtn");btn.textContent=issueCategory;btn.classList.remove("placeholder");
+  document.getElementById("issueCatList").classList.remove("sh");
+  document.getElementById("dynamicFormZone").innerHTML="";
+  setCreateBtnDisabled(true);
+
+  // Activate the Issue Type (3rd) dropdown and populate it
+  var itf=document.getElementById("issueTypeField");
+  if(itf){itf.style.opacity="1";itf.style.pointerEvents="auto";}
+
+  if(issueCategory==="Request"){
+    var reqTypes=["RTO Cancellation Request","Callback Request","Update Contact Details","Address Change"];
+    var opts=reqTypes.map(function(r){
+      return '<div class="cdd-item" onclick="pickRequestType(this,\''+r.replace(/'/g,"\\'")+'\')"><div class="cdd-main">'+r+'</div></div>';
+    }).join("");
+    document.getElementById("issueTypeRow").innerHTML=
+      '<div class="mf" id="issueTypeField">'+
+        '<div class="ml">Issue Type <span style="color:var(--red)">*</span></div>'+
+        '<div class="cdd"><div class="cdd-btn placeholder" id="issueTypeBtn" onclick="toggleCDD(\'issueTypeList\')">Select issue type</div>'+
+        '<div class="cdd-list" id="issueTypeList">'+opts+'</div></div>'+
+      '</div>'+
+      '<div id="requestDetailZone"></div>';
+  } else if(issueCategory==="Complaint"){
+    var compTypes=["Behavioural","Non-Behavioural"];
+    var copts=compTypes.map(function(t){
+      return '<div class="cdd-item" onclick="pickComplaintType(this,\''+t+'\')"><div class="cdd-main">'+t+'</div></div>';
+    }).join("");
+    document.getElementById("issueTypeRow").innerHTML=
+      '<div class="mf" id="issueTypeField">'+
+        '<div class="ml">Issue Type <span style="color:var(--red)">*</span></div>'+
+        '<div class="cdd"><div class="cdd-btn placeholder" id="issueTypeBtn" onclick="toggleCDD(\'issueTypeList\')">Select issue type</div>'+
+        '<div class="cdd-list" id="issueTypeList">'+copts+'</div></div>'+
+      '</div>'+
+      '<div id="complaintDetailZone"></div>';
+  } else if(issueCategory==="Enquiry"){
+    document.getElementById("issueTypeRow").innerHTML='';
+    document.getElementById("dynamicFormZone").innerHTML=buildEnquiryForm();
+  }
+}
+
+// ─── REQUEST FLOW ────────────────────────────────────
+// (buildRequestForm no longer needed — Issue Type is rendered inline by pickIssueCat)
+
+function pickRequestType(el,type){
+  document.querySelectorAll("#issueTypeList .cdd-item").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  var btn=document.getElementById("issueTypeBtn");btn.textContent=type;btn.classList.remove("placeholder");
+  document.getElementById("issueTypeList").classList.remove("sh");
+  var zone=document.getElementById("requestDetailZone");
+  if(zone)zone.innerHTML="";
+  document.getElementById("dynamicFormZone").innerHTML="";
+  setCreateBtnDisabled(true);
+
+  if(type==="RTO Cancellation Request"){
+    if(zone)zone.innerHTML=buildRTOForm();
+  } else if(type==="Callback Request"){
+    if(zone)zone.innerHTML=buildCallbackForm();
+  } else if(type==="Update Contact Details"){
+    if(zone)zone.innerHTML=buildUpdateContactForm();
+  } else if(type==="Address Change"){
+    if(zone)zone.innerHTML=buildAddressChangeForm();
+  }
+}
+
+// ── RTO CANCELLATION REQUEST ──
+function buildRTOForm(){
+  var subtypeOpts=RTO_SUBTYPES.map(function(s){
+    return '<div class="cdd-item" onclick="pickRTOSubtype(this,\''+s.replace(/'/g,"\\'")+'\')"><div class="cdd-main">'+s+'</div></div>';
+  }).join("");
+  return '<div class="mf" style="margin-top:14px"><div class="ml">Issue Sub-type <span style="color:var(--red)">*</span></div>'+
+    '<div class="cdd"><div class="cdd-btn placeholder" id="rtoSubBtn" onclick="toggleCDD(\'rtoSubList\')">Select RTO reason</div>'+
+    '<div class="cdd-list" id="rtoSubList"><div class="cdd-search"><input type="text" placeholder="Search..." oninput="filterCDD(\'rtoSubList\',this.value)"/></div><div class="cdd-items">'+subtypeOpts+'</div></div></div></div>'+
+    '<div id="rtoDetailZone"></div>';
+}
+function pickRTOSubtype(el,sub){
+  document.querySelectorAll("#rtoSubList .cdd-item").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  var btn=document.getElementById("rtoSubBtn");btn.textContent=sub;btn.classList.remove("placeholder");
+  document.getElementById("rtoSubList").classList.remove("sh");
+  document.getElementById("rtoDetailZone").innerHTML=
+    '<div class="mf" style="margin-top:8px"><div class="ml">AWB Number <span style="color:var(--red)">*</span></div>'+
+    '<div class="awb-row"><input class="mi" type="text" id="awbField" placeholder="Enter AWB number" oninput="resetAWB()"/><button class="awb-validate-btn" onclick="doValidate()">Validate AWB</button></div>'+
+    '<div id="awbHint" class="field-hint" style="display:none"></div></div>'+
+    '<div id="awbResultZone"></div>';
+}
+
+// ── CALLBACK REQUEST ──
+function buildCallbackForm(){
+  return '<div class="mf" style="margin-top:14px">'+
+    '<div class="ml">Remark <span style="color:var(--red)">*</span></div>'+
+    '<textarea class="mi-ta" id="callbackRemarks" placeholder="Describe the reason for callback..." style="min-height:100px" oninput="setCreateBtnDisabled(this.value.trim().length===0)"></textarea>'+
+    '<div style="font-size:11px;color:var(--ink3);margin-top:4px">Our team will call you back within 1 business day.</div>'+
+  '</div>'+
+  '<div class="mf">'+
+    '<div class="ml">Attach File / Image <span class="ml-hint">(optional)</span></div>'+
+    '<div class="uz" onclick="toast(\'📎 File picker opened\')"><div class="uz-t">Click to attach or drag & drop</div><div class="uz-s">Upload limit: 5 MB &nbsp;·&nbsp; JPG, PNG, PDF</div></div>'+
+  '</div>';
+}
+
+// ── UPDATE CONTACT DETAILS ──
+function buildUpdateContactForm(){
+  setCreateBtnDisabled(false);
+  return '<div style="margin-top:16px">'+
+    '<div style="border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:20px">'+
+      '<div onclick="togglePrevInfo(this)" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s2);cursor:pointer;user-select:none">'+
+        '<span style="font-size:12px;font-weight:600;color:var(--ink2)">View Previous Info</span>'+
+        '<span style="font-size:10px;color:var(--ink3)" id="prevInfoChev">▾</span>'+
+      '</div>'+
+      '<div id="prevInfoBody" style="display:none;padding:14px 16px;border-top:1px solid var(--border);background:var(--surface)">'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'+
+          buildCompactReadField("Name","Rahul Sharma")+
+          buildCompactReadField("Email ID","seller@example.com")+
+          buildCompactReadField("Contact No.","+91 98765 43210")+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Update Details</div>'+
+    '<div class="mf"><div class="ml">Name <span style="color:var(--red)">*</span></div><input class="mi" type="text" placeholder="Enter name"/></div>'+
+    '<div class="mf"><div class="ml">Email ID <span class="ml-hint">(optional)</span></div><input class="mi" type="email" placeholder="Enter email address"/></div>'+
+    '<div class="mf"><div class="ml">Contact No. <span style="color:var(--red)">*</span></div><input class="mi" type="tel" placeholder="Enter contact number"/></div>'+
+    buildCommonFields(false)+
+  '</div>';
+}
+
+// ── ADDRESS CHANGE ──
+function buildAddressChangeForm(){
+  setCreateBtnDisabled(false);
+  return '<div style="margin-top:16px">'+
+    '<div style="border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:20px">'+
+      '<div onclick="togglePrevInfo(this)" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s2);cursor:pointer;user-select:none">'+
+        '<span style="font-size:12px;font-weight:600;color:var(--ink2)">View Previous Info</span>'+
+        '<span style="font-size:10px;color:var(--ink3)" id="prevInfoChev">▾</span>'+
+      '</div>'+
+      '<div id="prevInfoBody" style="display:none;padding:14px 16px;border-top:1px solid var(--border);background:var(--surface)">'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">'+
+          buildCompactReadField("Name","Rahul Sharma")+
+          buildCompactReadField("Email ID","seller@example.com")+
+          buildCompactReadField("Contact No.","+91 98765 43210")+
+        '</div>'+
+        '<div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Previous Address</div>'+
+        '<div style="font-size:13px;color:var(--ink2);line-height:1.6;padding:10px 12px;background:var(--s2);border-radius:7px">42, MG Road, Bengaluru, Karnataka – 560001</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Update Details</div>'+
+    '<div class="mf"><div class="ml">Email ID <span class="ml-hint">(optional)</span></div><input class="mi" type="email" placeholder="Enter email address"/></div>'+
+    '<div class="mf"><div class="ml">Contact No. <span class="ml-hint">(optional)</span></div><input class="mi" type="tel" placeholder="Enter contact number"/></div>'+
+    '<div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin:6px 0 12px">New Address <span style="color:var(--red)">*</span></div>'+
+    '<div class="mf"><div class="ml">Pincode <span style="color:var(--red)">*</span></div>'+
+      '<input class="mi" type="text" id="pincodeField" placeholder="Enter 6-digit pincode" maxlength="6" oninput="handlePincode(this.value)"/>'+
+      '<div id="pincodeHint" class="field-hint" style="display:none"></div>'+
+    '</div>'+
+    '<div class="mo-row" style="margin-bottom:14px">'+
+      '<div class="mf" style="margin-bottom:0"><div class="ml">City</div><input class="mi" type="text" id="cityField" placeholder="Auto-filled from pincode" readonly style="background:var(--s3);color:var(--ink2)"/></div>'+
+      '<div class="mf" style="margin-bottom:0"><div class="ml">State</div><input class="mi" type="text" id="stateField" placeholder="Auto-filled from pincode" readonly style="background:var(--s3);color:var(--ink2)"/></div>'+
+    '</div>'+
+    '<div class="mf"><div class="ml">Address Line 1 <span style="color:var(--red)">*</span></div><input class="mi" type="text" placeholder="House/Flat no., Street name"/></div>'+
+    '<div class="mf"><div class="ml">Address Line 2 <span class="ml-hint">(optional)</span></div><input class="mi" type="text" placeholder="Landmark, Area"/></div>'+
+    buildCommonFields(false)+
+  '</div>';
+}
+
+// Pincode → City / State autofill (prototype data)
+var PINCODE_MAP={"400001":["Mumbai","Maharashtra"],"110001":["New Delhi","Delhi"],"560001":["Bengaluru","Karnataka"],"500001":["Hyderabad","Telangana"],"600001":["Chennai","Tamil Nadu"],"411001":["Pune","Maharashtra"],"380001":["Ahmedabad","Gujarat"],"700001":["Kolkata","West Bengal"],"302001":["Jaipur","Rajasthan"],"530001":["Visakhapatnam","Andhra Pradesh"]};
+function handlePincode(val){
+  var hint=document.getElementById("pincodeHint");
+  var city=document.getElementById("cityField");
+  var state=document.getElementById("stateField");
+  if(!city||!state)return;
+  if(val.length===6){
+    var data=PINCODE_MAP[val];
+    if(data){
+      city.value=data[0];state.value=data[1];
+      if(hint){hint.style.display="flex";hint.className="field-hint ok";hint.innerHTML="<span>✓</span><span>"+data[0]+", "+data[1]+"</span>";}
+    } else {
+      city.value="";state.value="";
+      if(hint){hint.style.display="flex";hint.className="field-hint err";hint.innerHTML="<span>✗</span><span>Pincode not found — please enter city and state manually</span>";}
+      city.removeAttribute("readonly");state.removeAttribute("readonly");
+      city.style.background="";city.style.color="";state.style.background="";state.style.color="";
+      city.placeholder="Enter city";state.placeholder="Enter state";
+    }
+  } else {
+    city.value="";state.value="";
+    if(hint)hint.style.display="none";
+  }
+}
+
+function buildCompactReadField(label,val){
+  return '<div style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm)">'+
+    '<div style="font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">'+label+'</div>'+
+    '<div style="font-size:13px;font-weight:600;color:var(--ink)">'+val+'</div>'+
+  '</div>';
+}
+
+function togglePrevInfo(headerEl){
+  var body=document.getElementById("prevInfoBody");
+  var chev=document.getElementById("prevInfoChev");
+  if(!body)return;
+  var isOpen=body.style.display!=="none";
+  body.style.display=isOpen?"none":"block";
+  if(chev)chev.textContent=isOpen?"▾":"▴";
+}
+
+// ─── COMMON FIELDS (Remark + AWB + Attach) ───────────
+// requireAWB=false only for Tech Related Issues
+function buildCommonFields(istech){
+  var awbSection=istech?'':
+    '<div class="mf"><div class="ml">AWB No. <span style="color:var(--red)">*</span></div>'+
+    '<div class="awb-row"><input class="mi" type="text" id="awbField" placeholder="Enter AWB number" style="font-family:var(--mono);letter-spacing:.4px" oninput="resetAWB()"/><button class="awb-validate-btn" onclick="doValidate()">Validate</button></div>'+
+    '<div id="awbHint" class="field-hint" style="display:none"></div></div>'+
+    '<div id="awbResultZone"></div>';
+  return '<div style="padding-top:16px;margin-top:8px">'+
+    awbSection+
+    '<div class="mf"><div class="ml">Remark <span style="color:var(--red)">*</span></div>'+
+    '<textarea class="mi-ta" placeholder="Describe your issue in detail..." style="min-height:90px" oninput="setCreateBtnDisabled(this.value.trim().length===0)" maxlength="500"></textarea>'+
+    '<div style="font-size:11px;color:var(--ink3);margin-top:4px;text-align:right" id="remarkCharCount">500 characters remaining</div></div>'+
+    '<div class="mf"><div class="ml">Attach File / Image <span class="ml-hint">(optional)</span></div>'+
+    '<div class="uz" onclick="toast(\'📎 File picker opened\')">'+
+      '<div class="uz-t">Click to attach or drag & drop</div>'+
+      '<div class="uz-s">Upload limit: 5 MB &nbsp;·&nbsp; JPG, PNG, PDF, XLSX</div>'+
+    '</div></div>'+
+  '</div>';
+}
+
+// ─── COMPLAINT FLOW ──────────────────────────────────
+function pickComplaintType(el,type){
+  document.querySelectorAll("#issueTypeList .cdd-item").forEach(function(i){i.classList.remove("on");});
+  el.classList.add("on");
+  var btn=document.getElementById("issueTypeBtn");btn.textContent=type;btn.classList.remove("placeholder");
+  document.getElementById("issueTypeList").classList.remove("sh");
+  var zone=document.getElementById("complaintDetailZone");
+  if(zone)zone.innerHTML=
+    '<div class="mf" style="margin-top:4px"><div class="ml">Remark <span style="color:var(--red)">*</span></div>'+
+    '<textarea class="mi-ta" placeholder="Describe the complaint in detail..." style="min-height:100px" oninput="setCreateBtnDisabled(this.value.trim().length===0)"></textarea></div>'+
+    '<div class="mf"><div class="ml">Attach File / Image <span class="ml-hint">(optional)</span></div>'+
+    '<div class="uz" onclick="toast(\'📎 File picker opened\')"><div class="uz-t">Click to attach or drag & drop</div><div class="uz-s">Upload limit: 5 MB &nbsp;·&nbsp; JPG, PNG, PDF</div></div></div>';
+  setCreateBtnDisabled(true);
+}
+
+// ─── ENQUIRY FLOW (unified) ───────────────────────────
+function buildEnquiryForm(){
+  setCreateBtnDisabled(true);
+  return '<div style="padding-top:16px;margin-top:4px">'+buildCommonFields(false)+'</div>';
+}
+
+// ─── LEGACY SINGLE/MULTI AWB (used in RTO path) ──────
+function buildSingleAWBInput(){
+  return '<div class="mf"><div class="ml">Enter your AWB</div><div class="awb-row"><input class="mi" type="text" id="awbField" placeholder="e.g. 1234567890" oninput="resetAWB()"/><button class="awb-validate-btn" onclick="doValidate()">Validate AWB</button></div><div id="awbHint" class="field-hint" style="display:none"></div></div>';
+}
+function buildAWBSection(){
+  return '<div class="mf"><div class="ml">Number of AWB(s) with this issue</div><div class="radio-row"><label class="radio-opt"><input type="radio" name="awbMode" value="single" checked onchange="switchAWBMode(\'single\')"> Single AWB</label><label class="radio-opt"><input type="radio" name="awbMode" value="multi" onchange="switchAWBMode(\'multi\')"> Multiple AWBs</label></div></div><div id="awbInputWrap">'+buildSingleAWBInput()+'</div>';
+}
+function switchAWBMode(mode){
+  if(mode==="single"){document.getElementById("awbInputWrap").innerHTML=buildSingleAWBInput();}
+  else{document.getElementById("awbInputWrap").innerHTML=buildMultiAWBInput();}
+  document.getElementById("awbResultZone").innerHTML="";awbValidated=false;
+}
+// pickSub kept for any legacy paths that might reference it
+function pickSub(el,sub){
+  selSub=sub;awbValidated=false;awbSc=null;
+  setCreateBtnDisabled(true);setSteps(2);
+}
+function buildMultiAWBInput(){
+  return '<div class="mf"><div class="ml">Enter your AWBs <span class="ml-hint">(comma-separated)</span></div><input class="mi" type="text" placeholder="e.g. 1234567890, 0987654321"/></div><div class="note-bar">You can add up to 10 AWBs. To add more, please upload a sheet.</div><div class="mf"><div class="ml">OR Upload AWB Sheet</div><div class="uz" id="uploadZone" onclick="simulateUpload()"><div class="uz-t">Drag & Drop to Upload File. OR</div><div style="margin-top:8px"><button class="tbtn tbtn-p" onclick="event.stopPropagation();simulateUpload()">Browse File</button></div><div class="uz-s">Supports .xlsx, .csv — max 5MB</div></div></div>';
+}
+function simulateUpload(){
+  var z=document.getElementById("uploadZone");if(!z)return;
+  // Show progress state
+  z.outerHTML='<div id="uploadZone"><div class="upload-progress"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--ink)">Uploading AWB_Sheet_May2026.xlsx…</span><span style="font-size:11px;color:var(--ink3)">52 AWBs</span></div><div class="upload-progress-bar"><div class="upload-progress-fill" id="upFill" style="width:0%"></div></div><div style="font-size:11px;color:var(--ink3)">Validating file…</div></div></div>';
+  var w=0;var iv=setInterval(function(){w+=14;var f=document.getElementById("upFill");if(f)f.style.width=Math.min(w,100)+"%";if(w>=100){clearInterval(iv);showUploadedState();}},120);
+}
+function showUploadedState(){
+  var z=document.getElementById("uploadZone");if(!z)return;
+  z.outerHTML='<div id="uploadZone"><div class="file-uploaded"><div class="file-icon">📊</div><div><div class="file-name">AWB_Sheet_May2026.xlsx</div><div class="file-meta">52 AWBs · 48.2 KB · Uploaded just now</div></div><div class="file-check">✓</div></div><div class="success-bar" style="margin-bottom:10px"><span>✓</span><span>File validated successfully. 52 AWBs detected. Click <b>Process Tickets</b> to continue.</span></div></div>';
+  setCreateBtnDisabled(false);
+  document.getElementById("moFt").innerHTML='<button class="mfb mfb-c" onclick="closeCreate()">Cancel</button><button class="mfb mfb-p" onclick="processBulk()">Process Tickets →</button>';
+}
+
+function resetAWB(){awbValidated=false;awbSc=null;document.getElementById("awbResultZone").innerHTML="";var h=document.getElementById("awbHint");if(h)h.style.display="none";setCreateBtnDisabled(true);}
+function setHint(type,msg){var h=document.getElementById("awbHint");if(!h)return;h.style.display="flex";h.className="field-hint "+type;h.innerHTML="<span>"+(type==="ok"?"✓":type==="err"?"✗":"ℹ")+"</span><span>"+msg+"</span>";}
+function setCreateBtnDisabled(dis){var b=document.getElementById("createBtn");if(b)b.disabled=dis;}
+
+// ─── PROCESS BULK TICKETS ─────────────────────────────
+function processBulk(){
+  closeCreate();
+  // Show bulk processing state then results
+  document.getElementById("bulkBody").innerHTML=buildBulkProcessing();
+  document.getElementById("bulkPanel").classList.add("sh");
+  setTimeout(function(){
+    document.getElementById("bulkBody").innerHTML=buildBulkResults();
+    initBulkTabs();
+  },1800);
+}
+function closeBulk(){document.getElementById("bulkPanel").classList.remove("sh");}
+
+function buildBulkProcessing(){
+  return '<div style="padding:40px 28px;text-align:center"><div style="font-size:32px;margin-bottom:16px">⚙️</div><div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">Processing 52 AWBs…</div><div style="font-size:12px;color:var(--ink3);margin-bottom:20px">Validating eligibility, checking existing tickets, and generating support requests</div><div style="max-width:360px;margin:0 auto"><div class="upload-progress-bar"><div class="upload-progress-fill" id="bulkFill" style="width:0%"></div></div></div></div>';
+  // Animation handled in setTimeout
+}
+var bulkAWBData=[
+  {order:"25JULBU030",awb:"5828010049066",origin:"KUKATPALLY (Ecil - 500062)",dest:"PRAVAN (KURNOOL - 518002)",lastUpdate:"17 May, Today",lastScan:"Manifest uploaded at Hyderabad_Bownplly_C (Telangana)",status:"created",tkId:"TK-4892305"},
+  {order:"25JULBU031",awb:"5828010049067",origin:"HITECH CITY (500081)",dest:"VIZAG (530002)",lastUpdate:"17 May, Today",lastScan:"In transit at Vijayawada Hub",status:"created",tkId:"TK-4892306"},
+  {order:"25JULBU032",awb:"5828010049068",origin:"SECUNDERABAD (500003)",dest:"PUNE (411001)",lastUpdate:"16 May, Yesterday",lastScan:"Arrived at Pune Distribution",status:"created",tkId:"TK-4892307"},
+  {order:"25JULBU033",awb:"5828010049069",origin:"BEGUMPET (500016)",dest:"CHENNAI (600001)",lastUpdate:"16 May, Yesterday",lastScan:"Out for delivery Chennai",status:"created",tkId:"TK-4892308"},
+  {order:"25JULBU034",awb:"5828010049070",origin:"GACHIBOWLI (500032)",dest:"BANGALORE (560001)",lastUpdate:"17 May, Today",lastScan:"Shipment picked up",status:"not_eligible",reason:"SLA not breached — 26 hrs remaining"},
+  {order:"25JULBU035",awb:"5828010049071",origin:"MADHAPUR (500081)",dest:"DELHI (110001)",lastUpdate:"15 May",lastScan:"In transit Nagpur Hub",status:"exists",existingId:"TK-4891540"},
+  {order:"25JULBU036",awb:"5828010049072",origin:"KONDAPUR (500084)",dest:"MUMBAI (400001)",lastUpdate:"15 May",lastScan:"Delivery attempt failed",status:"exists",existingId:"TK-4891541"},
+  {order:"25JULBU037",awb:"5828010049073",origin:"JUBILEE HILLS (500033)",dest:"KOLKATA (700001)",lastUpdate:"17 May, Today",lastScan:"Manifest uploaded",status:"created",tkId:"TK-4892309"},
+  {order:"25JULBU038",awb:"5828010049074",origin:"AMEERPET (500016)",dest:"JAIPUR (302001)",lastUpdate:"16 May",lastScan:"Reached Jaipur Hub",status:"created",tkId:"TK-4892310"},
+  {order:"25JULBU039",awb:"5828010049075",origin:"BANJARA HILLS (500034)",dest:"AHMEDABAD (380001)",lastUpdate:"17 May, Today",lastScan:"Picked up at origin",status:"not_eligible",reason:"SLA not breached — 18 hrs remaining"}
+];
+// Summary: 6 created, 2 not eligible, 2 already exist (representative sample)
+var bulkTab="created";
+function buildBulkResults(){
+  var created=bulkAWBData.filter(function(r){return r.status==="created";});
+  var notElig=bulkAWBData.filter(function(r){return r.status==="not_eligible";});
+  var exists=bulkAWBData.filter(function(r){return r.status==="exists";});
+  return '<div class="bulk-created-banner"><div><div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--blue)"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg> Ticket Created</div><div class="bulk-created-chips"><span class="chip">Shipment NDR &amp; RTO</span><span class="chip" style="background:var(--s3)">/</span><span class="chip">Issue Over Undelivered Shipment</span></div><div class="bulk-created-desc">Delayed delivery</div></div></div><div class="bulk-body"><div class="bulk-status-header"><div class="bulk-status-ico">📦</div><div class="bulk-status-title">Ticket Request Status</div></div><div class="bulk-tabs"><div class="bulk-tab on" id="bt0" onclick="switchBulkTab(0,this)">Tickets Created <span class="bulk-tab-count">'+created.length+'</span></div><div style="width:1px;height:20px;background:var(--border);align-self:center;margin:0 2px"></div><div class="bulk-tab" id="bt1" onclick="switchBulkTab(1,this)">Not Eligible for Tickets <span class="bulk-tab-count">'+notElig.length+'</span></div><div style="width:1px;height:20px;background:var(--border);align-self:center;margin:0 2px"></div><div class="bulk-tab" id="bt2" onclick="switchBulkTab(2,this)">Tickets already Exists <span class="bulk-tab-count">'+exists.length+'</span></div></div><div class="bulk-search"><input type="text" placeholder="Search by AWB number" oninput="filterBulkTable(this.value)"/></div><div id="bulkTableWrap">'+buildBulkTable("created")+'</div></div>';
+}
+function initBulkTabs(){/* already wired via onclick */}
+function switchBulkTab(idx,el){
+  document.querySelectorAll(".bulk-tab").forEach(function(t){t.classList.remove("on");});el.classList.add("on");
+  var map=["created","not_eligible","exists"];bulkTab=map[idx];
+  var w=document.getElementById("bulkTableWrap");if(w)w.innerHTML=buildBulkTable(bulkTab);
+}
+function buildBulkTable(status){
+  var rows=bulkAWBData.filter(function(r){return r.status===status;});
+  var headers='<thead><tr><th>Order ID &amp; AWB</th><th>Pickup &amp; Delivery Address</th><th>Last Update</th>';
+  if(status==="created")headers+='<th>Action</th>';
+  headers+='</tr></thead>';
+  var body='<tbody>'+rows.map(function(r){
+    var addrHtml='<div class="addr-col"><div class="addr-row-item"><div class="addr-dot origin"></div><div>'+r.origin+'</div></div><div style="padding-left:13px;border-left:1.5px dashed var(--border2);margin-left:3px;height:10px"></div><div class="addr-row-item"><div class="addr-dot dest"></div><div>'+r.dest+'</div></div></div>';
+    var actionHtml='';
+    if(status==="created")actionHtml='<td><button class="view-tk-btn" onclick="openBulkTicketDetail(\''+r.tkId+'\',\''+r.order+'\',\''+r.awb+'\')">📋 View Ticket</button></td>';
+    var lastUpd='<div style="font-size:12px;font-weight:600;color:var(--ink)">'+r.lastUpdate+'</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">'+r.lastScan+'</div>';
+    return '<tr><td><div class="order-id">'+r.order+'</div><div class="awb-num">'+r.awb+'</div></td><td>'+addrHtml+'</td><td>'+lastUpd+'</td>'+actionHtml+'</tr>';
+  }).join("")+'</tbody>';
+  return '<div style="border:1px solid var(--border);border-radius:9px;overflow:hidden"><table class="btbl">'+headers+body+'</table></div>';
+}
+function filterBulkTable(val){
+  var w=document.getElementById("bulkTableWrap");if(!w)return;
+  var rows=w.querySelectorAll("tbody tr");rows.forEach(function(r){r.style.display=r.textContent.toLowerCase().indexOf(val.toLowerCase())!==-1?"":"none";});
+}
+function openBulkTicketDetail(tkId,order,awb){
+  // Close bulk panel and open conv panel for this ticket
+  closeBulk();
+  setTimeout(function(){
+    openConvPanel(tkId,"Shipment, NDR & RTO","Issue Over Undelivered Shipment",awb,"OPEN","17 May 2026",false);
+    toast("Viewing ticket "+tkId+" for order "+order);
+  },300);
+}
+
+// ─── AWB VALIDATION ENGINE ────────────────────────────
+function doValidate(){
+  var f=document.getElementById("awbField");if(!f)return;
+  var val=f.value.trim();if(!val){setHint("err","Please enter an AWB number.");return;}
+  awbVal=val;
+  document.getElementById("awbResultZone").innerHTML='<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px"><div style="font-size:11px;color:var(--ink3);margin-bottom:12px">Validating AWB with XpressBees logistics system…</div><div class="shimmer" style="height:11px;width:55%;margin-bottom:8px"></div><div class="shimmer" style="height:11px;width:75%;margin-bottom:8px"></div><div class="shimmer" style="height:11px;width:40%;margin-bottom:14px"></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><div class="shimmer" style="height:50px;border-radius:7px"></div><div class="shimmer" style="height:50px;border-radius:7px"></div><div class="shimmer" style="height:50px;border-radius:7px"></div><div class="shimmer" style="height:50px;border-radius:7px"></div></div></div>';
+  setHint("info","Validating AWB…");
+  setTimeout(function(){
+    var sc=AWB_DB[val];
+    if(!sc){document.getElementById("awbResultZone").innerHTML='<div class="err-bar"><span>✗</span><div><b>AWB Not Found</b><br>AWB <span style="font-family:var(--mono)">'+val+'</span> could not be located. Please verify and try again.</div></div>';setHint("err","AWB not found in system.");awbValidated=false;setCreateBtnDisabled(true);}
+    else if(sc.duplicate){document.getElementById("awbResultZone").innerHTML=buildDuplicateBlock(sc);setHint("err","An open ticket already exists for this AWB.");awbValidated=false;setCreateBtnDisabled(true);}
+    else if(sc.ineligible){document.getElementById("awbResultZone").innerHTML=buildIneligibleBlock(sc);setHint("err","Shipment is not eligible for ticket creation at this time.");awbValidated=false;setCreateBtnDisabled(true);}
+    else if(sc.eligible){document.getElementById("awbResultZone").innerHTML=buildEligibleBlock(sc);setHint("ok","AWB validated — shipment is eligible.");awbValidated=true;awbSc=sc;setCreateBtnDisabled(false);setSteps(3);}
+  },950);
+}
+function buildEligibleBlock(sc){
+  var mvmt=sc.movements.map(function(m){return '<div class="mvmt-item"><div class="mvmt-dot'+(m.cur?" cur":"")+'"></div><div><div class="mvmt-loc">'+m.loc+'</div><div class="mvmt-time">'+m.time+'</div><span class="mvmt-st '+(m.cur?"st-open":"st-resolved")+'">'+m.status+'</span></div></div>';}).join("");
+  return '<div class="elig-box"><div class="elig-box-title">✓ Eligible for Ticket Creation</div><div class="elig-box-body">We\'re sorry for the delay in reattempt of your <b>'+sc.awb+'</b>. Please review details and create a ticket.</div><div class="awb-detail-row"><div class="awb-detail-cell"><div class="awb-detail-hdr">AWB</div><div class="awb-detail-val">'+sc.awb+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">Courier</div><div class="awb-detail-val ink">'+sc.courier+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">AWB Status</div><div class="awb-detail-val ink">'+sc.status+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">Expected Delivery</div><div class="awb-detail-val ink">'+sc.edd+'</div></div></div></div><div class="sla-block"><div class="sla-block-title">Shipment Movement Timeline</div><div class="sla-bar-wrap"><div class="sla-bar-fill" style="width:'+sc.slaPercent+'%"></div></div><div class="sla-bar-meta"><span>Pickup: 14 May</span><span>Expected: '+sc.edd+'</span></div><div class="mvmt-list">'+mvmt+'</div></div><div class="mf"><div class="ml">Share your input about this NDR <span class="ml-hint">(Buyer feedback / comments)</span></div><textarea class="mi-ta" placeholder="Type your reason here…" style="min-height:90px"></textarea></div><div class="uz-pair"><div class="mf" style="margin-bottom:0"><div class="ml">Upload recording with buyer</div><div class="uz" style="padding:12px 10px"><div class="uz-t" style="font-size:11px">⬆ Upload file</div></div></div><div class="mf" style="margin-bottom:0"><div class="ml">Upload screenshot of chat with buyer</div><div class="uz" style="padding:12px 10px"><div class="uz-t" style="font-size:11px">⬆ Upload Images</div></div></div></div><div class="mf"><div class="ml">Alternate Mobile no. of the buyer <span class="ml-hint">(optional)</span></div><input class="mi" type="text" placeholder="Enter Alternate Mobile No."/></div>';
+}
+function buildDuplicateBlock(sc){
+  var ex=sc.existingTicket;
+  return '<div class="dup-notice"><div class="dup-notice-title"><span>⚠</span> Ticket for this order already exists</div><div class="dup-notice-body">A support ticket is already open for AWB <b>'+sc.awb+'</b>. Creating a duplicate is not permitted.</div><div class="exist-tk-card"><div class="exist-tk-hdr"><span class="exist-tk-id">Existing Ticket ID — '+ex.id+'</span><button class="view-tk-btn" onclick="openExistingTicket()">📋 View Ticket</button></div><div class="exist-tk-chips"><span class="chip">'+ex.cat+'</span><span class="chip">'+ex.sub+'</span></div><div class="exist-tk-desc">'+ex.desc+'</div><div class="exist-tk-awb-row"><div><span class="exist-tk-awb-num">'+ex.id+'</span></div><div class="exist-tk-meta">Created: '+ex.date+' &nbsp;·&nbsp; Due: '+ex.due+'</div></div></div></div><div class="guide-list"><div class="guide-list-title">What you can do</div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Track the ticket</b> — Click "View Ticket" to see live status.</span></div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Add an update</b> — Attach new evidence to the existing ticket.</span></div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Escalate if overdue</b> — Call <b>1800-209-0809</b> (Mon–Sat, 9AM–7PM).</span></div></div>';
+}
+function openExistingTicket(){closeCreate();setTimeout(function(){openConvPanel("TK-4892240","Shipment, NDR & RTO","Issue Over Undelivered Shipment","0987654321","OPEN","15 May 2026",false);},300);}
+function buildIneligibleBlock(sc){
+  var hrs=sc.slaWindowHours-sc.hoursElapsed;
+  var mvmt=sc.movements.map(function(m){return '<div class="mvmt-item"><div class="mvmt-dot'+(m.cur?" cur":"")+'"></div><div><div class="mvmt-loc">'+m.loc+'</div><div class="mvmt-time">'+m.time+'</div><span class="mvmt-st '+(m.cur?"st-open":"st-resolved")+'">'+m.status+'</span></div></div>';}).join("");
+  return '<div class="restrict-banner"><div class="restrict-title"><span>✗</span> Ticket Creation Not Permitted</div><div class="restrict-body">This shipment is operationally <b>on-time</b> — the SLA window has not been breached. Ticket creation for delivery delay issues is only enabled once the SLA window expires.</div></div><div class="elig-box warn"><div class="elig-box-title">SLA Status — Shipment is On Time</div><div class="awb-detail-row" style="margin-top:10px"><div class="awb-detail-cell"><div class="awb-detail-hdr">AWB</div><div class="awb-detail-val">'+sc.awb+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">Courier</div><div class="awb-detail-val ink">'+sc.courier+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">Status</div><div class="awb-detail-val ink">'+sc.status+'</div></div><div class="awb-detail-cell"><div class="awb-detail-hdr">Expected Delivery</div><div class="awb-detail-val ink">'+sc.edd+'</div></div></div></div><div class="sla-block"><div class="sla-block-title">SLA Breakdown</div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:6px"><span>Elapsed: <b>'+sc.hoursElapsed+' hrs</b></span><span>Window: <b>'+sc.slaWindowHours+' hrs</b></span><span style="color:var(--green)">Remaining: <b>'+hrs+' hrs</b></span></div><div class="sla-bar-wrap"><div class="sla-bar-fill warn" style="width:'+sc.slaPercent+'%"></div></div><div class="sla-bar-meta"><span>Order placed: '+sc.orderDate+'</span><span>SLA due: '+sc.slaDue+'</span></div><div style="background:var(--al);border:1px solid var(--am);border-radius:8px;padding:11px;margin-top:10px"><div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:5px">Why can\'t I raise a ticket?</div><div style="font-size:12px;color:var(--amber);line-height:1.6">The issue type requires the SLA window to be exceeded. This shipment has <b>'+hrs+' hours remaining</b>. If not delivered by <b>'+sc.slaDue+'</b>, this AWB will automatically become eligible.</div></div><div style="margin-top:12px"><div class="sla-block-title">Movement History</div><div class="mvmt-list">'+mvmt+'</div></div></div><div class="guide-list"><div class="guide-list-title">What you can do instead</div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Track your shipment</b> — Monitor live movement updates.</span></div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Retry after SLA expiry</b> — Return after <b>'+sc.slaDue+'</b> if undelivered.</span></div><div class="guide-item"><span class="guide-arrow">→</span><span><b>Raise a different issue</b> — Select an appropriate subcategory above.</span></div></div>';
+}
+
+// ─── CREATE TICKET ────────────────────────────────────
+function doCreateTicket(){
+  if(!awbValidated&&AWB_SUBS.indexOf(selSub)!==-1){toast("⚠ Please validate AWB first");return;}
+  var newId="TK-"+String(4892300+Math.floor(Math.random()*99));
+  var now=new Date();var hh=now.getHours(),mm=now.getMinutes();var ampm=hh<12?"AM":"PM";hh=hh%12||12;
+  var timeStr=String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0")+" "+ampm;
+  var dateStr="17 May 2026";var dueStr="19 May 2026, "+timeStr;
+  TICKETS.unshift({id:newId,date:dateStr,time:timeStr,awb:awbSc?awbSc.awb:"N/A",sub:selSub||"Others",cat:selCat||"Others",status:"open",due:dueStr,updated:dateStr+", "+timeStr,sla:"ok",_isNew:true});
+  showSuccessScreen(newId,dateStr,timeStr,dueStr);
+}
+
+function showSuccessScreen(tkId,dateStr,timeStr,dueStr){
+  setSteps(3);var cat=selCat||"Shipment, NDR & RTO";var sub=selSub||"Issue Over Undelivered Shipment";var awbDisplay=awbSc?awbSc.awb:"N/A";var status=awbSc?awbSc.status:"—";var lastLoc=awbSc?awbSc.lastLoc:"—";
+  document.getElementById("moBody").innerHTML='<div class="success-screen"><div class="success-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="success-h">Ticket Created Successfully</div><div class="success-p">Your support ticket has been raised. Track progress under Open Tickets.<br>We will also notify you on your registered email id.</div><div class="success-tk-wrap"><div class="success-tk-top"><div class="success-tk-id-line"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="var(--green)" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>&nbsp;<span class="success-tk-id">Ticket Created — '+tkId+'</span><span class="success-tk-orders">(1 order)</span></div><button class="view-tk-btn" onclick="viewNewTicket(\''+tkId+'\')">📋 View Ticket</button></div><div class="success-tk-chips"><span class="chip">'+cat+'</span><span class="chip" style="background:var(--s3)">/</span><span class="chip">'+sub+'</span></div><div class="success-tk-desc">Delayed Delivery</div><div class="success-tk-awb-row"><div class="success-tk-awb-left"><span class="success-tk-awb-num">'+awbDisplay+'</span></div><div style="font-size:11px;color:var(--ink3);text-align:right">'+status+'<br>'+lastLoc+'</div></div></div><div class="success-track-note">Track progress of your ticket under \'Open Tickets\'.<br>We will also notify you on your registered email id.</div>'+buildCSATWidget()+'</div>';
+  document.getElementById("moFt").innerHTML='<button class="mfb mfb-c" onclick="closeCreate()">Close</button>';
+  curTab="open";document.querySelectorAll(".s-tab").forEach(function(t){t.classList.remove("on");});document.querySelectorAll(".s-tab")[0].classList.add("on");renderTickets();
+}
+function buildCSATWidget(){
+  var faces=[{label:"Extremely\nSatisfied",path:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"},{label:"Satisfied",path:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM8 14s1.5 1.5 4 1.5 4-1.5 4-1.5M9 9h.01M15 9h.01"},{label:"Average",path:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM8 15h8M9 9h.01M15 9h.01"},{label:"Dissatisfied",path:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM16 14s-1.5-1.5-4-1.5-4 1.5-4 1.5M9 9h.01M15 9h.01"},{label:"Extremely\nDissatisfied",path:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM16 14.5s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"}];
+  var h='<div class="csat-box"><div class="csat-title">Rate your ticket creation experience</div><div class="csat-faces">';
+  faces.forEach(function(f,i){h+='<div class="csat-face" onclick="pickCSAT(this)"><svg viewBox="0 0 24 24"><path d="'+f.path+'" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="csat-face-lbl">'+f.label.replace("\n","<br>")+'</div></div>';});
+  h+='</div><button class="csat-submit" id="csatSubmitBtn" onclick="submitCSAT()">Submit</button></div>';return h;
+}
+function pickCSAT(el){document.querySelectorAll(".csat-face").forEach(function(f){f.classList.remove("picked");});el.classList.add("picked");var b=document.getElementById("csatSubmitBtn");if(b)b.className="csat-submit active";}
+function submitCSAT(){toast("✓ Thank you for your feedback!");var b=document.getElementById("csatSubmitBtn");if(b){b.textContent="Submitted ✓";b.className="csat-submit";b.disabled=true;}}
+function viewNewTicket(id){closeCreate();setTimeout(function(){var tk=TICKETS.find(function(t){return t.id===id;});if(tk)openConvPanel(tk.id,tk.cat,tk.sub,tk.awb,"OPEN",tk.date,false);toast("✓ Ticket "+id+" visible at top of OPEN tab");},300);}
+</script>
+</body>
+</html>

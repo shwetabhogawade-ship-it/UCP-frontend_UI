@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1440"/>
+<title>XpressBees Seller Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--surface:#FFF;--s2:#F8F7F3;--s3:#EEECEA;
+  --border:#E2E0D8;--border2:#C5C3BB;
+  --ink:#1A190F;--ink2:#5C5B52;--ink3:#9B998F;
+  --orange:#E8520A;--ol:#FEF0E8;--om:#F5C09A;
+  --red:#C52E18;--rl:#FDECEA;
+  --green:#1A6B3A;--gl:#E7F5ED;--gm:#8DD4A9;
+  --sb-bg:#0F0E09;
+  --sb-hover:#1C1B14;
+  --sb-active:#252320;
+  --sb-border:#2A2920;
+  --sb-sep:#222118;
+  --sb-text:rgba(255,255,255,.62);
+  --sb-text-hover:rgba(255,255,255,.82);
+  --sb-text-active:#fff;
+
+  /* ─── Nav geometry tokens ─── */
+  /* FIX: collapsed width 52→56px for 44px touch targets */
+  --nav-w:56px;
+  --nav-exp:232px;
+  --nav-dur:200ms;
+  /* FIX: label fade is slightly delayed relative to width so text
+     never bleeds into the collapsed rail. Appear later, disappear sooner. */
+  --nav-lbl-in-delay:60ms;
+  /* FIX: sub-item indent as a computed CSS var — single source of truth */
+  --nav-ico-pad:16px;           /* left padding of nav-item in collapsed state */
+  --nav-ico-w:20px;             /* icon container width */
+  --nav-ico-gap:12px;           /* gap between icon and label */
+  --nav-sub-indent:calc(var(--nav-ico-pad) + var(--nav-ico-w) + var(--nav-ico-gap));
+  /* = 48px — sub-items indent to align text under parent labels */
+
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --shadow-md:0 4px 16px rgba(0,0,0,.1);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.22);
+}
+
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh;position:relative;overflow:hidden}
+
+/* FIX: main transitions its left margin in sync with sidebar width.
+   Previously static — caused overlay jitter as sidebar expanded over content. */
+.main{
+  flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;
+  margin-left:var(--nav-w);
+  transition:margin-left var(--nav-dur) ease-out;
+}
+.nav.open ~ .main{ margin-left:var(--nav-exp) }
+
+/* ══ TOPBAR — simplified per 2026 refresh ══
+   Layout: [Search]  ←→  [Wallet pill] [Quick Actions] [MR avatar]
+   Removed: plan ring, help, divider strokes, create-order button.   */
+.topbar{
+  height:56px;background:#fff;border-bottom:1px solid #E4E2DC;
+  padding:0 20px;display:flex;align-items:center;gap:12px;
+  flex-shrink:0;z-index:10;
+}
+
+/* Search bar — wide, takes most of the left side */
+.tb-srch{
+  display:flex;align-items:center;gap:8px;
+  flex:1;max-width:420px;min-width:0;height:34px;
+  background:#F9F8F5;border:1px solid #E4E2DC;
+  border-radius:8px;padding:0 12px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.tb-srch:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.tb-srch-ico{flex-shrink:0;opacity:.45;display:flex;align-items:center}
+.tb-srch-ico svg{width:14px;height:14px}
+.tb-srch input{
+  border:none;background:transparent;outline:none;
+  font-family:var(--font);font-size:12px;color:#1A190F;
+  width:100%;min-width:0;
+}
+.tb-srch input::placeholder{color:#6B6960;font-size:12px}
+
+/* Right-side action group */
+.tb-r{display:flex;align-items:center;gap:10px;margin-left:auto}
+
+/* Wallet — inline "🪙 Wallet: ₹1,741.32" pill */
+.tb-wallet{
+  display:inline-flex;align-items:center;gap:8px;
+  height:34px;padding:0 14px;
+  cursor:pointer;border:1px solid #E4E2DC;border-radius:8px;
+  background:#fff;font-family:var(--font);white-space:nowrap;
+  transition:background .12s,border-color .12s;
+}
+.tb-wallet:hover{background:#F9F8F5;border-color:#D6D4CC}
+.tb-wallet-ico{display:inline-flex;align-items:center;flex-shrink:0}
+.tb-wallet-ico svg{width:16px;height:16px}
+.tb-wallet-lbl{font-size:12px;font-weight:500;color:#6B6960;line-height:1}
+.tb-wallet-amount{font-size:12.5px;font-weight:700;color:#1A190F;font-family:var(--mono);line-height:1}
+
+/* Quick Actions — outline pill button */
+.tb-qa{
+  display:inline-flex;align-items:center;
+  height:34px;padding:0 14px;
+  cursor:pointer;border:1px solid #E4E2DC;border-radius:8px;
+  background:#fff;
+  font-family:var(--font);font-size:12.5px;font-weight:600;
+  color:#1A190F;white-space:nowrap;
+  transition:background .12s,border-color .12s;
+}
+.tb-qa:hover{background:#F9F8F5;border-color:#D6D4CC}
+
+/* Account avatar — initials circle only */
+.tb-av{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;padding:0;
+  cursor:pointer;border:0;background:transparent;
+  border-radius:50%;flex-shrink:0;
+}
+.tb-av-circle{
+  width:32px;height:32px;border-radius:50%;
+  background:#FDECEA;border:1px solid #F7C4A4;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#F07C00;
+  flex-shrink:0;letter-spacing:.3px;font-family:var(--font);
+  transition:filter .12s;
+}
+.tb-av:hover .tb-av-circle{filter:brightness(.97)}
+.page{flex:1;overflow-y:auto;padding:28px;display:flex;align-items:center;justify-content:center}
+.page-placeholder{text-align:center;color:var(--ink3)}
+.page-placeholder .ph-icon{width:64px;height:64px;border-radius:16px;background:var(--s2);border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.page-placeholder .ph-icon svg{width:28px;height:28px;color:var(--border2)}
+.page-placeholder h2{font-size:15px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+.page-placeholder p{font-size:12px;line-height:1.7;max-width:340px;margin:0 auto}
+
+/* ══ SIDEBAR ══ */
+.nav{
+  position:fixed;left:0;top:0;bottom:0;
+  width:var(--nav-w);
+  background:var(--sb-bg);
+  z-index:500;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width var(--nav-dur) ease-out, box-shadow var(--nav-dur) ease-out;
+  will-change:width;
+}
+.nav.open{width:var(--nav-exp);box-shadow:6px 0 28px rgba(0,0,0,.35)}
+
+/* ── Logo area: crossfade, no layout shift ── */
+.nav-logo{
+  height:52px;flex-shrink:0;
+  display:flex;align-items:center;
+  border-bottom:1px solid var(--sb-border);
+  overflow:hidden;
+  position:relative;
+}
+/* FIX: collapsed logo centre-aligned to the 56px rail */
+.nav-logo-collapsed{
+  position:absolute;
+  left:calc((var(--nav-w) - 28px) / 2);
+  top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:center;
+  width:28px;height:28px;flex-shrink:0;
+  opacity:1;transition:opacity var(--nav-dur) ease-out;
+  pointer-events:auto;cursor:pointer;
+}
+.nav.open .nav-logo-collapsed{opacity:0;pointer-events:none}
+
+/* Expanded wordmark: starts at same left as icon, fades in */
+.nav-logo-expanded{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;
+  opacity:0;
+  transition:opacity var(--nav-dur) ease-out var(--nav-lbl-in-delay);
+  pointer-events:none;
+  max-width:calc(var(--nav-exp) - 28px);overflow:hidden;
+}
+.nav-logo-expanded svg{height:20px;width:auto;max-width:100%;display:block}
+.nav.open .nav-logo-expanded{opacity:1;pointer-events:auto}
+
+/* ── Scroll body ── */
+.nav-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;scrollbar-width:none}
+.nav-body::-webkit-scrollbar{display:none}
+
+/* ── Separator ── */
+.nav-sep{height:1px;background:var(--sb-sep);margin:4px 12px}
+
+/* ── Dashboard — same geometry as all nav-items, no separator below ── */
+/* FIX: removed separator. Dashboard uses nav-item sizing exactly.
+   The only distinction is its position at top and the home icon.  */
+.nav-dash{
+  position:relative;
+  display:flex;align-items:center;
+  height:38px;
+  padding:0 var(--nav-ico-pad);
+  gap:var(--nav-ico-gap);
+  cursor:pointer;
+  color:var(--sb-text);
+  font-size:12.5px;font-weight:500;
+  white-space:nowrap;overflow:hidden;
+  text-decoration:none;
+  transition:background .12s,color .12s;
+  outline:none;user-select:none;
+  margin:0;border-radius:0;background:none;
+}
+.nav-dash:hover{background:var(--sb-hover);color:var(--sb-text-hover)}
+.nav-dash:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+.nav-dash.active{background:var(--sb-active);color:var(--sb-text-active)}
+.nav-dash.active::after{
+  content:'';position:absolute;left:0;top:7px;bottom:7px;
+  width:3px;background:var(--orange);border-radius:0 2px 2px 0;
+}
+
+/* ── Standard nav item ── */
+.nav-item{
+  position:relative;
+  display:flex;align-items:center;
+  height:38px;
+  padding:0 var(--nav-ico-pad);
+  gap:var(--nav-ico-gap);
+  cursor:pointer;color:var(--sb-text);
+  font-size:12.5px;font-weight:500;
+  white-space:nowrap;overflow:hidden;
+  text-decoration:none;
+  transition:background .12s,color .12s;
+  outline:none;user-select:none;
+}
+.nav-item:hover{background:var(--sb-hover);color:var(--sb-text-hover)}
+.nav-item:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+.nav-item.active,.nav-item[aria-current="page"]{background:var(--sb-active);color:var(--sb-text-active)}
+.nav-item.active::after,.nav-item[aria-current="page"]::after{
+  content:'';position:absolute;left:0;top:7px;bottom:7px;
+  width:3px;background:var(--orange);border-radius:0 2px 2px 0;
+}
+.nav-item.par-active{color:var(--orange)}
+.nav-item.par-active:hover{color:var(--orange)}
+
+/* ── Icon ── */
+.nav-ico{width:var(--nav-ico-w);min-width:var(--nav-ico-w);height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-ico svg{width:18px;height:18px;opacity:.72;transition:opacity .12s}
+.nav-item:hover .nav-ico svg,
+.nav-item.active .nav-ico svg,
+.nav-item[aria-current="page"] .nav-ico svg,
+.nav-dash:hover .nav-ico svg,
+.nav-dash.active .nav-ico svg{opacity:1}
+.nav-item.par-active .nav-ico svg{opacity:.88}
+
+/* ── Label ──
+   FIX: labels fade in with a small delay (after width starts expanding)
+   and fade out immediately (before width finishes collapsing).
+   This eliminates the ghost-text flicker during transition. */
+.nav-lbl{
+  flex:1;font-size:12.5px;font-weight:inherit;
+  opacity:0;
+  transition:opacity calc(var(--nav-dur) - 40ms) ease-out var(--nav-lbl-in-delay);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;
+}
+.nav.open .nav-lbl{opacity:1;pointer-events:auto}
+/* On collapse: fade out immediately with no delay */
+.nav:not(.open) .nav-lbl{
+  transition:opacity 80ms ease-out 0ms;
+}
+
+/* ── Chevron ── */
+.nav-chev{
+  width:10px;min-width:10px;height:10px;
+  opacity:0;transition:opacity var(--nav-dur),transform .2s ease;
+  flex-shrink:0;color:rgba(255,255,255,.35);
+}
+.nav.open .nav-chev{opacity:1}
+.nav-item:hover .nav-chev{color:rgba(255,255,255,.55)}
+.nav-item.par-active .nav-chev{color:rgba(232,82,10,.7)}
+.nav-item[aria-expanded="true"] .nav-chev{transform:rotate(180deg)}
+
+/* ── Badge — solid fill, white text (WCAG AA 6.2:1) ── */
+.nav-badge{
+  padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.5;
+  background:var(--red);color:#fff;flex-shrink:0;
+  opacity:0;transition:opacity var(--nav-dur);white-space:nowrap;
+}
+.nav.open .nav-badge{opacity:1}
+
+/* ── Tooltip (collapsed only) ──
+   FIX: offset now uses updated --nav-w */
+.nav-tip{
+  position:absolute;left:calc(var(--nav-w) + 10px);top:50%;transform:translateY(-50%);
+  background:#1C1B14;color:rgba(255,255,255,.88);
+  font-size:12px;font-weight:500;
+  padding:5px 11px;border-radius:6px;border:1px solid #2A2920;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .15s;z-index:600;box-shadow:var(--shadow-md);
+}
+.nav-item:hover .nav-tip,
+.nav-dash:hover .nav-tip{opacity:1}
+.nav.open .nav-tip{display:none !important}
+
+/* ── Sub-nav — 3-state layout-stable model ──
+   REMOVED: .nav:not(.open) .nav-sub { max-height:0 !important }
+   That rule fired synchronously on sidebar collapse, collapsing dropdown
+   height in frame-0 while the 200ms width transition was still running.
+   Result: every item below the open dropdown jumped upward instantly.
+
+   Replacement: JS sequences the close AFTER --nav-dur elapses.
+     (resting)   .nav-sub            → height:0, no transition
+     (expanded)  .nav-sub.open       → height:240px, ease-out in
+     (closing)   .nav-sub.collapsing → height:0, ease-in out, fires post-width
+── */
+.nav-sub{overflow:hidden;max-height:0;transition:none}
+.nav-sub.open{max-height:240px;transition:max-height .2s ease-out}
+.nav-sub.collapsing{max-height:0;transition:max-height .18s ease-in}
+
+/* ── Sub item ──
+   FIX: left padding uses CSS variable — single source of truth */
+.nav-sub-item{
+  display:flex;align-items:center;
+  height:32px;
+  padding:0 var(--nav-ico-pad) 0 var(--nav-sub-indent);
+  gap:8px;
+  cursor:pointer;color:rgba(255,255,255,.55);
+  font-size:12px;font-weight:400;
+  white-space:nowrap;overflow:hidden;text-decoration:none;
+  transition:background .12s,color .12s;
+  position:relative;outline:none;
+}
+.nav-sub-item:hover{background:var(--sb-hover);color:rgba(255,255,255,.78)}
+.nav-sub-item:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+.nav-sub-item.active,[aria-current="page"].nav-sub-item{color:#fff;font-weight:600;background:var(--sb-active)}
+.nav-sub-item.active::after{
+  content:'';position:absolute;left:0;top:5px;bottom:5px;
+  width:3px;background:var(--orange);border-radius:0 2px 2px 0;
+}
+.nav-sub-dot{width:5px;min-width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:background .12s}
+.nav-sub-item:hover .nav-sub-dot{background:rgba(255,255,255,.5)}
+.nav-sub-item.active .nav-sub-dot{background:var(--orange)}
+.nav-sub-lbl{
+  opacity:0;
+  transition:opacity calc(var(--nav-dur) - 40ms) ease-out var(--nav-lbl-in-delay);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.nav.open .nav-sub-lbl{opacity:1}
+.nav:not(.open) .nav-sub-lbl{transition:opacity 80ms ease-out 0ms}
+
+/* ── Bottom fixed ── */
+.nav-bottom{flex-shrink:0;border-top:1px solid var(--sb-sep);padding:4px 0}
+
+/* ── Toast ── */
+#xb-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:500;z-index:9999;transition:transform .25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.2)}
+
+/* ── Keyboard shortcut toast hint ── */
+.kbd-hint{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:10px;font-weight:600;font-family:var(--mono);color:rgba(255,255,255,.45);letter-spacing:.3px;flex-shrink:0;opacity:0;transition:opacity var(--nav-dur);white-space:nowrap;pointer-events:none}
+.nav.open .kbd-hint{opacity:1}
+
+/* ── Skip navigation link (WCAG 2.4.1 Level A) ── */
+.skip-link{
+  position:absolute;top:-999px;left:8px;
+  background:var(--orange);color:#fff;
+  padding:8px 16px;border-radius:0 0 6px 6px;
+  font-size:13px;font-weight:600;font-family:var(--font);
+  text-decoration:none;z-index:10000;
+  transition:top .15s ease;
+  white-space:nowrap;
+}
+.skip-link:focus{top:0;outline:3px solid #fff;outline-offset:2px}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div class="shell">
+
+<nav class="nav" id="xbNav"
+  role="navigation" aria-label="Main navigation"
+  onmouseenter="navHoverIn()" onmouseleave="navHoverOut()">
+
+  <!-- Logo: crossfade between collapsed XB mark and expanded wordmark -->
+  <div class="nav-logo">
+    <div class="nav-logo-collapsed" onclick="navGoTo('dashboard')" title="XpressBees">
+      <svg width="59" height="44" viewBox="0 0 59 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:auto">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.0945 31.1034L27.5466 21.7037L23.4589 12.8625H30.1491L31.9841 16.8485L35.5863 12.8625H41.9789L34.1376 21.5366L38.5464 31.106H31.7805L29.6871 26.4597L25.4975 31.106H19.0945V31.1034Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M47.7793 17.1905L47.1737 19.9809H50.1468C51.4207 19.9809 52.1489 19.4954 52.3917 18.4643C52.5744 17.616 52.0289 17.1905 50.755 17.1905H47.7793ZM39.1679 31.14L43.1095 12.8835H53.1174C55.2996 12.8835 56.7561 13.429 57.4844 14.4601C58.0299 15.2484 58.2127 16.2195 57.9699 17.4333C57.6071 19.0099 56.636 20.2237 54.9367 21.012C56.8788 21.7403 57.6045 23.2569 57.1189 25.5618C56.7561 27.3211 55.7851 28.655 54.2085 29.6861C52.8146 30.5971 51.2353 31.08 49.4786 31.08H39.1079L39.1679 31.14ZM46.4454 23.3769L45.7172 26.7729H48.9931C50.4496 26.7729 51.358 26.1674 51.5407 25.0136C51.7835 23.9225 51.2379 23.3143 49.9041 23.3143H46.3854L46.4454 23.3769Z" fill="#F07C00"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0439 31.1035L21.2348 20.9206L17.4368 12.86H20.6501L24.5812 21.4061L15.8184 31.1035H12.0439Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M6.01709 31.1035L15.2079 20.9206L11.4126 12.86H14.6232L18.5543 21.4061L9.79419 31.1035H6.01709Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 31.1035L9.19085 20.9206L5.39287 12.86H8.60614L12.5372 21.4061L3.77449 31.1035H0Z" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-logo-expanded" onclick="navGoTo('dashboard')" style="cursor:pointer">
+      <svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M103.944 27.1223L109.632 27.1837C109.509 27.6156 109.437 28.0689 109.562 28.4422C109.832 29.2741 110.56 29.7807 112.106 29.7807C113.652 29.7807 114.578 29.2234 114.826 28.0502C114.887 27.6183 114.764 27.2477 114.268 26.9384C113.898 26.7517 112.909 26.3811 111.301 25.8878C109.322 25.2692 108.024 24.7759 107.405 24.28C106.232 23.4134 105.797 22.1175 106.168 20.5097C106.6 18.4699 107.714 16.9234 109.506 15.8116C111.053 14.8223 112.906 14.3291 115.007 14.3291C117.108 14.3291 118.964 14.761 120.076 15.6889C121.374 16.7395 121.868 18.286 121.497 20.4484H116.058C116.306 19.8298 116.18 19.3365 115.687 18.9659C115.316 18.6566 114.759 18.4726 114.079 18.4726C112.658 18.4726 111.917 18.9046 111.73 19.7098C111.607 20.2671 112.101 20.7604 113.151 21.131C114.327 21.4403 115.5 21.7496 116.612 22.0589C118.095 22.4908 119.209 23.0481 119.828 23.728C120.694 24.6559 121.004 25.8905 120.694 27.437C120.201 29.6634 118.964 31.3325 116.863 32.4444C115.132 33.3723 113.093 33.8043 110.682 33.8043C108.272 33.8043 107.283 33.4336 106.045 32.6924C104.07 31.5112 103.39 29.6554 103.944 27.1223ZM121.809 27.0237L127.496 27.085C127.374 27.517 127.302 27.9702 127.427 28.3435C127.696 29.1754 128.424 29.6821 129.971 29.6821C131.517 29.6821 132.442 29.1248 132.69 27.9516C132.752 27.5196 132.629 27.149 132.133 26.8397C131.763 26.6531 130.773 26.2824 129.165 25.7891C127.187 25.1705 125.888 24.6773 125.27 24.1813C124.097 23.3147 123.662 22.0189 124.033 20.4111C124.465 18.3713 125.579 16.8248 127.371 15.7129C128.918 14.7237 130.771 14.2304 132.872 14.2304C134.973 14.2304 136.829 14.6624 137.941 15.5903C139.239 16.6408 139.732 18.1873 139.362 20.3497H133.922C134.17 19.7311 134.045 19.2379 133.552 18.8672C133.181 18.5579 132.624 18.374 131.944 18.374C130.523 18.374 129.781 18.8059 129.595 19.6112C129.472 20.1684 129.965 20.6617 131.016 21.0323C132.189 21.3416 133.365 21.6509 134.477 21.9602C135.959 22.3922 137.074 22.9495 137.693 23.6294C138.559 24.5573 138.866 25.7918 138.559 27.3383C138.066 29.5647 136.829 31.2339 134.728 32.3458C132.997 33.2737 130.957 33.7056 128.547 33.7056C126.136 33.7056 125.147 33.335 123.91 32.5937C121.932 31.4125 121.252 29.5594 121.809 27.0237ZM85.9088 33.3297L89.9191 14.7583H105.341L104.294 19.5098H94.6066L94.1133 21.8536H102.875L101.888 26.2958H93.1267L92.6334 28.6395H102.566L101.518 33.391H85.8928L85.9088 33.3297ZM75.3553 19.2005L74.5527 22.9041H77.5151C79.1816 22.9041 80.1681 22.2882 80.4161 21.0537C80.6641 19.8191 79.8615 19.2032 77.947 19.2032H75.294H75.3553V19.2005ZM66.6069 33.3857L70.6278 14.7637H81.616C83.3544 14.7637 84.6583 15.1983 85.5889 16.0675C86.5808 17.0594 86.8927 18.3633 86.5808 20.1018C86.3328 21.1577 85.8982 22.0882 85.2769 22.8961C84.5943 23.8267 83.7251 24.448 82.7332 24.7573C84.2237 25.3785 84.781 26.9304 84.4717 29.4128C84.4103 30.0953 84.285 30.7779 84.2237 31.3992C84.0984 32.3298 84.0984 33.0124 84.2237 33.3857H78.451C78.451 32.7031 78.451 31.7725 78.5763 30.53C78.7629 29.2874 78.7629 28.4822 78.5763 28.0476C78.3897 27.3036 77.7684 26.869 76.7152 26.869H73.6728L72.2463 33.3857H66.6069ZM57.6399 19.5098L56.8373 23.2748H59.0584C60.045 23.2748 60.7249 23.2134 61.2182 22.9655C61.9594 22.6562 62.3914 22.1015 62.5754 21.2376C62.7594 20.4964 62.5754 19.9418 62.0821 19.6938C61.7728 19.5098 61.1569 19.4458 60.293 19.4458H57.7626L57.6399 19.5098ZM48.9395 33.3323L52.9498 14.7583H62.514C64.7965 14.7583 66.4016 15.4996 67.3269 16.9794C68.0681 18.1526 68.3134 19.5712 67.9428 21.1763C67.4495 23.3361 66.463 25.0026 64.8578 26.1731C63.314 27.285 61.4635 27.7783 59.2424 27.7783H55.8481L54.6136 33.3937H48.9235L48.9395 33.3323ZM27.5045 33.3937L36.1382 23.792L31.9627 14.761H38.7966L40.6711 18.8326L44.3507 14.761H50.8806L42.8709 23.6214L47.3744 33.3963H40.4631L38.3247 28.6502L34.0451 33.3963H27.5045V33.3937Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M176.155 33.3137L180.163 14.7583H195.574L194.526 19.5045H184.847L184.354 21.8482H193.108L192.183 26.2878H183.429L182.936 28.6315H192.86L191.812 33.3777H176.155V33.3137ZM157.829 33.319L161.837 14.7637H177.248L176.2 19.5098H166.521L166.028 21.8536H174.782L173.857 26.2931H165.103L164.61 28.6368H174.537L173.489 33.383H157.816L157.829 33.319ZM147.803 19.1819L147.185 22.0322H150.222C151.523 22.0322 152.267 21.5363 152.515 20.4831C152.702 19.6165 152.144 19.1819 150.843 19.1819H147.803ZM139.007 33.431L143.033 14.7823H153.256C155.485 14.7823 156.973 15.3396 157.717 16.3928C158.274 17.1981 158.461 18.19 158.213 19.4298C157.842 21.0403 156.85 22.2802 155.115 23.0854C157.098 23.8294 157.84 25.3785 157.344 27.7329C156.973 29.5301 155.981 30.8926 154.371 31.9458C152.947 32.8764 151.334 33.3697 149.539 33.3697H138.946L139.007 33.431ZM146.441 25.5012L145.697 28.9701H149.043C150.531 28.9701 151.459 28.3515 151.646 27.173C151.894 26.0584 151.336 25.4372 149.974 25.4372H146.38L146.441 25.5012Z" fill="#F07C00"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.3026 33.3936L29.6909 22.9921L25.8114 14.7583H29.0937L33.1092 23.4881L24.1582 33.3936H20.3026Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.146 33.3936L23.5343 22.9921L19.6574 14.7583H22.9371L26.9526 23.4881L18.0043 33.3936H14.146Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M8 33.3936L17.3883 22.9921L13.5087 14.7583H16.791L20.8066 23.4881L11.8556 33.3936H8Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M194.228 27.0637L199.947 27.125C199.822 27.5596 199.753 28.0156 199.875 28.3889C200.147 29.2234 200.878 29.7354 202.432 29.7354C203.987 29.7354 204.917 29.1754 205.168 27.9942C205.229 27.5596 205.107 27.1863 204.608 26.8744C204.235 26.6877 203.24 26.3144 201.624 25.8185C199.635 25.1972 198.331 24.6986 197.707 24.2027C196.526 23.3334 196.092 22.0269 196.465 20.4111C196.899 18.3606 198.019 16.8061 199.822 15.6862C201.376 14.6917 203.24 14.1957 205.355 14.1957C207.469 14.1957 209.333 14.6304 210.45 15.5636C211.757 16.6195 212.252 18.174 211.879 20.3497H206.41C206.658 19.7285 206.536 19.2299 206.037 18.8592C205.664 18.5473 205.104 18.3633 204.421 18.3633C202.992 18.3633 202.246 18.7979 202.059 19.6058C201.934 20.1658 202.432 20.6617 203.488 21.035C204.669 21.347 205.85 21.6563 206.968 21.9682C208.458 22.4028 209.578 22.9628 210.199 23.6454C211.069 24.5786 211.381 25.8211 211.069 27.3756C210.573 29.6127 209.327 31.2925 207.216 32.4098C205.475 33.343 203.424 33.7776 201 33.7776C198.577 33.7776 197.582 33.4043 196.34 32.6577C194.353 31.4765 193.668 29.6127 194.228 27.0637Z" fill="#F07C00"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="nav-body">
+
+    <!-- Dashboard — no separator below; equal hierarchy with all items -->
+    <a class="nav-dash" id="ni-dashboard"
+      href="file:///Users/apple/Downloads/mod-dashboard_1.html"
+      data-id="dashboard"
+      onclick="handleClick(event,this)"
+      aria-label="Dashboard" tabindex="0">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 1.5H21C21.8284 1.5 22.5 2.17157 22.5 3V21C22.5 21.8284 21.8284 22.5 21 22.5H3C2.17157 22.5 1.5 21.8284 1.5 21V3C1.5 2.17157 2.17157 1.5 3 1.5Z" stroke="#FFF7ED"/> <path d="M7 5.5H8.59961C9.42804 5.5 10.0996 6.17157 10.0996 7V17C10.0996 17.8284 9.42804 18.5 8.59961 18.5H7C6.17157 18.5 5.5 17.8284 5.5 17V7C5.5 6.17157 6.17157 5.5 7 5.5Z" fill="#FFF7ED" stroke="#FFF7ED"/> <path d="M15.3999 5.5H16.9995C17.8279 5.5 18.4995 6.17157 18.4995 7V10C18.4995 10.8284 17.8279 11.5 16.9995 11.5H15.3999C14.5715 11.5 13.8999 10.8284 13.8999 10V7C13.8999 6.17157 14.5715 5.5 15.3999 5.5Z" fill="#FFF7ED" stroke="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Dashboard</span>
+      <span class="nav-tip">Dashboard</span>
+    </a>
+
+    <!-- Orders (reordered: NDR now immediately follows) -->
+    <div class="nav-item" id="ni-orders"
+      data-id="orders" data-expandable="1"
+      onclick="handleExpand(event,'orders')"
+      aria-expanded="false" aria-label="Orders" tabindex="0"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleExpand(event,'orders')}">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.74854 2.12H17.5005C17.9995 2.12001 18.4659 2.36818 18.7446 2.7821L21.6646 7.12H1.58545L4.50439 2.7821C4.78311 2.36818 5.24951 2.12005 5.74854 2.12Z" stroke="#FFF7ED"/> <path d="M12.1245 2.14673V7.50024H21.688V21.0002C21.6878 21.8285 21.0163 22.5002 20.188 22.5002H3.06299C2.23466 22.5002 1.56314 21.8285 1.56299 21.0002V7.50024H11.1245V2.14673H12.1245Z" stroke="#FFF7ED"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M16.705 11.3571C16.8818 11.4896 16.9177 11.7402 16.7853 11.917L11.2689 19.2818C11.1364 19.4586 10.8857 19.4946 10.7089 19.3621L6.54626 16.2438C6.36944 16.1113 6.33349 15.8606 6.46599 15.6838L7.18523 14.724C7.3177 14.5472 7.56838 14.5113 7.74516 14.6438L10.3069 16.5631C10.4837 16.6956 10.7345 16.6596 10.8669 16.4828L15.1852 10.7181C15.3177 10.5413 15.5684 10.5054 15.7452 10.6379L16.705 11.3571Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Orders</span>
+      <span class="nav-tip">Orders</span>
+      <svg class="nav-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="sn-orders">
+      <!-- FIX: "Orders" sub-item renamed to "All Orders" to eliminate label duplication -->
+      <a class="nav-sub-item" id="ni-orders-list" href="#" data-id="orders-list" data-parent="orders" onclick="handleClick(event,this)" aria-label="All Orders" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">All Orders</span>
+      </a>
+      <a class="nav-sub-item" id="ni-orders-pickup" href="#" data-id="orders-pickup" data-parent="orders" onclick="handleClick(event,this)" aria-label="Pickup Requests" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Pickup Requests</span>
+      </a>
+    </div>
+
+    <!-- NDR — reordered: sits next to Orders as operational sibling -->
+    <a class="nav-item" id="ni-ndr" href="file:///Users/apple/Downloads/ndr-v4_1.html" data-id="ndr" onclick="handleClick(event,this)" aria-label="NDR" tabindex="0">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.34521 4.5H15.5522C16.0513 4.50003 16.5177 4.74819 16.7964 5.16211L19.2661 8.83203H1.63135L4.10107 5.16211C4.37974 4.74819 4.84624 4.50013 5.34521 4.5Z" stroke="#FFF7ED"/> <path d="M10.8384 4.5238V9.28064H19.3364V21.0004C19.3362 21.8286 18.6647 22.5004 17.8364 22.5004H3.06299C2.23467 22.5004 1.56317 21.8286 1.56299 21.0004V9.28064H10.061V4.5238H10.8384Z" stroke="#FFF7ED"/> <rect x="10.3333" y="4.33337" width="8.79581" height="10.2618" rx="2" fill="#F07C00"/> <path d="M15.007 16C13.0721 16 11.4206 15.3158 10.0524 13.9473C8.6841 12.5788 8 10.9237 8 8.98204C8 7.06382 8.6841 5.4206 10.0524 4.05236C11.4206 2.68412 13.0698 2 15 2C16.9546 2 18.6099 2.67801 19.966 4.03403C21.322 5.39005 22 7.04535 22 9C22 10.9546 21.3182 12.6099 19.9546 13.966C18.5907 15.322 16.9415 16 15.007 16ZM14.4503 10.0995H15.733V4.85864H14.4503V10.0995ZM15.0916 13.2147C15.3238 13.2147 15.5192 13.1414 15.678 12.9948C15.8368 12.8482 15.9162 12.6527 15.9162 12.4084C15.9162 12.1641 15.8356 11.9686 15.6743 11.822C15.5131 11.6754 15.3249 11.6021 15.1099 11.6021C14.8412 11.6265 14.6396 11.712 14.5052 11.8586C14.3709 12.0052 14.3037 12.1946 14.3037 12.4267C14.3037 12.6588 14.377 12.8482 14.5236 12.9948C14.6702 13.1414 14.8595 13.2147 15.0916 13.2147Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">NDR</span>
+      <span class="nav-badge" aria-label="28 non-delivery reports requiring action">28</span>
+      <span class="nav-tip">NDR</span>
+    </a>
+
+    <!-- Information Center -->
+    <div class="nav-item" id="ni-info"
+      data-id="info" data-expandable="1"
+      onclick="handleExpand(event,'info')"
+      aria-expanded="false" aria-label="Information Center" tabindex="0"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleExpand(event,'info')}">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 1.5C14.7848 1.5 17.4557 2.60606 19.4248 4.5752C21.3939 6.54433 22.5 9.21523 22.5 12C22.5 14.7848 21.3939 17.4557 19.4248 19.4248C17.4557 21.3939 14.7848 22.5 12 22.5C9.21523 22.5 6.54433 21.3939 4.5752 19.4248C2.60606 17.4557 1.5 14.7848 1.5 12C1.5 9.21523 2.60606 6.54433 4.5752 4.5752C6.54433 2.60606 9.21523 1.5 12 1.5Z" stroke="#FFF7ED"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M13 8V6H11V8H13ZM11 11.5H9V9.5H13V15.5H15V17.5H9V15.5H11V11.5Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Information Center</span>
+      <span class="nav-tip">Information Center</span>
+      <svg class="nav-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="sn-info">
+      <a class="nav-sub-item" id="ni-info-pincode" href="file:///Users/apple/Downloads/info-center_8.html" data-id="info-pincode" data-parent="info" onclick="handleClick(event,this)" aria-label="Pincode Serviceability" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Pincode Serviceability</span>
+      </a>
+      <a class="nav-sub-item" id="ni-info-calc" href="file:///Users/apple/Downloads/info-center_8.html" data-id="info-calc" data-parent="info" onclick="handleClick(event,this)" aria-label="Rate Calculator" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Rate Calculator</span>
+      </a>
+      <a class="nav-sub-item" id="ni-info-ratecard" href="file:///Users/apple/Downloads/info-center_8.html" data-id="info-ratecard" data-parent="info" onclick="handleClick(event,this)" aria-label="Rate Card" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Rate Card</span>
+      </a>
+    </div>
+
+    <!-- Finance -->
+    <div class="nav-item" id="ni-finance"
+      data-id="finance" data-expandable="1"
+      onclick="handleExpand(event,'finance')"
+      aria-expanded="false" aria-label="Finance" tabindex="0"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleExpand(event,'finance')}">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 8C21.8284 8 22.5 8.67157 22.5 9.5V18.5C22.5 19.3284 21.8284 20 21 20H7C6.17157 20 5.5 19.3284 5.5 18.5V16.5H16C17.3807 16.5 18.5 15.3807 18.5 14V8H21Z" stroke="#FFF7ED"/> <path d="M3 4.5H17C17.8284 4.5 18.5 5.17157 18.5 6V15C18.5 15.8284 17.8284 16.5 17 16.5H3C2.17157 16.5 1.5 15.8284 1.5 15V6C1.5 5.17157 2.17157 4.5 3 4.5Z" stroke="#FFF7ED"/> <path d="M7.5 10.5C7.5 11.163 7.76339 11.7989 8.23223 12.2678C8.70107 12.7366 9.33696 13 10 13C10.663 13 11.2989 12.7366 11.7678 12.2678C12.2366 11.7989 12.5 11.163 12.5 10.5C12.5 9.83696 12.2366 9.20107 11.7678 8.73223C11.2989 8.26339 10.663 8 10 8C9.33696 8 8.70107 8.26339 8.23223 8.73223C7.76339 9.20107 7.5 9.83696 7.5 10.5Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Finance</span>
+      <span class="nav-tip">Finance</span>
+      <svg class="nav-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="sn-finance">
+      <a class="nav-sub-item" id="ni-finance-wallet" href="file:///Users/apple/Downloads/mod-wallet.html" data-id="finance-wallet" data-parent="finance" onclick="handleClick(event,this)" aria-label="Wallet" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Wallet</span>
+      </a>
+      <a class="nav-sub-item" id="ni-finance-remittance" href="#" data-id="finance-remittance" data-parent="finance" onclick="handleClick(event,this)" aria-label="Remittance" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Remittance</span>
+      </a>
+      <a class="nav-sub-item" id="ni-finance-invoice" href="#" data-id="finance-invoice" data-parent="finance" onclick="handleClick(event,this)" aria-label="Invoice &amp; Credits" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Invoice &amp; Credits</span>
+      </a>
+    </div>
+
+    <!-- Support -->
+    <a class="nav-item" id="ni-support" href="file:///Users/apple/Downloads/support_prototype_v3.html" data-id="support" onclick="handleClick(event,this)" aria-label="Support" tabindex="0">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.9998 1.5C17.7986 1.5 22.4998 6.20114 22.4998 12C22.4998 17.7989 17.7986 22.5 11.9998 22.5H1.99976C1.6073 22.4998 1.36814 22.0683 1.57593 21.7354L3.13062 19.2471C3.45619 18.726 3.41931 18.0806 3.11011 17.5898C2.09061 15.9715 1.49976 14.0543 1.49976 12C1.49976 6.20124 6.20103 1.50016 11.9998 1.5Z" stroke="#FFF7ED"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M9.93801 9.5C9.93801 8.96957 10.1487 8.46086 10.5238 8.08579C10.8989 7.71071 11.4076 7.5 11.938 7.5C12.4684 7.5 12.9772 7.71071 13.3522 8.08579C13.7273 8.46086 13.938 8.96957 13.938 9.5C13.938 9.56742 13.9092 9.63163 13.8588 9.67642L11.273 11.975C11.0599 12.1646 10.938 12.4378 10.938 12.723V13.5C10.938 14.0523 11.3857 14.5 11.938 14.5H12.0209C12.5274 14.5 12.938 14.0894 12.938 13.5829C12.938 13.3209 13.05 13.0714 13.2458 12.8974L15.602 10.803C15.8151 10.6134 15.937 10.3418 15.937 10.0566V9.5C15.937 8.43913 15.5156 7.42172 14.7654 6.67157C14.0153 5.92143 12.9979 5.5 11.937 5.5C10.8761 5.5 9.85873 5.92143 9.10858 6.67157C8.35844 7.42172 7.93701 8.43913 7.93701 9.5C7.93701 9.80707 8.18594 10.056 8.49301 10.056H9.38101C9.68824 10.056 9.93746 9.80723 9.93801 9.5ZM11.938 16C11.3857 16 10.938 16.4477 10.938 17C10.938 17.5523 11.3857 18 11.938 18C12.4903 18 12.938 17.5523 12.938 17C12.938 16.4477 12.4903 16 11.938 16Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Support</span>
+      <span class="nav-tip">Support</span>
+    </a>
+
+    <!-- Reports -->
+    <a class="nav-item" id="ni-reports" href="file:///Users/apple/Downloads/reports_3.html" data-id="reports" onclick="handleClick(event,this)" aria-label="Reports" tabindex="0">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 3h12a1 1 0 011 1v13a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="#FFF7ED" stroke-width="1.2"/><path d="M7 8h6M7 11h4M7 14h2" stroke="#FFF7ED" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <span class="nav-lbl">Reports</span>
+      <span class="nav-tip">Reports</span>
+    </a>
+
+    <!-- Services -->
+    <div class="nav-item" id="ni-services"
+      data-id="services" data-expandable="1"
+      onclick="handleExpand(event,'services')"
+      aria-expanded="false" aria-label="Services" tabindex="0"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleExpand(event,'services')}">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.9999 1.25C11.1815 1.24949 10.3888 1.53579 9.7596 2.05912C9.1304 2.58245 8.70449 3.30972 8.55589 4.11451C8.4073 4.9193 8.54542 5.75071 8.94625 6.46422C9.34708 7.17773 9.98527 7.72822 10.7499 8.02V13.1L6.27388 16.232C5.56876 15.8178 4.74088 15.6636 3.93393 15.7962C3.12698 15.9287 2.39192 16.3396 1.85634 16.9576C1.32075 17.5756 1.01846 18.3616 1.00194 19.1792C0.98541 19.9968 1.25569 20.7943 1.76586 21.4334C2.27604 22.0725 2.9939 22.5128 3.79483 22.6779C4.59576 22.8429 5.4292 22.7223 6.15048 22.337C6.87176 21.9516 7.43534 21.3259 7.74339 20.5684C8.05144 19.8108 8.08452 18.9694 7.83688 18.19L11.9999 15.276L16.1629 18.19C15.9152 18.9694 15.9483 19.8108 16.2564 20.5684C16.5644 21.3259 17.128 21.9516 17.8493 22.337C18.5706 22.7223 19.404 22.8429 20.2049 22.6779C21.0059 22.5128 21.7237 22.0725 22.2339 21.4334C22.7441 20.7943 23.0144 19.9968 22.9978 19.1792C22.9813 18.3616 22.679 17.5756 22.1434 16.9576C21.6078 16.3396 20.8728 15.9287 20.0658 15.7962C19.2589 15.6636 18.431 15.8178 17.7259 16.232L13.2499 13.1V8.02C14.0134 7.72729 14.6504 7.17656 15.0503 6.46335C15.4502 5.75014 15.5879 4.91943 15.4394 4.11533C15.291 3.31122 14.8657 2.58445 14.2375 2.06108C13.6092 1.53771 12.8176 1.25076 11.9999 1.25Z" fill="#FFF7ED"/></svg></div>
+      <span class="nav-lbl">Services</span>
+      <span class="nav-tip">Services</span>
+      <svg class="nav-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="sn-services">
+      <a class="nav-sub-item" id="ni-services-all" href="#" data-id="services-all" data-parent="services" onclick="handleClick(event,this)" aria-label="All" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">All</span>
+      </a>
+      <a class="nav-sub-item" id="ni-services-channels" href="file:///Users/apple/Downloads/channels.html" data-id="services-channels" data-parent="services" onclick="handleClick(event,this)" aria-label="Channels" tabindex="-1">
+        <div class="nav-sub-dot"></div><span class="nav-sub-lbl">Channels</span>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="nav-bottom">
+    <!-- Settings + keyboard shortcut hint -->
+    <a class="nav-item" id="ni-settings" href="https://claude.ai/public/artifacts/e75446e1-9561-49d0-92a8-011c85951727" data-id="settings" onclick="handleClick(event,this)" aria-label="Settings" tabindex="0">
+      <div class="nav-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_3183_5815)"> <path d="M11.9995 7.64258C10.8442 7.6427 9.73642 8.10209 8.91943 8.91895C8.10231 9.73607 7.64307 10.8444 7.64307 12C7.64307 13.1556 8.10231 14.2639 8.91943 15.0811C9.73642 15.8979 10.8442 16.3573 11.9995 16.3574C12.5717 16.3574 13.1388 16.2444 13.6675 16.0254C14.196 15.8065 14.676 15.4855 15.0806 15.0811C15.4852 14.6765 15.8069 14.1956 16.0259 13.667C16.2447 13.1385 16.3569 12.572 16.3569 12C16.3569 11.428 16.2447 10.8615 16.0259 10.333C15.8069 9.80438 15.4852 9.32354 15.0806 8.91895C14.676 8.51449 14.196 8.19353 13.6675 7.97461C13.1388 7.75564 12.5717 7.64258 11.9995 7.64258ZM3.26807 10.2725L3.15771 10.1348L1.77588 8.4209C1.60634 8.20798 1.50503 7.94826 1.48584 7.67676C1.46672 7.40527 1.5305 7.13402 1.66846 6.89941L1.67236 6.89355L2.40771 5.60352C2.54143 5.37243 2.74121 5.18682 2.98096 5.06934C3.22093 4.9518 3.49062 4.9082 3.75537 4.94434V4.94336L5.92432 5.27539L6.09619 5.30176L6.24658 5.21582L8.979 3.66602L9.13428 3.57812L9.19873 3.41211L9.99268 1.36328V1.3623C10.0901 1.10945 10.2618 0.892142 10.4849 0.738281C10.6803 0.60357 10.9076 0.522527 11.1431 0.503906L11.2446 0.5H12.7563L12.8569 0.503906C13.0923 0.522411 13.3197 0.602783 13.5151 0.737305C13.7104 0.871816 13.866 1.05542 13.9673 1.26855L14.0073 1.36133L14.8013 3.41211L14.8647 3.57715L15.0181 3.66504L17.7144 5.21484L17.8667 5.30176L18.0396 5.27539L20.2085 4.94336L20.2095 4.94434C20.4739 4.90815 20.7432 4.95099 20.9829 5.06836C21.1629 5.15653 21.3201 5.28384 21.4438 5.43945L21.5562 5.60352L22.2915 6.89355L22.2954 6.89941C22.4334 7.13402 22.4971 7.40527 22.478 7.67676C22.4588 7.94827 22.3575 8.20797 22.188 8.4209L22.186 8.42383L20.8384 10.1396L20.731 10.2754V13.7275L20.8423 13.8652L22.2251 15.5811C22.3938 15.7937 22.495 16.0525 22.5142 16.3232C22.5333 16.5947 22.4695 16.866 22.3315 17.1006L22.3276 17.1064L21.5903 18.3984C21.4566 18.6285 21.258 18.8136 21.019 18.9307C20.7791 19.0482 20.5094 19.0918 20.2446 19.0557H20.2437L18.0757 18.7246L17.9028 18.6982L17.7505 18.7852L15.0562 20.335L14.9028 20.4229L14.8394 20.5879L14.0454 22.6367L14.0444 22.6377C13.9471 22.8909 13.7757 23.1088 13.5522 23.2627C13.3288 23.4166 13.0638 23.4994 12.7925 23.5H11.2437C10.9731 23.4989 10.7087 23.4162 10.4858 23.2627C10.291 23.1284 10.1357 22.9451 10.0347 22.7324L9.99463 22.6387L9.20068 20.5879L9.13623 20.4229L8.98389 20.335L6.28662 18.7852L6.13525 18.6982L5.9624 18.7246L3.79248 19.0557C3.52789 19.0917 3.25887 19.0481 3.01904 18.9307C2.83912 18.8425 2.68189 18.716 2.55811 18.5605L2.4458 18.3965L1.70947 17.1064L1.70654 17.1006L1.65771 17.0107C1.55341 16.798 1.5072 16.5608 1.52393 16.3232C1.54312 16.0517 1.64434 15.7921 1.81396 15.5791L1.81592 15.5762L3.16162 13.8604L3.26807 13.7236V10.2725Z" stroke="#FFF7ED"/> <circle cx="12" cy="12" r="4" fill="#FFF7ED"/> </g> <defs> <clipPath id="clip0_3183_5815"> <rect width="24" height="24" fill="white"/> </clipPath> </defs></svg></div>
+      <span class="nav-lbl">Settings</span>
+      <span class="nav-tip">Settings</span>
+    </a>
+  </div>
+
+</nav>
+
+<main class="main" id="main-content">
+  <!-- TOPBAR — 2026 refresh: Search · Wallet · Quick Actions · MR avatar -->
+  <div class="topbar" role="banner">
+
+    <!-- Search bar -->
+    <div class="tb-srch" role="search">
+      <div class="tb-srch-ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" stroke-width="1.22"><circle cx="6.75" cy="6.75" r="4.25"/><path d="M10.25 10.25L13 13" stroke-linecap="round"/></svg>
+      </div>
+      <input type="text" placeholder="Search orders, AWB, customer..." aria-label="Search"/>
+    </div>
+
+    <!-- Right-side controls -->
+    <div class="tb-r" role="toolbar" aria-label="Top bar actions">
+
+      <!-- Wallet — inline pill -->
+      <button type="button" class="tb-wallet" onclick="xbToast('Wallet: ₹1,741.32')" title="Wallet balance">
+        <span class="tb-wallet-ico" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" stroke-width="1.22" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/>
+            <path d="M1.5 7.5H14.5" stroke-linecap="round"/>
+            <path d="M11.5 6.5H12.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="tb-wallet-lbl">Wallet:</span>
+        <span class="tb-wallet-amount">&#8377;1,741.32</span>
+      </button>
+
+      <!-- Quick Actions — outline button -->
+      <button type="button" class="tb-qa" onclick="xbToast('Quick Actions')" aria-label="Quick Actions">
+        Quick Actions
+      </button>
+
+      <!-- Account profile — initials circle -->
+      <button type="button" class="tb-av" onclick="xbToast('Account settings')" aria-label="Account menu">
+        <span class="tb-av-circle" aria-hidden="true">MR</span>
+      </button>
+
+    </div>
+  </div>
+  <div class="page">
+    <div class="page-placeholder">
+      <div class="ph-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M8 16h5" stroke-linecap="round"/><circle cx="12" cy="8" r="2"/></svg>
+      </div>
+      <h2>XpressBees Seller Platform</h2>
+      <p>Hover the sidebar to expand &middot; Press <strong>&#8984; \</strong> to toggle &middot; Click any item to open the module</p>
+    </div>
+  </div>
+</main>
+
+<div id="xb-toast"></div>
+
+<script>
+var NAV = {
+  dashboard:           {href:'file:///Users/apple/Downloads/mod-dashboard_1.html'},
+  ndr:                 {href:'file:///Users/apple/Downloads/ndr-v4_1.html'},
+  support:             {href:'file:///Users/apple/Downloads/support_prototype_v3.html'},
+  reports:             {href:'file:///Users/apple/Downloads/reports_3.html'},
+  settings:            {href:'https://claude.ai/public/artifacts/e75446e1-9561-49d0-92a8-011c85951727'},
+  orders:              {expandable:true},
+  info:                {expandable:true},
+  finance:             {expandable:true},
+  services:            {expandable:true},
+  'orders-list':       {parent:'orders',   href:'#'},
+  'orders-pickup':     {parent:'orders',   href:'#'},
+  'info-pincode':      {parent:'info',     href:'file:///Users/apple/Downloads/info-center_8.html'},
+  'info-calc':         {parent:'info',     href:'file:///Users/apple/Downloads/info-center_8.html'},
+  'info-ratecard':     {parent:'info',     href:'file:///Users/apple/Downloads/info-center_8.html'},
+  'finance-wallet':    {parent:'finance',  href:'file:///Users/apple/Downloads/mod-wallet.html'},
+  'finance-remittance':{parent:'finance',  href:'#'},
+  'finance-invoice':   {parent:'finance',  href:'#'},
+  'services-all':      {parent:'services', href:'#'},
+  'services-channels': {parent:'services', href:'file:///Users/apple/Downloads/channels.html'},
+};
+
+var EXPANDABLES = ['orders','info','finance','services'];
+var STORE_ACTIVE = 'xb_nav_active';
+var STORE_OPEN   = 'xb_nav_open';
+
+/* ─────────────────────────────────────────────────────
+   HOVER OPEN/CLOSE with dwell delay
+   FIX: navOpen now waits 180ms before expanding.
+   A cursor passing through the rail quickly never triggers open.
+   This matches Linear / HubSpot / Salesforce dwell behaviour.
+───────────────────────────────────────────────────── */
+var _openTimer       = null;
+var _closeTimer      = null;
+var _interactTimer   = null;   /* set on every click inside nav; blocks hover-close */
+
+function navHoverIn(){
+  clearTimeout(_closeTimer);
+  /* 180ms dwell — eliminates accidental triggers */
+  _openTimer = setTimeout(function(){
+    _doOpen();
+  }, 180);
+}
+
+function navHoverOut(){
+  clearTimeout(_openTimer);
+  /* If the user just clicked something inside the nav, don't close.
+     _interactTimer stays alive for 400ms after any nav click. */
+  _closeTimer = setTimeout(function(){
+    if(_interactTimer) return;   /* click is in progress — abort */
+    _doClose();
+  }, 160);
+}
+
+function _doOpen(){
+  document.getElementById('xbNav').classList.add('open');
+  document.querySelectorAll('.nav-sub-item').forEach(function(el){ el.setAttribute('tabindex','0'); });
+}
+
+function _doClose(){
+  var nav = document.getElementById('xbNav');
+  nav.classList.remove('open');
+  /* LAYOUT STABILITY: defer sub-nav height collapse until AFTER the sidebar
+     width transition finishes (--nav-dur = 200ms).
+     Icons stay vertically anchored during the entire collapse animation.
+     The sub-nav items disappear with the sidebar width, then their
+     container height collapses invisibly once the rail is already narrow. */
+  var navDur = 200;
+  setTimeout(function(){
+    closeAllDropdowns();
+  }, navDur);
+  document.querySelectorAll('.nav-sub-item').forEach(function(el){ el.setAttribute('tabindex','-1'); });
+}
+
+/* ─────────────────────────────────────────────────────
+   KEYBOARD SHORTCUT: ⌘ \ (Mac) or Ctrl+\ (Win/Linux)
+   FIX: global keydown handler toggles sidebar open/closed.
+   When opening via keyboard, no dwell delay is applied.
+───────────────────────────────────────────────────── */
+document.addEventListener('keydown', function(e){
+  var key = e.key === '\\' || e.code === 'Backslash';
+  var mod = e.metaKey || e.ctrlKey;
+  if(key && mod){
+    e.preventDefault();
+    var nav = document.getElementById('xbNav');
+    if(nav.classList.contains('open')){
+      clearTimeout(_openTimer);
+      _doClose();
+    } else {
+      clearTimeout(_closeTimer);
+      _doOpen();
+    }
+  }
+});
+
+/* External click closes sidebar.
+   With stopPropagation on handleClick/handleExpand, clicks INSIDE the nav
+   never reach this listener. This is purely for clicks outside the nav. */
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#xbNav')){
+    clearTimeout(_openTimer);
+    clearTimeout(_closeTimer);
+    clearTimeout(_interactTimer);
+    _interactTimer = null;
+    document.getElementById('xbNav').classList.remove('open');
+    setTimeout(function(){ closeAllDropdowns(); }, 200);
+    document.querySelectorAll('.nav-sub-item').forEach(function(el){ el.setAttribute('tabindex','-1'); });
+  }
+});
+
+/* Helper: close all dropdowns, preserve active highlights.
+   Uses .collapsing class (height → 0 with ease-in) instead of removing
+   .open immediately. After the height animation finishes, .collapsing is
+   also removed so the element returns to resting state. */
+function closeAllDropdowns(){
+  var opens = {};
+  EXPANDABLES.forEach(function(id){
+    var sn  = document.getElementById('sn-'+id);
+    var btn = document.getElementById('ni-'+id);
+    if(sn && sn.classList.contains('open')){
+      sn.classList.remove('open');
+      sn.classList.add('collapsing');
+      /* Remove .collapsing once height animation finishes (180ms) */
+      (function(el){
+        setTimeout(function(){ el.classList.remove('collapsing'); }, 200);
+      })(sn);
+    } else if(sn){
+      sn.classList.remove('open','collapsing');
+    }
+    if(btn){ btn.setAttribute('aria-expanded','false'); }
+    opens[id] = false;
+  });
+  writeStore(STORE_OPEN, opens);
+}
+
+/* ─────────────────────────────────────────────────────
+   ACCORDION: only one dropdown open at a time
+───────────────────────────────────────────────────── */
+function handleExpand(e, id){
+  e.stopPropagation();
+  /* Lock sidebar open during expand/collapse interactions */
+  clearTimeout(_interactTimer);
+  _interactTimer = setTimeout(function(){ _interactTimer = null; }, 400);
+  var nav = document.getElementById('xbNav');
+  if(!nav.classList.contains('open')){
+    clearTimeout(_closeTimer);
+    _doOpen();
+    return;
+  }
+  var sn  = document.getElementById('sn-'+id);
+  var btn = document.getElementById('ni-'+id);
+  if(!sn||!btn) return;
+
+  var isOpen = sn.classList.contains('open');
+  var opens  = readStore(STORE_OPEN);
+
+  if(!isOpen){
+    EXPANDABLES.forEach(function(otherId){
+      if(otherId===id) return;
+      var osn  = document.getElementById('sn-'+otherId);
+      var obtn = document.getElementById('ni-'+otherId);
+      if(osn && osn.classList.contains('open')){
+        osn.classList.remove('open');
+        if(obtn){ obtn.setAttribute('aria-expanded','false'); }
+        opens[otherId] = false;
+      }
+    });
+    sn.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+    opens[id] = true;
+  } else {
+    sn.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+    opens[id] = false;
+  }
+  writeStore(STORE_OPEN, opens);
+}
+
+/* ─────────────────────────────────────────────────────
+   CLICK HANDLER
+   FIX: stopPropagation prevents the document click listener from
+   seeing this event and closing the sidebar. _interactTimer locks
+   the sidebar open for 400ms so hover-out can't fire during the
+   click interaction or its immediate aftermath.
+───────────────────────────────────────────────────── */
+function handleClick(e, el){
+  /* Prevent click bubbling to document — stops sidebar collapse */
+  e.stopPropagation();
+
+  /* Lock sidebar open: hover-out during/after a click is ignored */
+  clearTimeout(_interactTimer);
+  _interactTimer = setTimeout(function(){ _interactTimer = null; }, 400);
+
+  var id = el.getAttribute('data-id');
+  if(!id) return;
+  var cfg = NAV[id];
+  if(!cfg) return;
+  setActive(id);
+  var href = cfg.href||'#';
+  if(href==='#'){
+    e.preventDefault();
+    xbToast('Coming soon: '+((el.querySelector('.nav-lbl,.nav-sub-lbl')||{}).textContent||id).trim());
+  }
+}
+
+function navGoTo(id){
+  setActive(id);
+  var cfg = NAV[id];
+  if(cfg && cfg.href && cfg.href!=='#'){ window.location.href = cfg.href; }
+}
+
+/* ─────────────────────────────────────────────────────
+   SET ACTIVE STATE
+───────────────────────────────────────────────────── */
+function setActive(id){
+  var cfg = NAV[id];
+  if(!cfg) return;
+
+  document.querySelectorAll('.nav-item,.nav-dash,.nav-sub-item').forEach(function(el){
+    el.classList.remove('active','par-active');
+    el.removeAttribute('aria-current');
+  });
+
+  if(cfg.parent){
+    var subEl = document.getElementById('ni-'+id);
+    if(subEl){ subEl.classList.add('active'); subEl.setAttribute('aria-current','page'); }
+
+    var parentEl = document.getElementById('ni-'+cfg.parent);
+    if(parentEl){ parentEl.classList.add('par-active'); }
+
+    var nav = document.getElementById('xbNav');
+    if(nav.classList.contains('open')){
+      var opens = readStore(STORE_OPEN);
+      var parentSn  = document.getElementById('sn-'+cfg.parent);
+      var isAlreadyOpen = parentSn && parentSn.classList.contains('open');
+
+      /* Only close other dropdowns — never touch the parent if it's already open.
+         Re-adding .open to an already-open sub-nav causes a flash (remove/re-add
+         in the same call stack). */
+      EXPANDABLES.forEach(function(otherId){
+        if(otherId===cfg.parent) return;
+        var osn  = document.getElementById('sn-'+otherId);
+        var obtn = document.getElementById('ni-'+otherId);
+        if(osn && osn.classList.contains('open')){
+          osn.classList.remove('open');
+          if(obtn){ obtn.setAttribute('aria-expanded','false'); }
+          opens[otherId] = false;
+        }
+      });
+
+      /* Open parent dropdown only if it wasn't already open */
+      if(!isAlreadyOpen){
+        if(parentSn){ parentSn.classList.add('open'); }
+        if(parentEl){ parentEl.setAttribute('aria-expanded','true'); }
+      }
+      opens[cfg.parent] = true;
+      writeStore(STORE_OPEN, opens);
+    }
+  } else {
+    var topEl = document.getElementById('ni-'+id);
+    if(topEl){ topEl.classList.add('active'); topEl.setAttribute('aria-current','page'); }
+  }
+  try{ sessionStorage.setItem(STORE_ACTIVE, id); }catch(ex){}
+}
+
+/* ─────────────────────────────────────────────────────
+   RESTORE STATE ON LOAD
+───────────────────────────────────────────────────── */
+function restoreState(){
+  var active = '';
+  try{ active = sessionStorage.getItem(STORE_ACTIVE)||'dashboard'; }catch(ex){ active='dashboard'; }
+  var path = window.location.pathname;
+  var routeMap = {'/dashboard':'dashboard','/ndr':'ndr','/support':'support','/reports':'reports','/settings':'settings'};
+  if(routeMap[path]) active = routeMap[path];
+  setActive(active);
+}
+
+function readStore(key){ try{ return JSON.parse(sessionStorage.getItem(key)||'{}'); }catch(e){ return {}; } }
+function writeStore(key,val){ try{ sessionStorage.setItem(key,JSON.stringify(val)); }catch(e){} }
+
+function xbToast(msg){
+  var el = document.getElementById('xb-toast');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.style.transform='translateX(-50%) translateY(70px)'; }, 2600);
+}
+
+restoreState();
+</script>
+</body>
+</html>

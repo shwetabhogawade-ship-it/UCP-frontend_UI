@@ -1,0 +1,941 @@
+/* ──────────────────────────────────────────────────────────────
+   XpressBees Sellportal — NDR (Non-Delivery Report) module
+   Visual language inherits from reports.css + orders.css
+   (`--orange`, `--ink`, `--surface`, `--mono`, …). Adds only
+   classes prefixed with `.ndr-` for elements that don't already
+   live inside the Orders module CSS (priority indicators, history
+   timeline, View Details drawer, NDR banner, etc).
+   ────────────────────────────────────────────────────────────── */
+
+/* ── Page header right-rail meta + Refresh CTA ────────────────── */
+.ndr-ph-meta {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-right: 8px;
+}
+
+/* "Learn more" pill next to the page title — info-blue tinted */
+.ndr-learn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blue);
+  padding: 4px 10px;
+  border: 1px solid var(--bm);
+  border-radius: 6px;
+  background: var(--bl);
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.ndr-learn:hover { background: var(--blue); color: #fff; }
+.ndr-learn svg { width: 11px; height: 11px; }
+
+/* ── KPI accent variants (extends `.ord-kc`) ──────────────────── */
+.ord-kc.ndr-acc-orange.on { box-shadow: 0 0 0 2px var(--orange); border-color: transparent; }
+.ord-kc.ndr-acc-red.on    { box-shadow: 0 0 0 2px var(--red);    border-color: transparent; }
+.ord-kc.ndr-acc-amber.on  { box-shadow: 0 0 0 2px var(--amber);  border-color: transparent; }
+.ord-kc.ndr-acc-grey.on   { box-shadow: 0 0 0 2px var(--gray-m); border-color: transparent; }
+
+/* Pulse dot used in the "All NDR" / "Critical" sub-tag */
+.ndr-kc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ndr-kc-tag.ink   { background: var(--s3); color: var(--ink2); }
+.ndr-kc-tag.red   { background: var(--rl); color: var(--red);   }
+.ndr-kc-tag.amber { background: var(--al); color: var(--amber); }
+.ndr-kc-tag.grey  { background: var(--gray-l, #EEECE9); color: var(--gray, #6B6A62); }
+.ndr-kc-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.ndr-kc-dot.red   { background: var(--red); }
+.ndr-kc-dot.amber { background: var(--amber); }
+.ndr-kc-dot.grey  { background: var(--gray, #6B6A62); }
+@keyframes ndrPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.ndr-blink { animation: ndrPulse 2s ease-in-out infinite; }
+
+/* ── Inline "Days since attempt" filter chip ──────────────────── */
+.ndr-fc-days {
+  cursor: default !important;
+  gap: 6px !important;
+}
+.ndr-fc-days input[type="number"] {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 38px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--ink);
+  -moz-appearance: textfield;
+}
+.ndr-fc-days input::-webkit-inner-spin-button,
+.ndr-fc-days input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.ndr-fc-days .ndr-fc-days-lbl {
+  white-space: nowrap;
+  color: var(--ink2);
+  font-weight: 500;
+}
+
+/* Grey divider between filter groups (mirrors `.ord-fdiv`) */
+.ndr-fbar-spacer { flex: 1; }
+
+/* Active filters row — shown beneath the filter bar when any chips are active */
+.ndr-af-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.ndr-af-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--ol);
+  color: var(--orange);
+  border: 1px solid var(--om);
+}
+.ndr-af-chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--orange);
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 2px;
+  font-weight: 700;
+  font-family: var(--font);
+}
+.ndr-af-clr {
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--red);
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-family: var(--font);
+}
+.ndr-af-clr:hover { background: var(--rl); }
+
+/* Grid toolbar — inline count + actions on the right */
+.ndr-gtb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.ndr-gtb-info { font-size: 12px; color: var(--ink2); }
+.ndr-gtb-info b { color: var(--ink); font-weight: 700; }
+.ndr-gtb-actions {
+  display: inline-flex;
+  gap: 8px;
+  margin-left: auto;
+  align-items: center;
+}
+
+/* ── Table cell — priority left border + attempt details ──────── */
+.ord-tbl tbody tr.ndr-pc td:first-child .tdi { border-left: 3px solid var(--red);    padding-left: 11px; }
+.ord-tbl tbody tr.ndr-ps td:first-child .tdi { border-left: 3px solid var(--amber);  padding-left: 11px; }
+.ord-tbl tbody tr.ndr-pn td:first-child .tdi { border-left: 3px solid var(--gray-m); padding-left: 11px; }
+.ord-tbl tbody tr.ndr-row td .tdi { padding: 13px 14px; transition: background .1s; }
+.ord-tbl tbody tr.ndr-row:hover td .tdi { background: var(--s2); }
+.ord-tbl tbody tr.ndr-row td { padding: 0; vertical-align: top; }
+.ord-tbl tbody tr.ndr-row.has-exp > td { border-bottom: none; }
+
+.ndr-att-d { font-size: 12px; font-weight: 700; color: var(--ink); }
+.ndr-att-n { font-size: 11px; color: var(--ink2); margin-top: 2px; }
+.ndr-att-r { font-size: 11px; color: var(--ink); margin-top: 6px; line-height: 1.4; max-width: 165px; }
+
+.ndr-sla-t {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ndr-sla-t.overdue { background: var(--rl); color: var(--red);   }
+.ndr-sla-t.warning { background: var(--al); color: var(--amber); }
+.ndr-sla-t.ok      { background: var(--gl); color: var(--green); }
+.ndr-sla-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+.ndr-sla-t.overdue .ndr-sla-dot { animation: ndrPulse 2s ease-in-out infinite; }
+
+.ndr-pri-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ndr-pri-pill.critical { background: var(--rl); color: var(--red);   }
+.ndr-pri-pill.seller   { background: var(--al); color: var(--amber); }
+.ndr-pri-pill.none     { background: var(--gray-l, #EEECE9); color: var(--gray, #6B6A62); }
+.ndr-pri-dot { width: 5px; height: 5px; border-radius: 50%; }
+.ndr-pri-dot.critical { background: var(--red);   }
+.ndr-pri-dot.seller   { background: var(--amber); }
+.ndr-pri-dot.none     { background: var(--gray, #6B6A62); }
+
+/* ── Order id / amount / payment cell ─────────────────────────── */
+.ndr-oid {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ndr-oid:hover { color: var(--orange); }
+.ndr-oamt { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+.ndr-pay-pill {
+  display: inline-flex;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+.ndr-pay-pill.cod     { background: var(--al); color: var(--amber); }
+.ndr-pay-pill.prepaid { background: var(--gl); color: var(--green); }
+
+/* Customer column */
+.ndr-cust-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.ndr-cust-phone { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+/* Address column */
+.ndr-addr { font-size: 11px; color: var(--ink2); line-height: 1.55; max-width: 165px; }
+.ndr-rto-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--rl);
+  color: var(--red);
+}
+.ndr-rto-pill svg { width: 10px; height: 10px; }
+
+/* Shipment / mode column */
+.ndr-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ndr-mode-pill.air     { background: var(--bl); color: var(--blue); }
+.ndr-mode-pill.surface { background: var(--gray-l, #EEECE9); color: var(--gray, #6B6A62); }
+.ndr-ship-carrier { font-size: 11px; color: var(--ink2); margin-top: 5px; }
+.ndr-ship-tier { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+
+/* Last action column */
+.ndr-last-by { font-size: 12px; font-weight: 600; }
+.ndr-last-by.xb     { color: var(--orange); }
+.ndr-last-by.seller { color: var(--blue); }
+.ndr-last-time { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+.ndr-hist-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 5px;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color .12s;
+}
+.ndr-hist-link:hover { color: var(--orange); text-decoration: underline; }
+.ndr-hist-link svg {
+  width: 8px;
+  height: 5px;
+  flex-shrink: 0;
+}
+
+/* ── Action cell — primary CTA + Actions dropdown + ghost btn ─── */
+.ndr-act-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.ndr-ab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 11px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+  border: none;
+  white-space: nowrap;
+}
+.ndr-ab:active { transform: scale(.97); }
+.ndr-ab.primary  { background: var(--orange); color: #fff; }
+.ndr-ab.primary:hover { opacity: .88; }
+.ndr-ab.ghost    {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+}
+.ndr-ab.ghost:hover { border-color: var(--ink2); color: var(--ink); }
+
+/* Actions dropdown wrapper */
+.ndr-adw { position: relative; display: inline-block; }
+.ndr-ab.actions {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+}
+.ndr-ab.actions:hover { border-color: var(--ink2); }
+.ndr-ab.actions svg { width: 8px; height: 8px; transition: transform .15s; }
+.ndr-adw.open .ndr-ab.actions svg { transform: rotate(180deg); }
+.ndr-adm {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 450;
+  overflow: hidden;
+}
+.ndr-adm-i {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  font-size: 12px;
+  color: var(--ink2);
+  cursor: pointer;
+  border-bottom: .5px solid var(--border);
+  transition: background .1s;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font);
+}
+.ndr-adm-i:last-child { border-bottom: none; }
+.ndr-adm-i:hover { background: var(--s2); color: var(--ink); }
+.ndr-adm-i.danger { color: var(--red); }
+.ndr-adm-i.danger:hover { background: var(--rl); color: var(--red); }
+
+/* ── Expanded history panel (timeline) ────────────────────────── */
+.ndr-exp-row td { padding: 0 !important; }
+.ndr-exp-row td .tdi { padding: 0 !important; background: transparent !important; }
+.ndr-exp-panel {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ndr-exp-top {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px 0;
+}
+.ndr-exp-hide {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ndr-exp-hide:hover { color: var(--ink); }
+.ndr-exp-hide svg { width: 10px; height: 10px; }
+
+.ndr-ht-wrap { padding: 4px 20px 16px; }
+.ndr-ht-hdr {
+  display: grid;
+  grid-template-columns: 22px 200px 160px 1fr;
+  padding: 8px 0 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.ndr-ht-hdr-cell {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--ink3);
+}
+.ndr-ht-row {
+  display: grid;
+  grid-template-columns: 22px 200px 160px 1fr;
+  align-items: start;
+  position: relative;
+  padding: 7px 0;
+}
+.ndr-ht-line {
+  position: absolute;
+  left: 8px;
+  top: 18px;
+  bottom: -8px;
+  width: 1.5px;
+  background: var(--border);
+  z-index: 0;
+}
+.ndr-ht-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+.ndr-ht-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.ndr-ht-dot.done { background: var(--green); border-color: var(--green); }
+.ndr-ht-dot.warn { background: var(--amber); border-color: var(--amber); }
+.ndr-ht-dot.info { background: var(--blue);  border-color: var(--blue);  }
+.ndr-ht-dot.pend { background: var(--surface); border-color: var(--border2); }
+
+.ndr-ht-ev { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.4; padding-top: 2px; }
+.ndr-ht-dt { font-size: 11px; color: var(--ink3); margin-top: 1px; }
+.ndr-ht-by { font-size: 12px; color: var(--ink2); font-weight: 500; padding-top: 3px; }
+.ndr-ht-det { font-size: 12px; color: var(--ink2); line-height: 1.5; padding-top: 3px; }
+.ndr-ht-det b { color: var(--ink); font-weight: 600; }
+
+/* ── View Details drawer (900px right rail) ───────────────────── */
+.ndr-vd-ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,5,.5);
+  z-index: 800;
+  display: flex;
+  justify-content: flex-end;
+  animation: ordFade .18s ease;
+}
+.ndr-vd {
+  background: var(--surface);
+  width: 900px;
+  max-width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: ordSlide .22s ease;
+}
+.ndr-vd-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.ndr-vd-hdr-l { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ndr-vd-oid {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.3px;
+}
+.ndr-vd-badges { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.ndr-vd-badge {
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.ndr-vd-badge.critical { background: var(--rl); color: var(--red);   }
+.ndr-vd-badge.seller   { background: var(--al); color: var(--amber); }
+.ndr-vd-badge.none     { background: var(--s3); color: var(--ink2);  }
+.ndr-vd-badge.cod      { background: var(--al); color: var(--amber); }
+.ndr-vd-badge.prepaid  { background: var(--gl); color: var(--green); }
+.ndr-vd-badge.air      { background: var(--bl); color: var(--blue);  }
+.ndr-vd-badge.surface  { background: var(--s3); color: var(--ink2);  }
+.ndr-vd-sla {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+.ndr-vd-sla.overdue { background: var(--rl); color: var(--red);   }
+.ndr-vd-sla.warning { background: var(--al); color: var(--amber); }
+.ndr-vd-sla.ok      { background: var(--gl); color: var(--green); }
+
+.ndr-vd-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+.ndr-vd-left { overflow-y: auto; padding: 0 0 24px; min-width: 0; }
+.ndr-vd-right {
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  background: var(--s2);
+  padding: 18px 0;
+}
+.ndr-vd-right-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 0 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Banner — surfaces NDR reason at top of drawer */
+.ndr-vd-banner {
+  margin: 18px 24px 0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--al);
+  border: 1px solid var(--am);
+}
+.ndr-vd-banner-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+  color: var(--amber);
+}
+.ndr-vd-banner-val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--amber);
+}
+.ndr-vd-banner-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(158,90,0,.15);
+  flex-wrap: wrap;
+}
+.ndr-vd-banner-meta-item {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--amber);
+  opacity: .85;
+}
+.ndr-vd-banner-meta-item b { font-weight: 700; opacity: 1; }
+
+/* Sections inside the left panel of the drawer */
+.ndr-vd-sec { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+.ndr-vd-sec-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .55px;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+.ndr-vd-grid {
+  display: grid;
+  gap: 14px 20px;
+}
+.ndr-vd-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ndr-vd-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ndr-vd-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ndr-vd-field-lbl {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.ndr-vd-field-val {
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.5;
+}
+.ndr-vd-field-val.mono { font-family: var(--mono); }
+.ndr-vd-field-val.muted { color: var(--ink2); font-weight: 400; }
+.ndr-vd-field-val.high  { color: var(--red);   font-weight: 700; }
+.ndr-vd-field-val.low   { color: var(--green); font-weight: 700; }
+.ndr-vd-field-val.span2 { grid-column: span 2; }
+.ndr-vd-tip {
+  margin-top: 14px;
+  padding: 11px 14px;
+  background: var(--s2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink3);
+  line-height: 1.55;
+}
+.ndr-vd-tip b { color: var(--ink2); font-weight: 700; }
+
+/* Product table inside drawer */
+.ndr-vd-ptbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+.ndr-vd-ptbl th {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--ink3);
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.ndr-vd-ptbl td {
+  font-size: 12px;
+  color: var(--ink2);
+  padding: 9px 10px;
+  border-bottom: .5px solid var(--border);
+}
+.ndr-vd-ptbl tr:last-child td { border-bottom: none; }
+.ndr-vd-ptbl tfoot td {
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 600;
+  padding: 9px 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* Activity log on the right rail */
+.ndr-vd-al { padding: 14px 18px 0; }
+.ndr-al-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 0 8px;
+  padding-bottom: 16px;
+  position: relative;
+}
+.ndr-al-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 18px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.ndr-al-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.ndr-al-dot.cur  { background: var(--blue); box-shadow: 0 0 0 3px rgba(18,70,160,.12); }
+.ndr-al-dot.done { background: var(--border2); }
+.ndr-al-ev { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+.ndr-al-ts { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+
+/* Drawer footer */
+.ndr-vd-ft {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: var(--surface);
+  gap: 10px;
+}
+.ndr-vd-ft-info { font-size: 11px; color: var(--ink3); }
+.ndr-vd-ft-info b { color: var(--ink); font-weight: 600; }
+.ndr-vd-ft-actions { display: flex; gap: 8px; }
+
+/* ── Small CTA modifier (matches `ui-source/screens/ndr-v4 (3).html`
+   `.gt`). Compresses `.ord-cta` to the 30px filter-chip height so
+   "Export" / "Bulk NDR Update" align visually with the filter
+   chips when they share the `.ord-tools-row`. */
+.ord-cta.ndr-cta-sm {
+  height: 30px;
+  padding: 0 12px;
+  gap: 5px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  border-width: 1px;
+  color: var(--ink2);
+}
+.ord-cta.ndr-cta-sm:hover { color: var(--ink); }
+.ord-cta.ndr-cta-sm svg { width: 12px; height: 12px; }
+
+/* ── Bulk NDR Update modal ─────────────────────────────────────
+   Lives inside the shared `.ord-modal` shell. Adds the upload
+   zone, progress bar and result tiles described in
+   `ui-source/screens/ndr-v4 (3).html`. */
+.ndr-bn-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 9px;
+  padding: 20px;
+  text-align: center;
+  background: var(--s2);
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.ndr-bn-zone:hover,
+.ndr-bn-zone:focus-visible {
+  border-color: var(--orange);
+  background: var(--ol);
+  outline: none;
+}
+.ndr-bn-zone-ico {
+  width: 28px;
+  height: 28px;
+  display: block;
+  margin: 0 auto 8px;
+}
+.ndr-bn-zone-t {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+.ndr-bn-zone-t span { color: var(--orange); }
+.ndr-bn-zone-s {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 4px;
+}
+
+.ndr-bn-file-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--gl);
+  border: 1px solid var(--gm);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.ndr-bn-file-meta { flex: 1; min-width: 0; }
+.ndr-bn-file-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ndr-bn-file-size {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 1px;
+}
+.ndr-bn-file-x {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink3);
+  font-size: 15px;
+  padding: 0;
+  line-height: 1;
+  font-family: var(--font);
+}
+.ndr-bn-file-x:hover { color: var(--ink); }
+
+.ndr-bn-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+.ndr-bn-actions:last-child { margin-bottom: 0; }
+
+.ndr-bn-howto {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.ndr-bn-howto-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ndr-bn-howto-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ndr-bn-howto-list li {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+.ndr-bn-howto-list b { color: var(--ink); font-weight: 600; }
+.ndr-bn-howto-num {
+  color: var(--orange);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ndr-bn-howto-muted { color: var(--ink3); }
+.ndr-bn-howto-muted b { color: var(--ink2); font-weight: 600; }
+
+/* Uploading state */
+.ndr-bn-up-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.ndr-bn-up-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ndr-bn-up-pct {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--orange);
+  font-family: var(--mono);
+}
+.ndr-bn-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ndr-bn-bar-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 3px;
+  transition: width .3s ease;
+}
+.ndr-bn-up-hint {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 8px;
+}
+
+/* Result state */
+.ndr-bn-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--gl);
+  border: 1px solid var(--gm);
+  border-radius: 9px;
+  margin-bottom: 16px;
+}
+.ndr-bn-success-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ndr-bn-success-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+}
+.ndr-bn-success-desc {
+  font-size: 11px;
+  color: var(--green);
+  opacity: .8;
+  margin-top: 2px;
+}
+.ndr-bn-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ndr-bn-tile {
+  padding: 14px 12px;
+  border-radius: 9px;
+  text-align: center;
+}
+.ndr-bn-tile.ok   { background: var(--gl); border: 1px solid var(--gm); }
+.ndr-bn-tile.skip { background: var(--al); border: 1px solid var(--am); }
+.ndr-bn-tile.err  { background: var(--rl); border: 1px solid var(--rm); }
+.ndr-bn-tile-n {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: var(--mono);
+  line-height: 1;
+}
+.ndr-bn-tile.ok   .ndr-bn-tile-n { color: var(--green); }
+.ndr-bn-tile.skip .ndr-bn-tile-n { color: var(--amber); }
+.ndr-bn-tile.err  .ndr-bn-tile-n { color: var(--red);   }
+.ndr-bn-tile-l {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .45px;
+  margin-top: 5px;
+}
+.ndr-bn-tile.ok   .ndr-bn-tile-l { color: var(--green); }
+.ndr-bn-tile.skip .ndr-bn-tile-l { color: var(--amber); }
+.ndr-bn-tile.err  .ndr-bn-tile-l { color: var(--red);   }

@@ -1,0 +1,2006 @@
+/* ──────────────────────────────────────────────────────────────
+   XpressBees Sellportal — Orders module
+   Visual language inherits from reports.css + dashboard.css
+   (`--orange`, `--ink`, `--surface`, `--mono`, …). Only adds
+   classes prefixed with `.ord-` to avoid clashing with the
+   existing dashboard/support styles.
+   ────────────────────────────────────────────────────────────── */
+
+/* ── Page header ──────────────────────────────────────────────
+   Two-row layout that gracefully collapses on narrow viewports:
+     Row 1: Title  ←→  + Forward Order / + Reverse Order CTAs
+     Row 2: All inline filter chips (date / pickup / payment / channel /
+            status / More Filters) on a dedicated line under the title.
+   Keeping the filters on their own row guarantees the CTAs never wrap
+   below the chips no matter how many filters the active tab exposes. */
+.ord-ph {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ord-ph-l { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ord-ph-title { font-size: 20px; font-weight: 700; letter-spacing: -.4px; color: var(--ink); flex-shrink: 0; }
+
+/* Inline filter chips — moved beneath the title row so the right-side
+   CTAs always stay aligned with the page heading. */
+.ord-ph-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.ord-ph-r { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+/* Pretty primary/secondary CTA buttons */
+.ord-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  border: 1.5px solid transparent;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.ord-cta-p { background: var(--orange); color: #fff; border-color: var(--orange); }
+.ord-cta-p:hover { opacity: .9; }
+.ord-cta-s { background: var(--surface); color: var(--ink); border-color: var(--border); }
+.ord-cta-s:hover { border-color: var(--border2); background: var(--s2); }
+
+/* ── Tools row: filter bar + actions group ─────────────────
+   The row keeps the filter card on the left at its natural
+   width and the Bulk Upload · Download · Bulk Action group on
+   the far right with auto-margin between the two. */
+.ord-tools-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.ord-tools-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── Filter bar ────────────────────────────────────────────
+   Mirrors `support_prototype_v7b.html` `.fbar`: a rounded card
+   that hugs its content (`inline-flex`) so it never stretches
+   across the page — the actions group sits on the same line. */
+.ord-fbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.ord-fb-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+.ord-fdiv {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Filter chip ───────────────────────────────────────────
+   Same visual recipe as support's `.fc` — compact 30px pill,
+   `--s2` background, orange-tinted when active. */
+.ord-fc {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  background: var(--s2);
+  border: 1.5px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink2);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: all .15s;
+  font-family: var(--font);
+}
+.ord-fc:hover { border-color: var(--border2); }
+.ord-fc.on   { border-color: var(--orange); background: var(--ol); color: var(--orange); }
+.ord-fc-ico { display: inline-flex; align-items: center; color: inherit; }
+.ord-fc-ico svg { width: 13px; height: 13px; }
+.ord-fc-chev { font-size: 9px; color: var(--ink3); margin-left: 2px; }
+.ord-fc.on .ord-fc-chev { color: var(--orange); }
+
+/* "Clear all" — subtle text link at the right of the chip cluster */
+.ord-fb-clear {
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: var(--font);
+  transition: color .12s;
+}
+.ord-fb-clear:hover { color: var(--orange); text-decoration: underline; }
+.ord-fb-clear:disabled { color: var(--border2); cursor: not-allowed; text-decoration: none; }
+
+/* Compact dropdown body shared by single + multi pickers */
+.ord-dd {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  min-width: 220px;
+  z-index: 500;
+  overflow: hidden;
+}
+.ord-dd.right { left: auto; right: 0; }
+.ord-dd-body { max-height: 280px; overflow-y: auto; }
+.ord-dd-i {
+  padding: 9px 14px;
+  font-size: 12px;
+  color: var(--ink2);
+  cursor: pointer;
+  border-bottom: .5px solid var(--border);
+  transition: background .1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ord-dd-i:last-child { border-bottom: none; }
+.ord-dd-i:hover { background: var(--s2); color: var(--ink); }
+.ord-dd-i.on { background: var(--ol); color: var(--orange); font-weight: 600; }
+.ord-dd-i .cb {
+  width: 14px; height: 14px;
+  border: 1.5px solid var(--border2);
+  border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ord-dd-i.on .cb { background: var(--orange); border-color: var(--orange); color: #fff; }
+.ord-dd-i.on .cb::after { content: "✓"; font-size: 10px; line-height: 1; }
+.ord-dd-ft {
+  border-top: 1px solid var(--border);
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  background: var(--s2);
+}
+.ord-dd-ft .lk {
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-family: var(--font);
+}
+.ord-dd-ft .lk:hover { background: var(--s3); color: var(--ink2); }
+.ord-dd-ft .lk.p { color: var(--orange); }
+
+/* ── KPI cards (clickable, 4-up) ───────────────────────────────
+   Visual recipe matches `support_prototype_v7b.html` `.kc`:
+   accent bar on the left, icon chip top-right, big monospaced
+   number, optional sub text. Each card is a full <button> so it
+   reads as actionable to screen readers and keyboard users. */
+.ord-kc-row {
+  display: grid;
+  /* `auto-fit` lets the strip flex between 3-card (Ready to Ship, Ready to
+     Pickup) and 4-card (Pending, In-Transit, Delivered, RTO, All) layouts
+     without needing a per-tab grid override. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ord-kc {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 13px;
+  padding: 18px 20px 16px;
+  text-align: left;
+  font-family: var(--font);
+  color: inherit;
+  cursor: pointer;
+  transition: border-color .18s, box-shadow .18s, transform .18s;
+}
+.ord-kc:hover  { border-color: var(--border2); box-shadow: var(--shadow); }
+.ord-kc:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.ord-kc.on    { border-color: var(--orange); box-shadow: 0 0 0 3px var(--ol); }
+.ord-kc-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 13px 0 0 13px;
+}
+.ord-kc-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ord-kc-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--ink3);
+  max-width: 160px;
+  line-height: 1.4;
+}
+.ord-kc-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ord-kc-ico svg { width: 15px; height: 15px; }
+.ord-kc-n {
+  font-family: var(--mono);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -.7px;
+  line-height: 1;
+  color: var(--ink);
+}
+.ord-kc-sub { font-size: 11px; color: var(--ink3); margin-top: 6px; }
+
+/* Warning pill used inside the "Orders Need Attention" sub area. */
+.ord-kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ord-kpi-pill.warn { background: var(--al); color: var(--amber); }
+
+/* ── Tab strip ─────────────────────────────────────────────── */
+.ord-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ord-tabs::-webkit-scrollbar { display: none; }
+.ord-tab {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: all .15s;
+  white-space: nowrap;
+  user-select: none;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: var(--font);
+}
+.ord-tab:hover { color: var(--ink2); }
+.ord-tab.on { color: var(--ink); border-bottom-color: var(--orange); }
+
+/* ── Inline order count (sits above the grid, right-aligned) ── */
+.ord-count-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.ord-count {
+  font-size: 12px;
+  color: var(--ink2);
+  font-weight: 500;
+}
+.ord-count b { color: var(--ink); font-weight: 700; }
+
+/* Icon buttons (download / bulk update) — match `.ord-fc` height */
+.ord-icobtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--s2);
+  color: var(--ink2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-icobtn:hover { border-color: var(--border2); background: var(--surface); color: var(--ink); }
+.ord-icobtn svg { width: 14px; height: 14px; }
+
+/* Bulk-actions dropdown — looks like a `.ord-fc` chip but wider */
+.ord-bulk-sel { position: relative; }
+.ord-bulk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--s2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+  white-space: nowrap;
+  transition: all .12s;
+}
+.ord-bulk-btn:hover { border-color: var(--border2); background: var(--surface); }
+.ord-bulk-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ord-bulk-btn .arr { color: var(--ink3); font-size: 9px; }
+
+/* ── Orders grid (table) ───────────────────────────────────── */
+.ord-grid {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ord-grid-scroll { overflow-x: auto; }
+
+table.ord-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1140px;
+}
+.ord-tbl thead tr { background: var(--s2); }
+.ord-tbl th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+.ord-tbl th.sortable { cursor: pointer; }
+.ord-tbl th.sortable:hover { color: var(--ink); }
+.ord-tbl th .ord-th-i {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Single ▲/▼ glyph rendered inline next to the column label.
+   First click → asc (▲), second click → desc (▼), third click
+   → reset (no arrow). Colour is dark grey (`--ink2`) per the
+   sort-header spec. */
+.ord-th-arr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9px;
+  color: var(--ink2);
+  font-size: 9px;
+  line-height: 1;
+}
+.ord-tbl th.sortable.on { color: var(--ink); }
+
+.ord-tbl td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink2);
+  vertical-align: middle;
+}
+.ord-tbl tbody tr:last-child td { border-bottom: none; }
+.ord-tbl tbody tr:hover td { background: var(--s2); }
+.ord-tbl tbody tr.selected td { background: var(--rl); }
+.ord-tbl tbody tr.selected:hover td { background: var(--rl); }
+
+/* Checkbox column */
+.ord-tbl th.ord-col-cb, .ord-tbl td.ord-col-cb {
+  width: 36px;
+  padding-left: 16px;
+  padding-right: 0;
+}
+.ord-cb {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .12s;
+  vertical-align: middle;
+  padding: 0;
+}
+.ord-cb:hover { border-color: var(--ink3); }
+.ord-cb.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+.ord-cb.on::after { content: "✓"; font-size: 10px; line-height: 1; }
+.ord-cb.partial { background: var(--orange); border-color: var(--orange); color: #fff; }
+.ord-cb.partial::after { content: "−"; font-size: 12px; line-height: 1; }
+
+/* Bulk selection banner row (replaces the column header row when items selected) */
+.ord-sel-row td {
+  background: var(--rl) !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 12px;
+}
+.ord-sel-row .ord-sel-info { display: flex; align-items: center; justify-content: space-between; }
+.ord-sel-row .ord-sel-link {
+  background: none;
+  border: none;
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  text-decoration: underline;
+}
+
+/* Cell typography */
+.ord-id {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.ord-id:hover { text-decoration: underline; }
+
+/* "View Details" hyperlink rendered under the Order Details cell on the
+   All Orders tab. Opens the read-only OrderDetailsDrawer. Styled as a
+   secondary inline link so it doesn't compete with the primary order
+   id link above. */
+.ord-view-details {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.ord-view-details:hover { color: var(--orange); }
+
+.ord-date { font-size: 11px; color: var(--ink); margin-bottom: 2px; }
+.ord-meta { font-size: 11px; color: var(--ink3); }
+.ord-meta b { color: var(--ink2); font-weight: 500; }
+.ord-meta .ch { color: var(--orange); font-weight: 600; }
+
+.ord-name { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+.ord-phone { font-size: 11px; color: var(--ink2); display: inline-flex; align-items: center; gap: 4px; }
+.ord-phone svg { width: 11px; height: 11px; color: var(--ink3); }
+
+.ord-prod-name { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+.ord-sku { font-size: 11px; color: var(--ink3); margin-bottom: 2px; }
+.ord-qty { font-size: 11px; color: var(--ink2); }
+.ord-qty b { color: var(--ink); font-weight: 600; }
+
+.ord-pkg-line { font-size: 11px; color: var(--ink2); margin-bottom: 2px; }
+.ord-pkg-line:first-child { color: var(--ink); font-weight: 500; font-size: 12px; }
+
+.ord-pay-amt {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ord-pay-mode {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 4px;
+  padding: 1px 0;
+  letter-spacing: .3px;
+}
+.ord-pay-mode.cod { color: var(--ink); }
+.ord-pay-mode.prepaid {
+  background: var(--bl);
+  color: var(--blue);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ord-status {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.ord-status.new   { background: var(--gl); color: var(--green); }
+.ord-status.old   { background: var(--s3); color: var(--ink2); }
+
+/* Shipment lifecycle pill variants. Tokens match the rest of the page. */
+.ord-status.green { background: var(--gl); color: var(--green); }
+.ord-status.blue  { background: var(--bl); color: var(--blue);  }
+.ord-status.amber { background: var(--al); color: var(--amber); }
+.ord-status.red   { background: var(--rl); color: var(--red);   }
+.ord-status.grey  { background: var(--s3); color: var(--ink2);  }
+
+/* "Download PO" link cell in the Delivered tab */
+.ord-po-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color .12s;
+}
+.ord-po-link:hover { color: var(--orange); }
+.ord-po-link svg   { width: 13px; height: 13px; color: var(--ink2); }
+.ord-po-link:hover svg { color: var(--orange); }
+
+/* Generic KPI pill variants. `warn` was already defined; surface the
+   remaining three so the KpiStrip helper can pick any status colour. */
+.ord-kpi-pill.danger  { background: var(--rl); color: var(--red);   }
+.ord-kpi-pill.info    { background: var(--bl); color: var(--blue);  }
+.ord-kpi-pill.success { background: var(--gl); color: var(--green); }
+
+.ord-addr-from { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 2px; }
+.ord-addr-arrow { font-size: 10px; color: var(--ink3); margin: 2px 0; letter-spacing: .5px; }
+.ord-addr-to { font-size: 12px; color: var(--ink); font-weight: 500; }
+
+/* Action cell */
+.ord-act-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+}
+.ord-ship-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 7px;
+  background: var(--surface);
+  border: 1.5px solid var(--orange);
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.ord-ship-btn:hover { background: var(--ol); }
+.ord-ship-btn .arr { font-size: 12px; line-height: 1; }
+
+/* 3-dot trigger button — mirrors support `.kb-btn` */
+.ord-dot-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink2);
+  font-family: var(--font);
+  font-size: 14px;
+  letter-spacing: -1px;
+  transition: all .12s;
+}
+.ord-dot-btn:hover { border-color: var(--border2); background: var(--s2); }
+
+/* Row actions popover — mirrors support `.kb-menu` / `.kb-item` */
+.ord-row-menu {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  min-width: 200px;
+  z-index: 600;
+  overflow: hidden;
+}
+.ord-row-menu-i {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background .1s, color .1s;
+  font-family: var(--font);
+}
+.ord-row-menu-i:hover { background: var(--s2); color: var(--ink); }
+.ord-row-menu-i.danger { color: var(--red); }
+.ord-row-menu-i.danger:hover { background: var(--rl); color: var(--red); }
+.ord-row-menu-i.fut { color: var(--ink3); }
+.ord-row-menu-i.fut:hover { color: var(--ink2); }
+.ord-row-menu-i.fut .fut-tag {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  background: var(--s3);
+  color: var(--ink3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.ord-row-menu-i svg { width: 13px; height: 13px; }
+.ord-row-menu-sep { height: 1px; background: var(--border); margin: 0; }
+
+/* ── Pagination footer ─────────────────────────────────────── */
+.ord-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--s2);
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink3);
+}
+.ord-foot-pgw { display: flex; align-items: center; gap: 4px; }
+.ord-foot-pgb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  transition: all .12s;
+}
+.ord-foot-pgb:hover { border-color: var(--border2); }
+.ord-foot-pgb.on { background: var(--orange); color: #fff; border-color: var(--orange); }
+.ord-foot-pgb.icon { padding: 0 8px; color: var(--ink2); }
+.ord-foot-pgb:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Generic modal overlay ─────────────────────────────────── */
+.ord-ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,5,.5);
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ordFade .18s ease;
+}
+@keyframes ordFade { from { opacity: 0; } to { opacity: 1; } }
+.ord-modal {
+  background: var(--surface);
+  border-radius: 14px;
+  width: 420px;
+  max-width: 92vw;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: ordPop .2s ease;
+}
+@keyframes ordPop {
+  from { transform: scale(.96); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.ord-modal-hdr {
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ord-modal-title { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -.2px; }
+.ord-modal-x {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--s2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink2);
+}
+.ord-modal-x:hover { background: var(--s3); }
+.ord-modal-body { padding: 18px 22px; font-size: 13px; color: var(--ink2); line-height: 1.6; }
+.ord-modal-ft {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--s2);
+}
+
+/* Cancel-order specific danger card */
+.ord-warn {
+  border: 1px solid var(--rm);
+  background: var(--rl);
+  border-radius: 9px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.ord-warn-ico {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--red);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ord-warn-text { font-size: 12px; color: var(--ink); line-height: 1.5; }
+.ord-warn-text b { color: var(--red); font-weight: 700; }
+
+/* Add-tag modal pieces */
+.ord-tag-section { margin-bottom: 14px; }
+.ord-tag-section-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 8px;
+}
+.ord-tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.ord-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  color: var(--ink2);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-tag:hover { border-color: var(--border2); }
+.ord-tag.on { background: var(--ol); border-color: var(--orange); color: var(--orange); }
+.ord-tag.on::before { content: "✓"; font-size: 11px; }
+.ord-tag-x {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+}
+.ord-tag-new {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ord-tag-new input {
+  flex: 1;
+  height: 34px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--s2);
+  outline: none;
+}
+.ord-tag-new input:focus { border-color: var(--orange); background: var(--surface); }
+.ord-tag-add {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 7px;
+  background: var(--surface);
+  border: 1.5px solid var(--orange);
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.ord-tag-add:hover { background: var(--ol); }
+
+/* ── Coming-soon placeholder for unimplemented tabs ────────── */
+.ord-empty {
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: 13px;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--ink3);
+}
+.ord-empty h3 { font-size: 15px; color: var(--ink); font-weight: 700; margin-bottom: 6px; }
+.ord-empty p  { font-size: 12px; max-width: 360px; margin: 0 auto; line-height: 1.6; }
+
+/* ── More Filters side drawer ──────────────────────────────── */
+.ord-drawer-ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,5,.5);
+  z-index: 750;
+  display: flex;
+  justify-content: flex-end;
+  animation: ordFade .18s ease;
+}
+.ord-drawer {
+  background: var(--surface);
+  width: 440px;
+  max-width: 92vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: ordSlide .22s ease;
+}
+@keyframes ordSlide {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.ord-drawer-hdr {
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ord-drawer-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -.2px; }
+.ord-drawer-sub { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.ord-drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.ord-drawer-ft {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--s2);
+}
+
+.ord-df-sec { margin-bottom: 18px; }
+.ord-df-sec-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink2);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 8px;
+}
+
+.ord-df-input {
+  width: 100%;
+  height: 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--s2);
+  outline: none;
+}
+.ord-df-input:focus { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px var(--ol); }
+.ord-df-input::placeholder { color: var(--ink3); }
+
+.ord-df-textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--s2);
+  outline: none;
+  resize: vertical;
+  line-height: 1.5;
+}
+.ord-df-textarea:focus { border-color: var(--orange); background: var(--surface); }
+
+.ord-df-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.ord-df-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-df-opt:hover { border-color: var(--border2); }
+.ord-df-opt.on { background: var(--ol); border-color: var(--orange); color: var(--orange); }
+.ord-df-opt.on::before { content: "✓"; font-size: 11px; }
+
+/* ──────────────────────────────────────────────────────────────
+   New Forward Order screen — `.ord-nf-*`
+   Page-specific styling for the create-order screen. Re-uses
+   `.ord-cta`, `.ord-tabs`, `.cdd*`, `.sup-mf`/`.sup-mi`/`.sup-row`,
+   `.sup-panel.w-create` and the existing colour tokens — these
+   classes only add the bits that don't already exist (cards,
+   address tiles, product-row picker, dimension grid, totals strip).
+   ────────────────────────────────────────────────────────────── */
+
+/* Back chevron next to the page title */
+.ord-nf-back {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink2);
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-nf-back:hover { border-color: var(--border2); background: var(--s2); color: var(--ink); }
+
+/* ── Page-level 2-column grid ─────────────────────────────────
+   LEFT column (`1fr`)  → order form (Pickup/Customer pair, Product,
+                          Payment) stacked vertically. Product and
+                          Payment inherit the 1fr width from this
+                          column — they MUST NOT use grid-column span
+                          or width: 100% breakouts.
+   RIGHT column (520px) → persistent Package Details rail. */
+.ord-nf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 520px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Vertical stack inside the LEFT column. `gap` replaces ad-hoc
+   marginTop spacing so every child (pair, Product, Payment) sits
+   on the same 16px rhythm. */
+.ord-nf-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Nested 2-column grid for the Pickup | Customer pair. Identical
+   tile width ensures both cards stay visually balanced.
+   `minmax(0, 1fr)` is required (not `1fr`) so long, non-wrapping
+   content inside a card (e.g. a single-line address in the saved-
+   address dropdown trigger) cannot stretch its column wider than
+   the other — without `minmax(0, …)` a grid track's implicit
+   min-width is `auto`, which equals min-content. */
+.ord-nf-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.ord-nf-pair > * { min-width: 0; }
+
+/* Right rail container — keeps a stable 520px fixed width so the
+   Package Details panel never collapses or stretches with content. */
+.ord-nf-right {
+  min-width: 0;
+}
+
+/* Responsive: at narrower viewports stack everything vertically and
+   release the 520px fixed rail. Pickup/Customer pair also stacks. */
+@media (max-width: 1180px) {
+  .ord-nf-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .ord-nf-pair { grid-template-columns: 1fr; }
+}
+
+/* Generic surface card used everywhere on the page */
+.ord-nf-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px 18px;
+}
+.ord-nf-card-hdr {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ord-nf-card-hdr-note {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--orange);
+  margin-left: auto;
+}
+
+/* Section labels inside drawers / package card */
+.ord-nf-sec-lbl {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 14px 0 10px;
+}
+
+.ord-nf-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 18px 0;
+}
+
+/* Address tag pill row (Warehouse / Home / Work / Other) */
+.ord-nf-tagrow { display: flex; gap: 6px; flex-wrap: wrap; }
+.ord-nf-tag {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-nf-tag:hover { border-color: var(--border2); }
+.ord-nf-tag.on { background: var(--ol); border-color: var(--orange); color: var(--orange); }
+
+/* Phone input with sticky +91 prefix */
+.ord-nf-phone {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  background: var(--s2);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.ord-nf-phone:focus-within { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px var(--ol); }
+.ord-nf-phone-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  background: var(--s3);
+  border-right: 1px solid var(--border);
+}
+.ord-nf-phone input {
+  flex: 1;
+  height: 40px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  padding: 0 12px;
+}
+.ord-nf-phone input::placeholder { color: var(--ink3); }
+.ord-nf-phone input:disabled { color: var(--ink3); }
+
+/* Inline checkbox-with-label */
+.ord-nf-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink2);
+  cursor: pointer;
+  user-select: none;
+}
+.ord-nf-check input { accent-color: var(--orange); width: 14px; height: 14px; cursor: pointer; }
+.ord-nf-check.accent input { accent-color: var(--orange); }
+
+/* Label preferences 2×2 grid */
+.ord-nf-prefgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+
+/* Dimensions tri-column */
+.ord-nf-dims {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Chargeable-weight info banner */
+.ord-nf-chargeable {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--gl);
+  border: 1px solid var(--gm);
+  border-radius: 9px;
+  margin-top: 12px;
+}
+.ord-nf-chargeable-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ord-nf-chargeable-ico svg { width: 18px; height: 18px; }
+.ord-nf-chargeable-n { font-size: 14px; font-weight: 700; color: var(--green); }
+.ord-nf-chargeable-sub { font-size: 11px; color: var(--ink2); margin-top: 2px; }
+
+/* Tip banner in the package card */
+.ord-nf-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--ol);
+  border: 1px solid var(--om);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--orange);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Row label + actions split (used by the Package card header line) */
+.ord-nf-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.ord-nf-pkg-actions { display: inline-flex; gap: 10px; }
+.ord-nf-mini-link {
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orange);
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font);
+}
+.ord-nf-mini-link:hover { text-decoration: underline; }
+
+/* Unit suffix attached to a numeric input */
+.ord-nf-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ord-nf-unit input { padding-right: 38px !important; }
+.ord-nf-unit-suffix {
+  position: absolute;
+  right: 12px;
+  font-size: 12px;
+  color: var(--ink3);
+  pointer-events: none;
+}
+.ord-nf-unit-prefix {
+  position: absolute;
+  left: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  z-index: 1;
+}
+.ord-nf-unit .ord-nf-unit-prefix + input { padding-left: 26px !important; }
+
+/* Verified pill — green chip used by both address card + dropdown rows */
+.ord-nf-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 11px;
+  background: var(--gl);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+/* Selected-address tile under the dropdown */
+.ord-nf-addrcard {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 12px 14px;
+  background: var(--s2);
+}
+.ord-nf-addrcard-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ord-nf-addrcard-name { font-size: 13px; font-weight: 700; color: var(--ink); flex: 1; }
+.ord-nf-addrcard-body { font-size: 12px; color: var(--ink2); line-height: 1.5; margin-bottom: 6px; }
+.ord-nf-addrcard-meta {
+  font-size: 11px;
+  color: var(--ink2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.ord-nf-addrcard-meta a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
+.ord-nf-addrcard-ft {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.ord-nf-addrcard-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink2);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.ord-nf-addrcard-btn:hover { border-color: var(--border2); background: var(--s2); color: var(--ink); }
+
+/* Saved address dropdown — rich two-line option rows */
+.ord-nf-addrlist .cdd-items { padding: 4px 0; }
+.ord-nf-addr-item { padding: 10px 14px !important; }
+.ord-nf-addr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.ord-nf-addr-name { font-size: 13px; font-weight: 700; color: var(--ink); flex: 1; }
+.ord-nf-addr-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+  background: var(--ol);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.ord-nf-addr-line { font-size: 11px; color: var(--ink2); line-height: 1.45; }
+.ord-nf-addr-meta { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+.ord-nf-addr-ft {
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  background: var(--s2);
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: right;
+}
+.ord-nf-addr-ft:hover { background: var(--ol); }
+
+/* ── Product search dropdown (matches the screenshot) ──── */
+
+.ord-nf-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ord-nf-search-ico {
+  position: absolute;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink3);
+  pointer-events: none;
+}
+.ord-nf-search input {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  background: var(--s2);
+  padding: 0 14px 0 38px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s;
+}
+.ord-nf-search input:focus {
+  border-color: var(--orange);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--ol);
+}
+.ord-nf-search input::placeholder { color: var(--ink3); }
+
+.ord-nf-prodlist { border-radius: 12px; }
+.ord-nf-prod-item {
+  display: grid;
+  grid-template-columns: 50px 2fr 100px 110px 100px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: .5px solid var(--border);
+  cursor: pointer;
+  transition: background .1s;
+}
+.ord-nf-prod-item:hover { background: var(--s2); }
+.ord-nf-prod-item:last-child { border-bottom: none; }
+.ord-nf-prod-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink3);
+  flex-shrink: 0;
+}
+.ord-nf-prod-thumb svg { width: 22px; height: 22px; }
+.ord-nf-prod-thumb.sm { width: 36px; height: 36px; border-radius: 7px; }
+.ord-nf-prod-thumb.sm svg { width: 20px; height: 20px; }
+.ord-nf-prod-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.ord-nf-prod-hi { color: var(--orange); font-weight: 700; }
+.ord-nf-prod-sku { font-size: 12px; color: var(--ink2); font-family: var(--mono); }
+.ord-nf-prod-cat { font-size: 10px; color: var(--ink2); font-weight: 700; letter-spacing: .4px; }
+.ord-nf-prod-price { font-size: 13px; font-weight: 700; color: var(--ink); text-align: right; font-family: var(--mono); }
+
+.ord-nf-prod-ft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--s2);
+}
+.ord-nf-prod-ft-l { font-size: 11px; color: var(--ink2); }
+.ord-nf-prod-ft-l b { color: var(--ink); font-weight: 700; }
+.ord-nf-prod-ft-add {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--orange);
+  cursor: pointer;
+}
+.ord-nf-prod-ft-add:hover { text-decoration: underline; }
+
+/* Line items table inside the Product card */
+.ord-nf-lines { margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.ord-nf-lines-hdr {
+  display: grid;
+  grid-template-columns: 1fr 140px 120px 36px;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--s2);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.ord-nf-line {
+  display: grid;
+  grid-template-columns: 1fr 140px 120px 36px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+.ord-nf-line-prod { display: flex; align-items: center; gap: 10px; }
+.ord-nf-line-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.ord-nf-line-sku { font-size: 11px; color: var(--ink3); margin-top: 2px; font-family: var(--mono); }
+.ord-nf-line-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 2px 4px;
+  background: var(--surface);
+  width: max-content;
+}
+.ord-nf-line-qty button {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: none;
+  background: var(--s2);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+}
+.ord-nf-line-qty button:hover { background: var(--s3); color: var(--ink); }
+.ord-nf-line-qty span { min-width: 18px; text-align: center; font-size: 12px; font-weight: 700; color: var(--ink); }
+.ord-nf-line-total { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--ink); text-align: right; }
+.ord-nf-line-del {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink3);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+}
+.ord-nf-line-del:hover { border-color: var(--rm); color: var(--red); background: var(--rl); }
+.ord-nf-line-del svg { width: 13px; height: 13px; }
+
+/* Collapsible "Add Other Charges & Discount" toggle */
+.ord-nf-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--s2);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+}
+.ord-nf-collapse:hover { border-color: var(--border2); color: var(--ink); }
+.ord-nf-collapse .chev { font-size: 10px; color: var(--ink3); }
+
+/* Payment-details grid (3-up) + segmented toggle */
+.ord-nf-paygrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+@media (max-width: 720px) { .ord-nf-paygrid { grid-template-columns: 1fr; } }
+
+.ord-nf-toggle {
+  display: inline-flex;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--s2);
+  width: max-content;
+  height: 40px;
+}
+.ord-nf-toggle button {
+  border: none;
+  background: none;
+  padding: 0 18px;
+  height: 100%;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+}
+.ord-nf-toggle button.on { background: var(--ink); color: #fff; }
+
+/* Totals strip (Sub Total / Tax / Discount / Grand Total) */
+.ord-nf-totals {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.ord-nf-totals > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px;
+  font-size: 13px;
+  color: var(--ink2);
+}
+.ord-nf-totals > div b { color: var(--ink); font-weight: 700; font-family: var(--mono); }
+.ord-nf-totals .grand {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ord-nf-totals .grand b { font-size: 15px; }
+
+/* ── Post-create lifecycle screens ─────────────────────────────
+   Reused by the "Order Created — Pending Manifest" and "AWB Assigned"
+   states. Centered card sitting inside the page shell so the back
+   chevron + global toast stay where the user expects them. */
+.ord-nf-state {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 0;
+}
+.ord-nf-state-card {
+  width: 100%;
+  max-width: 680px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 32px 26px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.ord-nf-state-ico {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+.ord-nf-state-ico.ok { background: var(--gl); color: var(--green); }
+.ord-nf-state-ico svg { width: 26px; height: 26px; }
+.ord-nf-state-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.3px;
+  margin-bottom: 6px;
+}
+.ord-nf-state-sub {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.ord-nf-state-sub b { color: var(--ink); font-family: var(--mono); font-weight: 700; }
+
+/* Two-column key/value grid summarising the created order. Wraps to
+   a single column on narrow viewports. */
+.ord-nf-state-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  text-align: left;
+  margin-top: 20px;
+  padding: 18px 20px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+@media (max-width: 560px) { .ord-nf-state-grid { grid-template-columns: 1fr; } }
+.ord-nf-state-k {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+.ord-nf-state-v { font-size: 13px; color: var(--ink); font-weight: 600; }
+.ord-nf-state-v.mono { font-family: var(--mono); letter-spacing: .2px; }
+
+.ord-nf-state-ft {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+/* AWB highlight block — sits between the title and the key/value grid
+   on the AWB Assigned screen. Mono'd AWB number reads as a real
+   tracking ID without needing a separate widget. */
+.ord-nf-awb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--ol);
+  border: 1px solid var(--om);
+  text-align: left;
+}
+.ord-nf-awb-l { min-width: 0; }
+.ord-nf-awb-num {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: .4px;
+  margin-top: 2px;
+}
+.ord-nf-awb-courier { font-size: 11px; color: var(--ink2); margin-top: 4px; font-weight: 500; }
+.ord-nf-awb-pill { flex-shrink: 0; }
+
+/* ── Select Shipment Mode screen ─────────────────────────────
+   Two-column layout that mirrors the reference design exactly:
+     LEFT  (260px) → sticky order-summary sidebar
+     RIGHT (1fr)   → tab + sort toolbar above a courier services
+                     table with selectable rows. */
+.ord-nf-mode-grid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .ord-nf-mode-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Back-as-link header variant used on this step only — bigger, no
+   border, sits flush left with a chevron glyph. */
+.ord-nf-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  letter-spacing: -.2px;
+}
+.ord-nf-back-link:hover { color: var(--orange); }
+
+/* Sidebar — labelled key/value blocks separated by horizontal rules.
+   `position: sticky` keeps it pinned while the table on the right
+   scrolls past it on long courier lists. */
+.ord-nf-mode-side {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 4px;
+}
+.ord-nf-mode-side-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ord-nf-mode-side-k {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+.ord-nf-mode-side-v {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: var(--mono);
+  letter-spacing: .2px;
+}
+.ord-nf-mode-side-sub { font-size: 11px; color: var(--ink2); font-weight: 500; }
+
+/* Route block — pickup → delivery with a thin separator line */
+.ord-nf-mode-side-route {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+.ord-nf-mode-side-loc { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ord-nf-mode-side-loc.to { text-align: right; }
+.ord-nf-mode-side-loc b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ord-nf-mode-side-loc span {
+  font-size: 10px;
+  color: var(--ink3);
+  font-family: var(--mono);
+  letter-spacing: .2px;
+}
+.ord-nf-mode-side-line {
+  display: block;
+  height: 1px;
+  background: var(--border2);
+  position: relative;
+}
+.ord-nf-mode-side-line::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -3px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--border2);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+/* ── Main panel: toolbar + table ───────────────────────────── */
+.ord-nf-mode-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ord-nf-mode-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+
+/* Tab strip with built-in count badges */
+.ord-nf-mode-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+}
+.ord-nf-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.ord-nf-mode-tab:hover { color: var(--ink); }
+.ord-nf-mode-tab.on    { background: var(--surface); color: var(--orange); box-shadow: var(--shadow); }
+.ord-nf-mode-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: var(--s3);
+  color: var(--ink3);
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.ord-nf-mode-tab.on .ord-nf-mode-tab-count { background: var(--ol); color: var(--orange); }
+
+/* Right side of toolbar — services-found counter + sort select */
+.ord-nf-mode-toolbar-r {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.ord-nf-mode-count-lbl { font-size: 12px; color: var(--ink2); }
+.ord-nf-mode-count-lbl b { color: var(--ink); font-weight: 700; }
+
+.ord-nf-mode-sort { position: relative; display: inline-flex; }
+.ord-nf-mode-sort::after {
+  content: '▾';
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--ink3);
+  pointer-events: none;
+}
+.ord-nf-mode-sort select {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 32px;
+  padding: 0 28px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+  transition: border-color .12s;
+}
+.ord-nf-mode-sort select:hover { border-color: var(--border2); }
+.ord-nf-mode-sort select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--ol); }
+
+/* ── Courier table ───────────────────────────────────────────
+   Same grid-template-columns used by the header and every row
+   so columns stay perfectly aligned. */
+.ord-nf-mode-tbl { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.ord-nf-mode-tbl-hdr,
+.ord-nf-mode-tbl-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.ord-nf-mode-tbl-hdr {
+  padding: 0 18px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.ord-nf-mode-tbl-hdr .num { text-align: center; }
+
+.ord-nf-mode-tbl-row {
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font);
+  text-align: left;
+  transition: border-color .15s, background .12s, box-shadow .15s;
+}
+.ord-nf-mode-tbl-row:hover { border-color: var(--border2); background: var(--s2); }
+.ord-nf-mode-tbl-row.on    { border-color: var(--orange); background: var(--ol); box-shadow: 0 0 0 2px var(--ol); }
+
+.ord-nf-mode-tbl-courier { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ord-nf-mode-tbl-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ord-nf-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.ord-nf-mode-tag.air     { background: var(--orange); color: #fff; }
+.ord-nf-mode-tag.surface { background: var(--blue);   color: #fff; }
+
+/* Weight pill — centered mono badge that matches the reference */
+.ord-nf-mode-tbl-wt { text-align: center; }
+.ord-nf-mode-wt-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: .4px;
+}
+
+.ord-nf-mode-tbl-rate {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+
+/* Empty-state row shown when a tab filters to zero couriers */
+.ord-nf-mode-tbl-empty {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink3);
+  background: var(--s2);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}

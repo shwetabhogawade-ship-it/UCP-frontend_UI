@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1440"/>
+<title>Dashboard · Seller Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--surface:#FFF;--s2:#F8F7F3;--s3:#EEECEA;
+  --border:#E2E0D8;--border2:#C5C3BB;
+  --ink:#1A190F;--ink2:#5C5B52;--ink3:#9B998F;
+  --orange:#E8520A;--ol:#FEF0E8;--om:#F5C09A;
+  --red:#C52E18;--rl:#FDECEA;
+  --green:#1A6B3A;--gl:#E7F5ED;--gm:#8DD4A9;
+  --amber:#9E5A00;--al:#FFF5E5;--am:#F5C878;
+  --blue:#1246A0;--bl:#EAF0FD;--bm:#8EAFF0;
+  --gray:#6B6A62;--gray-l:#EEECE9;--gray-m:#C3C1B8;
+  --purple:#6A1B9A;--pl:#F3E8FD;
+  --c-delivered:#B39DDB;--c-transit:#81D4FA;--c-rto:#F5C878;--c-lost:#F2A39A;
+  --c-ontime:#8DD4A9;--c-late:#F2A39A;--c-prepaid:#8EAFF0;--c-cod:#F5C878;
+  --c-ndr:#E8520A;--c-resp:#B39DDB;--c-pos:#8DD4A9;--c-buyer-resp:#CE93D8;
+  --c-shop:#8DD4A9;--c-amz:#81D4FA;--c-insta:#CE93D8;--c-woo:#F5C878;--c-whats:#F2A39A;
+  --radius:10px;--radius-sm:7px;
+  --shadow:0 1px 3px rgba(0,0,0,.04);--shadow-md:0 2px 8px rgba(0,0,0,.07);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sb{width:54px;background:#0F0E09;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 0 18px;gap:4px}
+.sb-logo{width:34px;height:34px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.sb-logo svg{width:18px;height:18px;fill:#fff}
+.sb-i{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#46443C;transition:all .15s}
+.sb-i:hover{background:#1C1B14;color:#8A8878}.sb-i.on{background:var(--orange);color:#fff}.sb-i svg{width:16px;height:16px}
+.sb-sep{width:26px;height:1px;background:#222118;margin:5px 0}.sb-f{flex:1}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:200}
+.tb-srch{flex:1;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;height:34px;padding:0 12px}
+.tb-srch:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.tb-srch svg{width:13px;height:13px;color:var(--ink3);flex-shrink:0}
+.tb-srch input{border:none;background:transparent;outline:none;font-family:var(--font);font-size:12px;color:var(--ink);width:100%}
+.tb-srch input::placeholder{color:var(--ink3)}
+.tb-sep{width:1px;height:20px;background:var(--border)}
+.tb-r{display:flex;align-items:center;gap:8px;margin-left:auto}
+.tbtn{display:inline-flex;align-items:center;gap:5px;padding:0 13px;height:32px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:var(--font);transition:all .15s;white-space:nowrap}
+.tbtn:hover{border-color:var(--border2)}.tbtn-p{background:var(--orange);color:#fff;border-color:var(--orange)}.tbtn-p:hover{opacity:.88}
+.av{width:30px;height:30px;border-radius:50%;background:var(--ol);border:1.5px solid var(--om);font-size:11px;font-weight:700;color:var(--orange);display:flex;align-items:center;justify-content:center}
+.page{flex:1;overflow-y:auto;padding:20px 22px 60px}.page::-webkit-scrollbar{width:6px}.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ph-title{font-size:20px;font-weight:700;letter-spacing:-.4px}.ph-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.df{position:relative}
+.df-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--ink);cursor:pointer;font-weight:500}
+.df-btn:hover{border-color:var(--border2)}.df-btn .arr{font-size:9px;color:var(--ink3);transition:transform .2s}.df-btn.open .arr{transform:rotate(180deg)}
+.df-dd{display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:999;min-width:180px;overflow:hidden}.df-dd.open{display:block}
+.df-dd .opt{padding:10px 16px;font-size:12px;cursor:pointer;color:var(--ink);transition:background .12s}.df-dd .opt:hover{background:var(--s2)}.df-dd .opt.on{color:var(--orange);background:var(--ol);font-weight:600}
+.df-dd .opt-custom{padding:10px 16px;font-size:12px;cursor:pointer;color:var(--orange);font-weight:600;border-top:1px solid var(--border)}.df-dd .opt-custom:hover{background:var(--ol)}
+.df-custom{display:none;padding:14px 16px;border-top:1px solid var(--border)}.df-custom.open{display:block}
+.df-custom label{display:block;font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.df-custom input[type=date]{width:100%;height:34px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 10px;font-size:12px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;margin-bottom:10px}
+.df-custom input[type=date]:focus{border-color:var(--orange);background:var(--surface)}
+.df-custom-btns{display:flex;gap:8px;justify-content:flex-end}
+.df-custom-btns button{padding:0 14px;height:30px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.df-clear{border:1px solid var(--border);background:var(--s2);color:var(--ink2)}.df-apply{border:none;background:var(--orange);color:#fff}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px}
+.tab{padding:10px 22px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--ink2)}.tab.on{color:var(--ink);border-bottom-color:var(--orange)}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.tab.on .tab-count{background:var(--ol);color:var(--orange)}.tab:not(.on) .tab-count{background:var(--s3);color:var(--ink3)}
+.tab-panel{display:none}.tab-panel.on{display:block}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:20px;box-shadow:var(--shadow);transition:all .18s;display:flex;flex-direction:column}.card:hover{border-color:var(--border2)}
+.card>.legend{margin-top:auto}
+.kpi-grid{display:grid;gap:12px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:20px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.kpi:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.kpi-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:13px 0 0 13px}
+.kpi-content{flex:1}
+.kpi-lbl{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3;letter-spacing:-.2px}
+.kpi-n{font-family:var(--mono);font-size:34px;font-weight:700;letter-spacing:-.8px;line-height:1;color:var(--ink)}
+.kpi-sub{font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.4}
+.kpi-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
+.kpi-sev{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700}
+.kpi-dot{width:6px;height:6px;border-radius:50%}
+/* NDR KPI — hug content, no min-height */
+.kpi-hug{min-height:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}.blink{animation:pulse 2s ease-in-out infinite}
+.cta{display:inline-flex;align-items:center;padding:0 14px;height:28px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);border:none;transition:opacity .15s}
+.cta-p{background:var(--orange);color:#fff}.cta-p:hover{opacity:.88}.cta-s{background:var(--surface);border:1px solid var(--orange);color:var(--orange)}
+.kpi-high .kpi-bar{background:var(--red)}.kpi-high .kpi-sev{background:var(--rl);color:var(--red)}.kpi-high .kpi-dot{background:var(--red)}
+.kpi-med .kpi-bar{background:var(--amber)}.kpi-med .kpi-sev{background:var(--al);color:var(--amber)}.kpi-med .kpi-dot{background:var(--amber)}
+.kpi-low .kpi-bar{background:var(--gray-m)}.kpi-low .kpi-sev{background:var(--gray-l);color:var(--gray)}.kpi-low .kpi-dot{background:var(--gray)}
+.kpi-neutral .kpi-bar{background:var(--border2)}.kpi-neutral .kpi-sev{background:var(--s3);color:var(--ink2)}.kpi-neutral .kpi-dot{background:var(--border2)}
+.tip{position:relative;display:inline-flex}.tip-t{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 12px;border-radius:var(--radius-sm);font-size:11px;white-space:nowrap;z-index:100;margin-bottom:6px;box-shadow:var(--shadow-md);line-height:1.5;pointer-events:none;font-weight:400}.tip:hover .tip-t{display:block}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;align-items:stretch}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;align-items:stretch}
+.row-2w{display:grid;grid-template-columns:1.4fr 0.6fr;gap:14px;margin-bottom:16px;align-items:stretch}
+.stat-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;margin-left:6px;padding:1px 6px;border-radius:4px}
+.stat-delta.up{background:var(--gl);color:var(--green)}.stat-delta.down{background:var(--rl);color:var(--red)}
+.stk-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:5px 10px;border-radius:5px;font-size:10px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10}
+.stacked>div{position:relative;cursor:pointer}.stacked>div:hover{opacity:.85}.stacked>div:hover .stk-tip{opacity:1}
+.val-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:4px}
+.val-big{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-.6px;line-height:1;color:var(--ink)}.val-big.green{color:var(--green)}
+.val-mid{font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:-.3px;color:var(--ink)}
+.val-sm{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink)}
+.w-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}.w-sub{font-size:11px;color:var(--ink3)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.bg-green{background:var(--gl);color:var(--green)}.bg-red{background:var(--rl);color:var(--red)}.bg-amber{background:var(--al);color:var(--amber)}.bg-blue{background:var(--bl);color:var(--blue)}.bg-gray{background:var(--gray-l);color:var(--gray)}.bg-orange{background:var(--ol);color:var(--orange)}
+.bar{width:100%;height:8px;background:var(--s3);border-radius:4px;overflow:hidden}.bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.bar-lg{height:10px;border-radius:5px}.bar-lg .bar-fill{border-radius:5px}
+.stacked{display:flex;border-radius:6px;overflow:hidden;width:100%}.stacked>div{transition:width .6s ease}
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding-top:14px;border-top:1px solid var(--border);margin-top:14px}
+.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink2)}.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.leg b{color:var(--ink);font-weight:700}.leg .pct{color:var(--ink3);font-size:10px}
+.insight{margin-top:12px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--s2);border:1px solid var(--border);font-size:11px;color:var(--ink2);line-height:1.6}
+.insight b{color:var(--ink);font-weight:700}.insight .warn{color:var(--amber);font-weight:600}.insight .good{color:var(--green);font-weight:600}.insight .bad{color:var(--red);font-weight:600}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 8px;text-align:left;color:var(--ink3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--border)}.tbl tr:last-child td{border-bottom:none}
+.tbl tr.overdue{background:var(--rl)}.tbl .fw{font-weight:600;color:var(--ink)}.tbl .mono{font-family:var(--mono);font-weight:600}
+.ranked-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ranked-row:last-child{margin-bottom:0}
+.ranked-row .r-name{flex-shrink:0;width:130px;min-width:0}
+.ranked-row .r-name span{font-size:12px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.ranked-row .r-name .r-badge{margin-top:2px}
+.ranked-row .r-bar{flex:1;min-width:0}
+.ranked-row .r-meta{display:flex;gap:10px;font-size:11px;flex-shrink:0;justify-content:flex-end;min-width:120px}
+.ranked-row .r-meta .m-dim{color:var(--ink3)}.ranked-row .r-meta .m-val{font-weight:700;color:var(--ink);font-family:var(--mono)}
+.donut-wrap{display:flex;align-items:center;justify-content:center;padding:16px 0}
+.rev-line{display:flex;align-items:center;gap:8px}.rev-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.rev-lbl{font-size:11px;color:var(--ink2);flex:1}.rev-val{font-family:var(--mono);font-size:12px;font-weight:600}.rev-neg{color:var(--red)}.rev-total{border-top:1px solid var(--border);padding-top:8px;margin-top:4px;display:flex;justify-content:space-between}
+.sec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+/* NOTIFICATION BANNER */
+.notif{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border:1.5px solid var(--orange);border-radius:9px;margin-bottom:14px;font-size:12px;color:var(--ink);font-weight:500;line-height:1.4}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.notif b{font-weight:700;color:var(--red)}
+.notif-text{flex:1}
+.notif-close{flex-shrink:0;width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:11px;font-family:var(--font);transition:all .15s;padding:0;line-height:1}
+.notif-close:hover{background:var(--s3);color:var(--ink)}
+/* FILTER BAR */
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}
+.fb-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.fdiv{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.fc{display:flex;align-items:center;gap:6px;padding:0 11px;height:30px;border-radius:8px;background:var(--s2);border:1.5px solid var(--border);font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;white-space:nowrap;user-select:none;transition:all .15s}
+.fc:hover{border-color:var(--border2)}
+.fc.on{border-color:var(--orange);background:var(--ol);color:var(--orange)}
+/* NDR funnel */
+.funnel-dual{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.funnel-dual .f-col{padding:16px 20px}
+.funnel-dual .f-col+.f-col{border-left:1.5px solid var(--border)}
+.funnel-dual .f-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:14px}
+.funnel-step{display:flex;align-items:center;gap:12px;margin-bottom:14px;position:relative}
+.funnel-step:last-child{margin-bottom:0}
+.funnel-n{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink);min-width:36px;text-align:center;flex-shrink:0}
+.funnel-info{flex:1;min-width:0}
+.funnel-info .f-lbl{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.funnel-info .f-bar{width:100%}
+.funnel-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.funnel-3 .f3-col{padding:12px 16px;text-align:center}
+.funnel-3 .f3-col+.f3-col{border-left:1px solid var(--border)}
+.funnel-3 .f3-hdr{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.funnel-3 .f3-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);text-align:left}
+.funnel-3 .f3-row:last-child{border-bottom:none}
+.funnel-3 .f3-n{font-family:var(--mono);font-size:18px;font-weight:700;min-width:26px;text-align:center}
+.funnel-3 .f3-lbl{font-size:11px;color:var(--ink2)}
+.gbar-chart{display:flex;align-items:flex-end;gap:0;width:100%;padding:0}
+.gbar-slot{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.gbar-group{display:flex;align-items:flex-end;gap:3px;height:120px}
+.gbar-col{border-radius:3px 3px 0 0;transition:height .4s ease;flex:1;min-width:10px;max-width:28px}
+.gbar-lbl{font-size:9px;color:var(--ink3);text-align:center;margin-top:8px;max-width:70px;line-height:1.2;word-break:break-word}
+.ht{width:100%;border-collapse:collapse;font-size:11px}
+.ht th{padding:6px 8px;text-align:center;color:var(--ink3);font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.ht th:first-child{text-align:left}
+.ht td{padding:8px 8px;text-align:center;border-bottom:1px solid var(--border);font-family:var(--mono);font-weight:600;font-size:12px}
+.ht td:first-child{text-align:left;font-family:var(--font);font-weight:600;color:var(--ink);font-size:11px}
+.ht tr:last-child td{border-bottom:none}
+.ht .cell-good{background:var(--gl);color:var(--green);border-radius:4px}
+.ht .cell-warn{background:var(--al);color:var(--amber);border-radius:4px}
+.ht .cell-bad{background:var(--rl);color:var(--red);border-radius:4px}
+.ht .cell-neutral{color:var(--ink)}
+/* AREA CHART */
+.area-chart{width:100%;overflow:visible}
+.fade{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="sb">
+  <div class="sb-logo"><svg viewBox="0 0 20 20"><path d="M3 10L10 3l7 7M5 8.5v9h4v-5h2v5h4v-9"/></svg></div>
+  <div class="sb-i on"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12M4 8h8M4 12h10M4 16h6" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15l4-4 3 3 4-5 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18h14" stroke-linecap="round"/></svg></div>
+  <div class="sb-sep"></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16" stroke-linecap="round"/></svg></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 6.5v4l2.5 2" stroke-linecap="round"/></svg></div>
+  <div class="sb-f"></div><div class="sb-sep"></div>
+  <div class="sb-i"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3.5"/><path d="M3 18c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg></div>
+</nav>
+<div class="main">
+<div class="topbar">
+  <div class="tb-srch"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3" stroke-linecap="round"/></svg><input type="text" placeholder="Search orders, AWB, customer..."/></div>
+  <div class="tb-sep"></div>
+  <div class="tb-r"><button class="tbtn">Export</button><button class="tbtn tbtn-p">Bulk Actions</button><div class="av">MR</div></div>
+</div>
+<div class="page">
+  <div class="ph"><div><div class="ph-title">Dashboard</div><div class="ph-sub">Last updated 2 min ago</div></div>
+    <div class="df" id="df"><button class="df-btn" id="dfBtn" onclick="toggleDF()"><span id="dfLabel">Last Week</span><span class="arr">▼</span></button>
+      <div class="df-dd" id="dfDD"><div class="opt on" onclick="pickDF(this)">Last Week</div><div class="opt" onclick="pickDF(this)">Last 2 Weeks</div><div class="opt" onclick="pickDF(this)">Last Month</div><div class="opt" onclick="pickDF(this)">Last Quarter</div><div class="opt-custom" id="customToggle" onclick="toggleCustom(event)">Custom Range</div><div class="df-custom" id="dfCustom"><label>Start Date</label><input type="date" id="dfStart"/><label>End Date</label><input type="date" id="dfEnd"/><div class="df-custom-btns"><button class="df-clear" onclick="clearCustom(event)">Clear</button><button class="df-apply" onclick="applyCustom(event)">Apply</button></div></div></div>
+    </div>
+  </div>
+  <div class="sec-lbl">Quick Actions</div>
+  <div class="notif" id="notifBanner">
+    <div class="notif-dot"></div>
+    <div class="notif-text">Action needed: <b>28 NDRs unresolved</b> — ₹2.4L revenue at risk. 1 pickup overdue at Mumbai warehouse.</div>
+    <button class="notif-close" onclick="document.getElementById('notifBanner').style.display='none'">✕</button>
+  </div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)" id="kpiGrid"></div>
+  <div class="tabs"><div class="tab on" onclick="switchTab('orders',this)">Orders & Shipments<span class="tab-count">1,380</span></div><div class="tab" onclick="switchTab('ndr',this)">NDR<span class="tab-count">28</span></div><div class="tab" onclick="switchTab('rto',this)">RTO<span class="tab-count">64</span></div></div>
+
+  <!-- ORDERS TAB -->
+  <div class="tab-panel on" id="tp-orders">
+    <div class="fbar"><div class="fb-lbl">Filters</div><div class="fdiv"></div><div class="fc on">All Time</div><div class="fc">Payment Mode</div><div class="fc">Shipment Type</div><div class="fc">Channel</div><div class="fc">Courier</div></div>
+    <div class="row-2w" id="os-r1"></div>
+    <div class="row-3" id="os-r2"></div>
+    <div class="row-2" id="os-r3"></div>
+    <div class="row-2" id="os-r4"></div>
+  </div>
+
+  <!-- NDR TAB -->
+  <div class="tab-panel" id="tp-ndr">
+    <div class="fbar"><div class="fb-lbl">Filters</div><div class="fdiv"></div><div class="fc on">All Time</div><div class="fc">NDR Reason</div><div class="fc">Attempt Count</div><div class="fc">COD / Prepaid</div><div class="fdiv"></div><div class="fc">Days Since</div><div class="fc">Courier</div></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px" id="nk"></div>
+    <div class="row-2" id="n-f1"></div>
+    <div class="row-2" id="n-f2"></div>
+    <div class="row-3" id="n-f3"></div>
+  </div>
+
+  <!-- RTO TAB -->
+  <div class="tab-panel" id="tp-rto">
+    <div class="fbar"><div class="fb-lbl">Filters</div><div class="fdiv"></div><div class="fc on">All Time</div><div class="fc">COD / Prepaid</div><div class="fc">RTO Reason</div><div class="fc">Zone / State</div><div class="fdiv"></div><div class="fc">Order Value</div><div class="fc">Courier</div></div>
+    <div class="row-3" id="r-f1"></div>
+    <div class="row-2" id="r-f2"></div>
+    <div class="row-2" id="r-f3"></div>
+  </div>
+
+</div></div></div>
+<script>
+function toggleDF(){document.getElementById('dfDD').classList.toggle('open');document.getElementById('dfBtn').classList.toggle('open')}
+function pickDF(el){document.querySelectorAll('.df-dd .opt').forEach(function(o){o.classList.remove('on')});document.getElementById('customToggle').classList.remove('on');document.getElementById('dfCustom').classList.remove('open');el.classList.add('on');document.getElementById('dfLabel').textContent=el.textContent;document.getElementById('dfDD').classList.remove('open');document.getElementById('dfBtn').classList.remove('open')}
+function toggleCustom(e){e.stopPropagation();document.getElementById('dfCustom').classList.toggle('open');document.getElementById('customToggle').classList.add('on');document.querySelectorAll('.df-dd .opt').forEach(function(o){o.classList.remove('on')})}
+function clearCustom(e){e.stopPropagation();document.getElementById('dfStart').value='';document.getElementById('dfEnd').value='';document.getElementById('dfCustom').classList.remove('open');document.getElementById('customToggle').classList.remove('on');document.querySelectorAll('.df-dd .opt')[0].classList.add('on');document.getElementById('dfLabel').textContent='Last Week'}
+function applyCustom(e){e.stopPropagation();var s=document.getElementById('dfStart').value,en=document.getElementById('dfEnd').value;if(s&&en){var fmt=function(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]};document.getElementById('dfLabel').textContent=fmt(s)+' \u2013 '+fmt(en);document.getElementById('dfDD').classList.remove('open');document.getElementById('dfBtn').classList.remove('open')}}
+document.addEventListener('click',function(e){if(!document.getElementById('df').contains(e.target)){document.getElementById('dfDD').classList.remove('open');document.getElementById('dfBtn').classList.remove('open')}});
+function switchTab(id,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on')});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('on')});el.classList.add('on');var tp=document.getElementById('tp-'+id);tp.classList.add('on');tp.classList.add('fade');setTimeout(function(){tp.classList.remove('fade')},350)}
+function B(t,c){return '<span class="badge '+c+'">'+t+'</span>'}
+function bar(v,m,c,lg){return '<div class="bar'+(lg?' bar-lg':'')+'"><div class="bar-fill" style="width:'+((v/m)*100)+'%;background:'+c+'"></div></div>'}
+function sbarTip(s,h){var t=0;s.forEach(function(x){t+=x.v});return '<div class="stacked" style="height:'+h+'px">'+s.map(function(x){return '<div style="width:'+((x.v/t)*100)+'%;background:'+x.c+'"><div class="stk-tip">'+x.l+': '+x.v+' ('+(Math.round(x.v/t*1000)/10)+'%)</div></div>'}).join('')+'</div>'}
+function sbar(s,h){var t=0;s.forEach(function(x){t+=x.v});return '<div class="stacked" style="height:'+h+'px">'+s.map(function(x){return '<div style="width:'+((x.v/t)*100)+'%;background:'+x.c+'" title="'+x.l+': '+x.v+'"></div>'}).join('')+'</div>'}
+function L(items){return '<div class="legend">'+items.map(function(i){return '<div class="leg"><div class="leg-dot" style="background:'+i.c+'"></div><span>'+i.l+'</span> <b>'+i.v+'</b>'+(i.p?' <span class="pct">'+i.p+'</span>':'')+'</div>'}).join('')+'</div>'}
+function donut(segs,size,hole,ct,cs){var r=size/2,ir=hole/2,total=0;segs.forEach(function(s){total+=s.v});var angle=-90,paths='';segs.forEach(function(s){var pct=s.v/total,a1=angle,a2=angle+pct*360,large=pct>.5?1:0,rad=function(d){return d*Math.PI/180};var x1=r+r*Math.cos(rad(a1)),y1=r+r*Math.sin(rad(a1)),x2=r+r*Math.cos(rad(a2)),y2=r+r*Math.sin(rad(a2)),ix1=r+ir*Math.cos(rad(a1)),iy1=r+ir*Math.sin(rad(a1)),ix2=r+ir*Math.cos(rad(a2)),iy2=r+ir*Math.sin(rad(a2));paths+='<path d="M'+x1+','+y1+' A'+r+','+r+' 0 '+large+' 1 '+x2+','+y2+' L'+ix2+','+iy2+' A'+ir+','+ir+' 0 '+large+' 0 '+ix1+','+iy1+'Z" fill="'+s.c+'"/>';angle=a2});return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block;margin:0 auto">'+paths+'<text x="'+r+'" y="'+(r-4)+'" text-anchor="middle" font-family="DM Mono,monospace" font-size="16" font-weight="700" fill="var(--ink)">'+ct+'</text><text x="'+r+'" y="'+(r+12)+'" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="var(--ink3)">'+cs+'</text></svg>'}
+function rankedRow(name,val,max,color,meta,topBadge){return '<div class="ranked-row"><div class="r-name"><span>'+name+'</span>'+(topBadge?'<div class="r-badge">'+topBadge+'</div>':'')+'</div><div class="r-bar">'+bar(val,max,color,true)+'</div><div class="r-meta">'+meta+'</div></div>'}
+function areaChart(w,h,datasets,labels){var pad=24,cw=w-pad*2,ch=h-30,maxV=0;datasets.forEach(function(ds){ds.data.forEach(function(v){if(v>maxV)maxV=v})});if(maxV===0)maxV=1;var svg='<svg viewBox="0 0 '+w+' '+h+'" class="area-chart" style="width:100%;height:auto">';datasets.forEach(function(ds){var pts='';ds.data.forEach(function(v,i){var x=pad+i/(ds.data.length-1)*cw;var y=ch-(v/maxV)*ch+10;pts+=x+','+y+' '});svg+='<polygon points="'+pad+','+(ch+10)+' '+pts+(pad+cw)+','+(ch+10)+'" fill="'+ds.c+'" opacity="0.25"/>';svg+='<polyline points="'+pts.trim()+'" fill="none" stroke="'+ds.c+'" stroke-width="2" stroke-linecap="round"/>'});labels.forEach(function(l,i){var x=pad+i/(labels.length-1)*cw;svg+='<text x="'+x+'" y="'+(h-4)+'" text-anchor="middle" font-size="8" fill="var(--ink3)" font-family="DM Sans">'+l+'</text>'});for(var i=0;i<=4;i++){var y=ch-(i/4)*ch+10;svg+='<line x1="'+pad+'" y1="'+y+'" x2="'+(w-pad)+'" y2="'+y+'" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>';svg+='<text x="'+(pad-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="var(--ink3)" font-family="DM Mono">'+Math.round(i/4*maxV)+'</text>'}svg+='</svg>';return svg}
+
+/* KPIs */
+document.getElementById('kpiGrid').innerHTML=[
+  {lbl:"Pending Shipment",n:"142",sub:"\u20B91.2L awaiting dispatch",sev:"med",cta:"Ship Now",tip:"Orders ready to ship"},
+  {lbl:"Pending Pickup",n:"36",sub:"2 pickups scheduled today",sev:"med",cta:"Book Now",tip:"Manifested but not picked up"},
+  {lbl:"Critical NDR Action Required",n:"28",sub:"\u20B92.4L at RTO risk",sev:"high",cta:"Resolve",tip:"Non-delivery reports needing action"},
+  {lbl:"Weight Dispute",n:"8",sub:"\u20B93.2K in penalties",sev:"low",cta:"Resolve",tip:"Courier weight mismatch"}
+].map(function(k){return '<div class="kpi kpi-'+k.sev+'" style="min-height:160px"><div class="kpi-bar"></div><div class="kpi-content"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="kpi-lbl">'+k.lbl+'</div><span class="tip"><span style="cursor:help;color:var(--ink3);font-size:12px">i</span><span class="tip-t">'+k.tip+'</span></span></div><div class="kpi-n">'+k.n+'</div><div class="kpi-sub">'+k.sub+'</div></div><div class="kpi-bottom"><div class="kpi-sev"><span class="kpi-dot '+(k.sev==='high'?'blink':'')+'"></span>'+(k.sev==='high'?'Needs attention':k.sev==='med'?'Action pending':'Low priority')+'</div>'+(k.cta?'<button class="cta '+(k.sev==='high'?'cta-p':'cta-s')+'">'+k.cta+'</button>':'')+'</div></div>'}).join('');
+
+/* ══ TAB 1: ORDERS ══ */
+var rv={del:1168350,rto:54200,ship:42800,pen:8600},nt=rv.del-rv.rto-rv.ship-rv.pen;
+var rvL=[{l:"Delivered Value",v:rv.del,c:"var(--c-ontime)",n:false},{l:"RTO Losses",v:rv.rto,c:"var(--c-lost)",n:true},{l:"Shipping Cost",v:rv.ship,c:"var(--c-transit)",n:true},{l:"Penalties",v:rv.pen,c:"var(--c-cod)",n:true}];
+var pck=[{id:"MAN-8821",d:"Today",o:24,loc:"Warehouse A, Delhi",st:"today"},{id:"MAN-8820",d:"Today",o:12,loc:"Warehouse B, Mumbai",st:"overdue"},{id:"MAN-8819",d:"28 Apr",o:38,loc:"Warehouse A, Delhi",st:"upcoming"},{id:"MAN-8818",d:"29 Apr",o:15,loc:"Warehouse C, Bangalore",st:"upcoming"}];
+var sB={today:["Today","bg-amber"],overdue:["Overdue","bg-red"],upcoming:["Upcoming","bg-gray"]};
+document.getElementById("os-r1").innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div class="w-title">Upcoming Pickups</div><div class="w-sub">4 scheduled</div></div><button class="cta cta-s" style="margin:0">+ Create Pickup</button></div><table class="tbl"><thead><tr><th>Manifest</th><th>Date</th><th>Orders</th><th>Location</th><th></th></tr></thead><tbody>'+pck.map(function(p){return '<tr class="'+(p.st==="overdue"?"overdue":"")+'"><td class="fw">'+p.id+"</td><td>"+B(sB[p.st][0],sB[p.st][1])+"</td>"+'<td class="fw">'+p.o+'</td><td style="color:var(--ink2)">'+p.loc+"</td><td>"+(p.st==="overdue"?'<button class="cta cta-p" style="margin:0">Reschedule</button>':"")+'</td></tr>'}).join("")+"</tbody></table>"+L([{l:"Scheduled",v:2,c:"var(--am)"},{l:"Overdue",v:1,c:"var(--red)"},{l:"Upcoming",v:1,c:"var(--gray-m)"}])+"</div>";
+document.getElementById("os-r1").innerHTML+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div class="w-title">Net Revenue</div><div class="w-sub">After deductions</div></div>'+B("\u2191 4.2%","bg-green")+'</div><div style="margin:6px 0 12px">'+sbarTip([{l:"Net",v:nt,c:"var(--c-ontime)"},{l:"RTO",v:rv.rto,c:"var(--c-lost)"},{l:"Ship",v:rv.ship,c:"var(--c-transit)"},{l:"Pen",v:rv.pen,c:"var(--c-cod)"}],12)+'</div><div class="val-big" style="color:var(--green);font-size:30px;margin-bottom:14px">\u20B9'+(nt/100000).toFixed(2)+'L</div><div style="display:flex;flex-direction:column;gap:7px">'+rvL.map(function(r){return '<div class="rev-line"><div class="rev-dot" style="background:'+r.c+'"></div><span class="rev-lbl">'+r.l+'</span><span class="rev-val '+(r.n?"rev-neg":"")+'">' +(r.n?"\u2212":"+")+' \u20B9'+(r.v/1000).toFixed(1)+"K</span></div>"}).join("")+'<div class="rev-total"><span style="font-size:12px;font-weight:700">Net Revenue</span><span class="val-sm" style="color:var(--green)">\u20B9'+(nt/1000).toFixed(1)+"K</span></div></div>"+L(rvL.map(function(r){return {l:r.l,v:"\u20B9"+(r.v/1000).toFixed(0)+"K",c:r.c}}))+'</div>';
+
+var shS=[{l:"Delivered",v:856,c:"var(--c-delivered)"},{l:"In Transit",v:318,c:"var(--c-transit)"},{l:"Failed",v:146,c:"var(--c-lost)"}];
+document.getElementById("os-r2").innerHTML='<div class="card"><div class="w-title">Orders</div><div class="w-sub" style="margin-bottom:14px">Order health & risk profile</div><div style="display:flex;gap:0;margin-bottom:14px"><div style="flex:1;padding-right:16px"><div class="val-label">Total Orders</div><div style="display:flex;align-items:baseline"><span class="val-big">1,380</span><span class="stat-delta up">\u2191 12%</span></div></div><div style="flex:1;border-left:1px solid var(--border);padding-left:16px"><div class="val-label">GMV</div><div style="display:flex;align-items:baseline"><span class="val-big">\u20B911.7L</span><span class="stat-delta up">\u2191 8%</span></div></div></div><div style="display:flex;gap:0;margin-bottom:16px"><div style="flex:1;padding-right:16px"><div class="val-label">Today</div><div class="val-mid">47</div></div><div style="flex:1;border-left:1px solid var(--border);padding-left:16px"><div class="val-label">Yesterday</div><div class="val-mid">52</div></div></div><div class="val-label" style="margin-bottom:6px">Payment Split</div>'+sbarTip([{l:"Prepaid",v:58,c:"var(--c-prepaid)"},{l:"COD",v:42,c:"var(--c-cod)"}],32)+'<div class="val-label" style="margin-top:12px;margin-bottom:6px">Customer Mix</div>'+sbarTip([{l:"New Customers",v:68,c:"var(--c-insta)"},{l:"Repeat",v:32,c:"var(--c-amz)"}],32)+'<div class="insight" style="margin-top:12px"><b>COD 42%</b> with <span class="warn">68% new customers</span> \u2014 expected RTO ~5.2%. Push prepaid incentive.</div>'+L([{l:"Prepaid",v:"58%",c:"var(--c-prepaid)"},{l:"COD",v:"42%",c:"var(--c-cod)"},{l:"New",v:"68%",c:"var(--c-insta)"},{l:"Repeat",v:"32%",c:"var(--c-amz)"}])+'</div>';
+document.getElementById("os-r2").innerHTML+='<div class="card"><div class="w-title">Shipment Overview</div><div class="w-sub" style="margin-bottom:14px">Pipeline health</div><div class="val-label">Delivery Rate</div><div style="display:flex;align-items:baseline;margin-bottom:14px"><span class="val-big" style="color:var(--green);font-size:32px">85.4%</span><span class="stat-delta down">\u2193 3.2%</span></div><div class="val-label" style="margin-bottom:6px">Pipeline (1,320 shipments)</div>'+sbarTip(shS,40)+'<div style="display:flex;gap:10px;margin-top:12px"><div style="flex:1;padding:10px 12px;background:var(--s2);border-radius:var(--radius-sm);border:1px solid var(--border)"><div class="val-label">Delivered</div><div class="val-mid" style="color:var(--green)">856</div></div><div style="flex:1;padding:10px 12px;background:var(--s2);border-radius:var(--radius-sm);border:1px solid var(--border)"><div class="val-label">In Transit</div><div class="val-mid">318</div></div><div style="flex:1;padding:10px 12px;background:var(--rl);border-radius:var(--radius-sm);border:1px solid #f5c6c6"><div class="val-label">Failed</div><div class="val-mid" style="color:var(--red)">146</div></div></div><div class="insight"><b>60 shipments in transit 6+ days</b> \u2014 high NDR risk. Proactive outreach recommended.</div>'+L([{l:"Delivered",v:"856",c:"var(--c-delivered)"},{l:"Transit",v:"318",c:"var(--c-transit)"},{l:"Failed",v:"146",c:"var(--c-lost)"}])+'</div>';
+document.getElementById("os-r2").innerHTML+='<div class="card"><div class="w-title">Delivery Performance</div><div class="w-sub" style="margin-bottom:14px">Delivery quality</div><div class="val-label">On-Time Delivery</div><div style="display:flex;align-items:baseline;margin-bottom:6px"><span class="val-big" style="font-size:32px">78%</span><span class="stat-delta down">\u2193 4%</span></div><div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:12px;color:var(--ink2)"><span style="font-weight:600">First Attempt:</span> <span style="font-family:var(--mono);font-weight:700;color:var(--ink)">68%</span><span class="stat-delta down">\u2193 2%</span></div><div class="val-label" style="margin-bottom:6px">Delay Severity (188 late)</div>'+sbarTip([{l:"On-time",v:668,c:"var(--c-ontime)"},{l:"1-2 days late",v:118,c:"var(--am)"},{l:"3+ days late",v:70,c:"var(--c-lost)"}],40)+'<div style="display:flex;gap:10px;margin-top:12px"><div style="flex:1;padding:10px 12px;background:var(--gl);border-radius:var(--radius-sm);border:1px solid #b8dfc9"><div class="val-label">On-time</div><div class="val-mid" style="color:var(--green)">668</div></div><div style="flex:1;padding:10px 12px;background:var(--al);border-radius:var(--radius-sm);border:1px solid #f0d5a0"><div class="val-label">Mild</div><div class="val-mid" style="color:var(--amber)">118</div></div><div style="flex:1;padding:10px 12px;background:var(--rl);border-radius:var(--radius-sm);border:1px solid #f5c6c6"><div class="val-label">Critical</div><div class="val-mid" style="color:var(--red)">70</div></div></div><div class="insight"><b>East zone via Xpressbees: 38% late</b> vs 12% avg. <span class="bad">70 deliveries 3+ days late</span> = NDR candidates.</div>'+L([{l:"On-time",v:"78%",c:"var(--c-ontime)"},{l:"Mild",v:"14%",c:"var(--am)"},{l:"Critical",v:"8%",c:"var(--c-lost)"}])+'</div>';
+
+var cats=[{n:"Ethnic Wear",o:412,r:286000,c:"var(--c-insta)"},{n:"Accessories",o:324,r:198000,c:"var(--c-amz)"},{n:"Footwear",o:196,r:152400,c:"var(--c-cod)"},{n:"Electronics",o:148,r:124000,c:"var(--c-transit)"},{n:"Home & Living",o:86,r:64000,c:"var(--c-ontime)"}];
+var prods=[{n:"Cotton Kurti Set",o:168,r:142000},{n:"Leather Wallet",o:224,r:98400},{n:"Silk Saree",o:42,r:87600},{n:"Running Shoes",o:96,r:76200},{n:"Phone Case",o:432,r:64800},{n:"Silver Earrings",o:86,r:58200},{n:"Gym T-Shirt",o:124,r:52400},{n:"Laptop Sleeve",o:68,r:48600}];
+document.getElementById("os-r3").innerHTML='<div class="card"><div class="w-title">Popular Product Categories</div><div class="w-sub" style="margin-bottom:14px">Revenue by category</div>'+cats.map(function(c,i){return rankedRow(c.n,c.r,cats[0].r,c.c,'<span class="m-dim">'+c.o+' ord</span><span class="m-val">\u20B9'+(c.r/1000).toFixed(0)+"K</span>",i===0?B("Top","bg-green"):"")}).join("")+L(cats.map(function(c){return {l:c.n,v:Math.round(c.r/824400*100)+"%",c:c.c}}))+'</div><div class="card"><div class="w-title">Popular Products</div><div class="w-sub" style="margin-bottom:14px">Top sellers</div>'+prods.map(function(p){return rankedRow(p.n,p.r,prods[0].r,"var(--c-insta)",'<span class="m-dim">'+p.o+' sold</span><span class="m-val">\u20B9'+(p.r/1000).toFixed(0)+"K</span>","")}).join("")+L([{l:"Top 3",v:"28.1% of revenue",c:"var(--orange)"}])+"</div>";
+
+var locs=[{s:"Uttar Pradesh",o:248,r:41000,p:45.91},{s:"Gujarat",o:184,r:15200,p:17.02},{s:"Madhya Pradesh",o:142,r:11100,p:12.43},{s:"Maharashtra",o:118,r:5400,p:6.05},{s:"Assam",o:64,r:2900,p:3.25},{s:"Rajasthan",o:52,r:2400,p:2.69}];
+var custs=[{n:"Priya Sharma",o:12,r:24800},{n:"Rajesh Kumar",o:8,r:18600},{n:"Anita Patel",o:6,r:16200},{n:"Mohammed Ali",o:9,r:14400},{n:"Sneha Reddy",o:5,r:12800},{n:"Vikram Singh",o:7,r:11200},{n:"Kavitha N.",o:4,r:10600},{n:"Arjun Mehta",o:6,r:9800}];
+document.getElementById("os-r4").innerHTML='<div class="card"><div class="w-title">Popular Locations / Cities</div><div class="w-sub" style="margin-bottom:14px">Demand concentration</div>'+locs.map(function(l){return rankedRow(l.s,l.p,45.91,"var(--orange)",'<span class="m-dim">'+l.o+' ord</span><span class="m-val">\u20B9'+l.r.toLocaleString()+'</span><span class="m-val" style="color:var(--ink3);min-width:42px">'+l.p+"%</span>","")}).join("")+L([{l:"Top",v:"UP (45.9%)",c:"var(--orange)"}])+'</div><div class="card"><div class="w-title">Top Customers</div><div class="w-sub" style="margin-bottom:14px">By lifetime revenue</div>'+custs.map(function(c){return rankedRow(c.n,c.r,custs[0].r,"var(--c-amz)",'<span class="m-dim">'+c.o+' ord</span><span class="m-val">\u20B9'+(c.r/1000).toFixed(1)+"K</span>","")}).join("")+L([{l:"Top 3",v:"\u20B959.6K",c:"var(--orange)"}])+"</div>";
+
+/* NDR KPIs — reordered: Action Required first, hug content */
+document.getElementById('nk').innerHTML=[
+  {lbl:"Action Required",n:"17",sev:"high"},{lbl:"NDR Raised",n:"28",sev:"neutral"},{lbl:"Delivered",n:"6",sev:"neutral"},{lbl:"Post NDR",n:"14",sev:"neutral"},{lbl:"NDR Raised %",n:"27.78%",sev:"neutral"}
+].map(function(k){return '<div class="kpi kpi-'+k.sev+' kpi-hug"><div class="kpi-bar"></div><div class="kpi-content"><div class="kpi-lbl" style="font-size:12px">'+k.lbl+'</div><div class="kpi-n">'+k.n+'</div></div></div>'}).join('');
+
+/* NDR Fold 1: Reason Split + Funnel */
+var ndrR=[{l:"Customer Refused",v:8,c:"var(--c-insta)"},{l:"Wrong Address",v:6,c:"var(--c-lost)"},{l:"Unavailable",v:5,c:"var(--c-transit)"},{l:"Payment Dispute",v:4,c:"var(--c-prepaid)"},{l:"Office Closed",v:3,c:"var(--c-cod)"},{l:"Landmark Missing",v:2,c:"var(--c-delivered)"}];var ndrT=28;
+document.getElementById('n-f1').innerHTML='<div class="card"><div class="w-title">NDR Reason Split</div><div class="w-sub" style="margin-bottom:14px">'+ndrT+' total NDRs by cause</div>'+ndrR.map(function(r){return rankedRow(r.l,r.v,ndrR[0].v,r.c,'<span class="m-val">'+r.v+'</span><span class="m-dim">('+Math.round(r.v/ndrT*100)+'%)</span>','')}).join('')+L(ndrR.map(function(r){return {l:r.l,v:r.v+'',c:r.c}}))+'</div>'+
+'<div class="card"><div class="w-title">NDR Funnel</div><div class="w-sub" style="margin-bottom:16px">Attempt-wise progression</div><div class="funnel-3"><div class="f3-col"><div class="f3-hdr">1st NDR</div><div class="f3-row"><div class="f3-n">16</div><div class="f3-lbl">Total</div></div><div class="f3-row"><div class="f3-n" style="color:var(--amber)">8</div><div class="f3-lbl">Pending</div></div><div class="f3-row"><div class="f3-n" style="color:var(--green)">4</div><div class="f3-lbl">Delivered</div></div></div><div class="f3-col"><div class="f3-hdr">2nd NDR</div><div class="f3-row"><div class="f3-n">8</div><div class="f3-lbl">Total</div></div><div class="f3-row"><div class="f3-n" style="color:var(--amber)">3</div><div class="f3-lbl">Pending</div></div><div class="f3-row"><div class="f3-n" style="color:var(--green)">2</div><div class="f3-lbl">Delivered</div></div></div><div class="f3-col"><div class="f3-hdr">3rd NDR</div><div class="f3-row"><div class="f3-n">4</div><div class="f3-lbl">Total</div></div><div class="f3-row"><div class="f3-n" style="color:var(--amber)">2</div><div class="f3-lbl">Pending</div></div><div class="f3-row"><div class="f3-n" style="color:var(--green)">0</div><div class="f3-lbl">Delivered</div></div></div></div><div class="insight">3rd NDR delivers <span class="bad">0%</span>. Flag orders reaching 3rd attempt for RTO instead.</div>'+L([{l:'1st',v:'25%',c:'var(--green)'},{l:'2nd',v:'25%',c:'var(--amber)'},{l:'3rd',v:'0%',c:'var(--red)'}])+'</div>';
+
+/* NDR Fold 2: Response dual funnel + NDR-to-Delivery heatmap */
+document.getElementById('n-f2').innerHTML='<div class="card"><div class="w-title">NDR Response</div><div class="w-sub" style="margin-bottom:16px">Seller vs Buyer conversion</div><div class="funnel-dual"><div class="f-col"><div class="f-hdr">Seller Channel</div><div class="funnel-step"><div class="funnel-n">8</div><div class="funnel-info"><div class="f-lbl">Responded</div><div class="f-bar">'+bar(8,8,'var(--c-resp)',true)+'</div></div></div><div class="funnel-step"><div class="funnel-n" style="color:var(--amber)">5</div><div class="funnel-info"><div class="f-lbl">Positive Action</div><div class="f-bar">'+bar(5,8,'var(--am)',true)+'</div></div></div><div class="funnel-step"><div class="funnel-n" style="color:var(--green)">4</div><div class="funnel-info"><div class="f-lbl">Delivered</div><div class="f-bar">'+bar(4,8,'var(--c-ontime)',true)+'</div></div></div></div><div class="f-col"><div class="f-hdr">Buyer Channel</div><div class="funnel-step"><div class="funnel-n">5</div><div class="funnel-info"><div class="f-lbl">Responded</div><div class="f-bar">'+bar(5,8,'var(--c-buyer-resp)',true)+'</div></div></div><div class="funnel-step"><div class="funnel-n" style="color:var(--amber)">3</div><div class="funnel-info"><div class="f-lbl">Positive Action</div><div class="f-bar">'+bar(3,8,'var(--am)',true)+'</div></div></div><div class="funnel-step"><div class="funnel-n" style="color:var(--green)">2</div><div class="funnel-info"><div class="f-lbl">Delivered</div><div class="f-bar">'+bar(2,8,'var(--c-ontime)',true)+'</div></div></div></div></div><div class="insight"><b>Seller converts 50%</b> vs buyer at <span class="warn">25%</span>. Seller channel is 2x more effective.</div>'+L([{l:'Seller',v:'50%',c:'var(--green)'},{l:'Buyer',v:'25%',c:'var(--amber)'}])+'</div>'+
+'<div class="card"><div class="w-title">NDR to Delivery Attempt</div><div class="w-sub" style="margin-bottom:14px">Daily reattempt coverage</div><table class="ht"><thead><tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th><th>Total</th></tr></thead><tbody><tr><td>NDR Raised</td><td>2</td><td>4</td><td>5</td><td>3</td><td>6</td><td>4</td><td>4</td><td>28</td></tr><tr><td>Reattempted</td><td class="cell-good">2</td><td class="cell-warn">3</td><td class="cell-warn">4</td><td class="cell-good">3</td><td class="cell-warn">5</td><td class="cell-good">4</td><td class="cell-bad">2</td><td class="cell-warn">23</td></tr><tr><td>Gap</td><td class="cell-good">\u2713</td><td class="cell-bad">-1</td><td class="cell-bad">-1</td><td class="cell-good">\u2713</td><td class="cell-bad">-1</td><td class="cell-good">\u2713</td><td class="cell-bad">-2</td><td class="cell-warn">-5</td></tr></tbody></table><div class="insight"><b>82% reattempt rate.</b> <span class="bad">Sun had only 2/4 reattempted</span> \u2014 courier weekend staffing bottleneck.</div>'+L([{l:'Reattempted',v:'23/28',c:'var(--c-ontime)'},{l:'Missed',v:'5',c:'var(--red)'}])+'</div>';
+
+/* NDR Fold 3: NDR Status + Seller heatmap + Buyer heatmap */
+var ndrSt=[{l:"05-11 May",del:1,rto:0,pend:0,lost:0},{l:"12-18 May",del:1,rto:2,pend:1,lost:0},{l:"19-25 May",del:2,rto:2,pend:1,lost:0},{l:"26 May-01 Jun",del:1,rto:0,pend:1,lost:1},{l:"02-03 Jun",del:0,rto:1,pend:0,lost:0}];var ndrStMax=5;
+var gH='<div class="gbar-chart">';ndrSt.forEach(function(w){gH+='<div class="gbar-slot"><div class="gbar-group"><div class="gbar-col" style="height:'+(w.del/ndrStMax*100)+'px;background:var(--c-ontime);width:12px"></div><div class="gbar-col" style="height:'+(w.rto/ndrStMax*100)+'px;background:var(--c-delivered);width:12px"></div><div class="gbar-col" style="height:'+(w.pend/ndrStMax*100)+'px;background:var(--c-cod);width:12px"></div><div class="gbar-col" style="height:'+(w.lost/ndrStMax*100)+'px;background:var(--c-lost);width:12px"></div></div><div class="gbar-lbl">'+w.l+'</div></div>'});gH+='</div>';
+document.getElementById('n-f3').innerHTML='<div class="card"><div class="w-title">NDR Status</div><div class="w-sub" style="margin-bottom:16px">Weekly outcomes</div>'+gH+L([{l:'Delivered',v:'',c:'var(--c-ontime)'},{l:'RTO',v:'',c:'var(--c-delivered)'},{l:'Pending',v:'',c:'var(--c-cod)'},{l:'Lost',v:'',c:'var(--c-lost)'}])+'</div>'+
+'<div class="card"><div class="w-title">Seller Response</div><div class="w-sub" style="margin-bottom:14px">Daily engagement</div><table class="ht"><thead><tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody><tr><td>NDR</td><td>2</td><td>4</td><td>5</td><td>3</td><td>6</td><td>4</td><td>4</td></tr><tr><td>Response</td><td class="cell-good">2</td><td class="cell-warn">3</td><td class="cell-warn">4</td><td class="cell-warn">2</td><td class="cell-warn">5</td><td class="cell-warn">3</td><td class="cell-warn">3</td></tr><tr><td>+ve Action</td><td class="cell-warn">1</td><td class="cell-warn">2</td><td class="cell-good">3</td><td class="cell-bad">1</td><td class="cell-warn">4</td><td class="cell-warn">2</td><td class="cell-warn">2</td></tr></tbody></table><div class="insight"><b>79% responded</b> but only <span class="warn">54% positive</span>. Wed best, Thu worst.</div>'+L([{l:'Response',v:'79%',c:'var(--c-resp)'},{l:'+ve',v:'54%',c:'var(--c-ontime)'}])+'</div>'+
+'<div class="card"><div class="w-title">Buyer Response</div><div class="w-sub" style="margin-bottom:14px">Daily engagement</div><table class="ht"><thead><tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody><tr><td>NDR</td><td>2</td><td>4</td><td>5</td><td>3</td><td>6</td><td>4</td><td>4</td></tr><tr><td>Response</td><td class="cell-warn">1</td><td class="cell-warn">2</td><td class="cell-warn">2</td><td class="cell-bad">1</td><td class="cell-warn">3</td><td class="cell-warn">2</td><td class="cell-bad">1</td></tr><tr><td>+ve Action</td><td class="cell-bad">0</td><td class="cell-warn">1</td><td class="cell-good">2</td><td class="cell-bad">0</td><td class="cell-warn">2</td><td class="cell-warn">1</td><td class="cell-warn">1</td></tr></tbody></table><div class="insight"><b>Only 43% buyer response.</b> <span class="bad">Mon & Thu = zero positive</span>. Auto-flag for prepaid-only.</div>'+L([{l:'Response',v:'43%',c:'var(--c-buyer-resp)'},{l:'+ve',v:'25%',c:'var(--c-ontime)'}])+'</div>';
+
+/* ══ TAB 3: RTO (Seller-first fold order) ══ */
+/* RTO Fold 1: Overview + Revenue Impact + Pincodes */
+var rtoR=[{l:"COD Refusal",v:28,c:"var(--c-cod)"},{l:"Address Issue",v:16,c:"var(--c-lost)"},{l:"Unavailable",v:12,c:"var(--c-transit)"},{l:"Refused After Open",v:8,c:"var(--c-insta)"}];var rtoT=64;
+document.getElementById('r-f1').innerHTML='<div class="card"><div class="w-title">RTO Overview</div><div class="w-sub" style="margin-bottom:16px">Return-to-origin summary</div><div style="display:flex;gap:20px;margin-bottom:16px"><div><div class="val-label">Total RTOs</div><div class="val-big" style="color:var(--red)">64</div></div><div style="border-left:1px solid var(--border);padding-left:20px"><div class="val-label">RTO Rate</div><div class="val-big" style="color:var(--red)">4.6%</div></div><div style="border-left:1px solid var(--border);padding-left:20px"><div class="val-label">RTO Loss</div><div class="val-big" style="color:var(--red)">\u20B954.2K</div></div></div>'+sbar(rtoR,24)+L(rtoR.map(function(s){return {l:s.l,v:s.v+'',c:s.c,p:Math.round(s.v/rtoT*100)+'%'}}))+'</div>'+
+'<div class="card"><div class="w-title">RTO Revenue Impact</div><div class="w-sub" style="margin-bottom:16px">Where the money goes</div><div style="display:flex;flex-direction:column;gap:10px"><div class="rev-line"><div class="rev-dot" style="background:var(--c-lost)"></div><span class="rev-lbl">Product value lost</span><span class="rev-val rev-neg">\u2212\u20B938.4K</span></div><div class="rev-line"><div class="rev-dot" style="background:var(--c-transit)"></div><span class="rev-lbl">Forward shipping wasted</span><span class="rev-val rev-neg">\u2212\u20B98.6K</span></div><div class="rev-line"><div class="rev-dot" style="background:var(--c-cod)"></div><span class="rev-lbl">Return shipping cost</span><span class="rev-val rev-neg">\u2212\u20B95.8K</span></div><div class="rev-line"><div class="rev-dot" style="background:var(--c-insta)"></div><span class="rev-lbl">Packaging waste</span><span class="rev-val rev-neg">\u2212\u20B91.4K</span></div><div class="rev-total"><span style="font-size:12px;font-weight:700">Total Loss</span><span class="val-sm" style="color:var(--red)">\u2212\u20B954.2K</span></div></div>'+L([{l:'Product',v:'\u20B938.4K',c:'var(--c-lost)'},{l:'Shipping',v:'\u20B914.4K',c:'var(--c-transit)'},{l:'Packaging',v:'\u20B91.4K',c:'var(--c-insta)'}])+'</div>'+
+'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div class="w-title">Top RTO Pincodes</div><div class="w-sub">Block COD here</div></div>'+B('Actionable','bg-red')+'</div>'+[{pin:"700001",city:"Kolkata",rto:18,reason:"COD Refusal"},{pin:"400601",city:"Thane",rto:15,reason:"Address Issue"},{pin:"110085",city:"Delhi",rto:12,reason:"COD Refusal"},{pin:"560034",city:"Bangalore",rto:11,reason:"Not Available"},{pin:"600028",city:"Chennai",rto:9,reason:"COD Refusal"},{pin:"380015",city:"Ahmedabad",rto:8,reason:"Address Issue"}].map(function(p){return rankedRow(p.pin+' '+p.city,p.rto,18,'var(--c-lost)','<span class="m-val" style="color:var(--red)">'+p.rto+'</span>',B(p.reason,p.reason==="COD Refusal"?'bg-amber':'bg-orange'))}).join('')+L([{l:'COD Refusal',v:'62%',c:'var(--amber)'},{l:'Address',v:'24%',c:'var(--orange)'}])+'</div>';
+
+/* RTO Fold 2: Trend + Reason breakdown */
+var rtoTrend=[{l:"Jan",v:32},{l:"Feb",v:28},{l:"Mar",v:44},{l:"Apr",v:52},{l:"May",v:64}];var rtoTMax=64;
+var rtH='<div class="gbar-chart">';rtoTrend.forEach(function(m){rtH+='<div class="gbar-slot"><div class="gbar-group"><div class="gbar-col" style="height:'+(m.v/rtoTMax*100)+'px;background:var(--c-lost);width:28px"></div></div><div class="gbar-lbl">'+m.l+'</div></div>'});rtH+='</div>';
+document.getElementById('r-f2').innerHTML='<div class="card"><div class="w-title">RTO Trend</div><div class="w-sub" style="margin-bottom:16px">5-month view</div>'+rtH+'<div class="insight"><b>RTOs doubled Jan\u2192May.</b> <span class="bad">Steepest rise Mar\u2192Apr (+18%)</span>. Correlates with COD growth in Tier-3.</div>'+L([{l:'Jan',v:'32',c:'var(--gray-m)'},{l:'May',v:'64',c:'var(--c-lost)'}])+'</div>'+
+'<div class="card"><div class="w-title">RTO by Reason</div><div class="w-sub" style="margin-bottom:14px">What\u2019s causing returns</div>'+rtoR.map(function(r){return rankedRow(r.l,r.v,rtoR[0].v,r.c,'<span class="m-val">'+r.v+'</span><span class="m-dim">('+Math.round(r.v/rtoT*100)+'%)</span>','')}).join('')+L(rtoR.map(function(r){return {l:r.l,v:r.v+'',c:r.c}}))+'</div>';
+
+/* RTO Fold 3: RTO Status */
+var rtoSt=[{l:"Mar",init:0,del:14,undel:0},{l:"Apr",init:0,del:18,undel:0},{l:"May",init:8,del:12,undel:2}];var rtoStMax=22;
+var rsH='<div class="gbar-chart">';rtoSt.forEach(function(m){rsH+='<div class="gbar-slot"><div class="gbar-group"><div class="gbar-col" style="height:'+(m.init/rtoStMax*100)+'px;background:var(--c-delivered);width:16px"></div><div class="gbar-col" style="height:'+(m.del/rtoStMax*100)+'px;background:var(--c-ontime);width:16px"></div><div class="gbar-col" style="height:'+(m.undel/rtoStMax*100)+'px;background:var(--c-lost);width:16px"></div></div><div class="gbar-lbl">'+m.l+' 2026</div></div>'});rsH+='</div>';
+document.getElementById('r-f3').innerHTML='<div class="card"><div class="w-title">RTO Status</div><div class="w-sub" style="margin-bottom:16px">Monthly outcomes</div>'+rsH+'<div class="insight"><b>May: 8 still in transit.</b> Previous months had <span class="good">100% completion</span>. <span class="warn">2 undelivered</span> = stuck inventory.</div>'+L([{l:'Initiated',v:'8',c:'var(--c-delivered)'},{l:'Delivered',v:'44',c:'var(--c-ontime)'},{l:'Undelivered',v:'2',c:'var(--c-lost)'}])+'</div><div class="card"></div>';
+</script>
+</body>
+</html>

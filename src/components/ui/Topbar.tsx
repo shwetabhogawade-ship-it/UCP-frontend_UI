@@ -1,17 +1,249 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useReportsStore } from '../../store/useReportsStore';
 
-export const Topbar: React.FC = () => {
+interface TopbarProps {
+  onMobileMenuClick: () => void;
+}
+
+/* ─── Quick Actions dropdown menu ──────────────────────────────────────────
+ * Mirrors the visual pattern of the existing `.date-dd` dropdown
+ * (DateFilter component) — same positioning, surface, divider treatment.
+ * `path` set → navigate; otherwise → toast.
+ * ───────────────────────────────────────────────────────────────────────── */
+interface QuickAction {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  path?: string;
+}
+
+const QA_ICON = (d: string, fill?: string) => (
+  <svg viewBox="0 0 20 20" fill={fill ?? 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+    <path d={d} />
+  </svg>
+);
+
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    id: 'tracking',
+    label: 'Tracking Page',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <path d="M10 17.5s6-5.4 6-10a6 6 0 10-12 0c0 4.6 6 10 6 10z" />
+        <circle cx="10" cy="7.5" r="2.2" />
+      </svg>
+    ),
+  },
+  {
+    id: 'create-order',
+    label: 'Create Order',
+    icon: QA_ICON('M10 4v12M4 10h12'),
+  },
+  {
+    id: 'create-reverse',
+    label: 'Create Reverse Order',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <path d="M3.5 10a6.5 6.5 0 1011.7-3.9" />
+        <path d="M3.5 4v3.5H7" />
+      </svg>
+    ),
+  },
+  {
+    id: 'pickup',
+    label: 'Create Pickup Request',
+    path: '/orders/pickup',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <path d="M3 6.5L10 3l7 3.5v7L10 17l-7-3.5v-7z" />
+        <path d="M3 6.5L10 10l7-3.5M10 10v7" />
+      </svg>
+    ),
+  },
+  {
+    id: 'pincode',
+    label: 'Pincode Serviceability',
+    path: '/info/pincode',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="5" />
+        <path d="M12.5 12.5L17 17" />
+      </svg>
+    ),
+  },
+  {
+    id: 'rate-calc',
+    label: 'Rate Calculator',
+    path: '/info/rate-calculator',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <rect x="4" y="2.5" width="12" height="15" rx="2" />
+        <rect x="6.5" y="5" width="7" height="2.5" rx=".5" />
+        <path d="M7 11h.01M10 11h.01M13 11h.01M7 14h.01M10 14h.01M13 14h.01" />
+      </svg>
+    ),
+  },
+  {
+    id: 'create-ticket',
+    label: 'Create Ticket',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+        <path d="M5 2.5h7l4 4v11a0 0 0 010 0H5a0 0 0 010 0v-15a0 0 0 010 0z" />
+        <path d="M12 2.5v4h4M8 11h5M8 14h3" />
+      </svg>
+    ),
+  },
+];
+
+/**
+ * Sellportal top bar.
+ * Layout (left → right):
+ *   • Search (flex)
+ *   • Wallet pill (icon + balance, no label)
+ *   • Need Help? pill (label + help icon)
+ *   • Quick Actions   — dropdown trigger
+ *   • MR avatar       — initials circle
+ */
+export const Topbar: React.FC<TopbarProps> = ({ onMobileMenuClick }) => {
+  const navigate = useNavigate();
+  const showToast = useReportsStore((s) => s.showToast);
+
+  const [qaOpen, setQaOpen] = useState(false);
+  const qaWrapRef = useRef<HTMLDivElement>(null);
+
+  // Close Quick Actions dropdown on outside click / Escape
+  useEffect(() => {
+    if (!qaOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (qaWrapRef.current && !qaWrapRef.current.contains(e.target as Node)) {
+        setQaOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setQaOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [qaOpen]);
+
+  const handleQuickAction = (action: QuickAction) => {
+    setQaOpen(false);
+    if (action.path) {
+      navigate(action.path);
+    } else {
+      showToast(`Coming soon: ${action.label}`);
+    }
+  };
+
   return (
-    <div className="topbar">
-      <div className="tb-srch">
-        <svg viewBox="0 0 16 16" fill="none" stroke="var(--ink3)" strokeWidth="1.5" width="13" height="13">
-          <circle cx="7" cy="7" r="4.5" />
-          <path d="M10.5 10.5l3 3" strokeLinecap="round" />
+    <header className="topbar" role="banner">
+      {/* Mobile hamburger — only visible on narrow viewports */}
+      <button
+        type="button"
+        className="tb-burger"
+        onClick={onMobileMenuClick}
+        aria-label="Open navigation"
+      >
+        <svg viewBox="0 0 16 16" fill="none" stroke="#1A190F" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+          <path d="M2 4h12M2 8h12M2 12h12" />
         </svg>
-        <input type="text" placeholder="Search reports..." />
+      </button>
+
+      {/* Search */}
+      <div className="tb-srch" role="search">
+        <span className="tb-srch-ico" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" strokeWidth="1.22">
+            <circle cx="6.75" cy="6.75" r="4.25" />
+            <path d="M10.25 10.25L13 13" strokeLinecap="round" />
+          </svg>
+        </span>
+        <input type="text" placeholder="Search orders, AWB, customer..." aria-label="Search" />
       </div>
-      <div className="av">MR</div>
-    </div>
+
+      <div className="tb-r" role="toolbar" aria-label="Top bar actions">
+        {/* Wallet — icon + amount only (no "Wallet:" label) */}
+        <button
+          type="button"
+          className="tb-wallet"
+          title="Wallet balance"
+          onClick={() => showToast('Wallet: ₹1,741.32')}
+        >
+          <span className="tb-wallet-ico" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" strokeWidth="1.22">
+              <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" />
+              <path d="M1.5 7.5H14.5" strokeLinecap="round" />
+              <path d="M11.5 6.5H12.5" strokeLinecap="round" />
+            </svg>
+          </span>
+          <span className="tb-wallet-amount">₹1,741.32</span>
+        </button>
+
+        {/* Need Help? — label on the left, help icon on the right */}
+        <button
+          type="button"
+          className="tb-help"
+          title="Get help"
+          onClick={() => showToast('Help & Documentation')}
+        >
+          <span className="tb-help-lbl">Need Help?</span>
+          <span className="tb-help-ico" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#6B6960" strokeWidth="1.22">
+              <path d="M6.5 1.5H3C2.17 1.5 1.5 2.17 1.5 3V13C1.5 13.83 2.17 14.5 3 14.5H13C13.83 14.5 14.5 13.83 14.5 13V9.5" strokeLinecap="round" />
+              <path d="M1.5 11.5H14.5M11.5 14.5H13.5" strokeLinecap="round" />
+            </svg>
+          </span>
+        </button>
+
+        {/* Quick Actions — dropdown */}
+        <div className="tb-qa-wrap" ref={qaWrapRef}>
+          <button
+            type="button"
+            className={`tb-qa ${qaOpen ? 'on' : ''}`}
+            aria-label="Quick Actions"
+            aria-haspopup="menu"
+            aria-expanded={qaOpen}
+            onClick={() => setQaOpen((p) => !p)}
+          >
+            <span className="tb-qa-lbl">Quick Actions</span>
+            <svg className="tb-qa-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" width="10" height="6" aria-hidden="true">
+              <path d="M1 1l4 4 4-4" strokeLinecap="round" />
+            </svg>
+          </button>
+
+          <div className={`tb-qa-dd ${qaOpen ? 'sh' : ''}`} role="menu" aria-label="Quick Actions">
+            <div className="tb-qa-dd-head">QUICK ACTIONS</div>
+            {QUICK_ACTIONS.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                role="menuitem"
+                className="tb-qa-dd-opt"
+                onClick={() => handleQuickAction(action)}
+              >
+                <span className="tb-qa-dd-ico">{action.icon}</span>
+                <span className="tb-qa-dd-lbl">{action.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Account avatar */}
+        <button
+          type="button"
+          className="tb-av"
+          aria-label="Account menu"
+          onClick={() => showToast('Account settings')}
+        >
+          <span className="tb-av-circle" aria-hidden="true">MR</span>
+        </button>
+      </div>
+    </header>
   );
 };
+
 export default Topbar;

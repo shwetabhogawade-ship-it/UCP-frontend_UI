@@ -1,0 +1,326 @@
+/* ──────────────────────────────────────────────────────────────
+   XpressBees Sellportal — Topbar
+   Loaded AFTER reports.css so its rules override the stale
+   `.topbar / .tb-srch / .av` block in the legacy stylesheet.
+   ────────────────────────────────────────────────────────────── */
+
+.topbar {
+  height: 56px;
+  background: #fff;
+  border-bottom: 1px solid #E4E2DC;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* Mobile hamburger — only visible on narrow viewports */
+.tb-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .12s;
+}
+.tb-burger:hover { background: #F9F8F5; }
+.tb-burger svg { width: 18px; height: 18px; }
+
+/* Search — wide, takes most of the left side */
+.tb-srch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 420px;
+  min-width: 0;
+  height: 34px;
+  background: #F9F8F5;
+  border: 1px solid #E4E2DC;
+  border-radius: 8px;
+  padding: 0 12px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.tb-srch:focus-within {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--ol);
+}
+.tb-srch-ico {
+  flex-shrink: 0;
+  opacity: .45;
+  display: flex;
+  align-items: center;
+}
+.tb-srch-ico svg { width: 14px; height: 14px; }
+.tb-srch input {
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--font);
+  font-size: 12px;
+  color: #1A190F;
+  width: 100%;
+  min-width: 0;
+}
+.tb-srch input::placeholder { color: #6B6960; font-size: 12px; }
+
+/* Right-side action group */
+.tb-r {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* ── Wallet pill: icon + amount only ── */
+.tb-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  cursor: pointer;
+  border: 1px solid #E4E2DC;
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--font);
+  white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.tb-wallet:hover { background: #F9F8F5; border-color: #D6D4CC; }
+.tb-wallet-ico {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.tb-wallet-ico svg { width: 16px; height: 16px; }
+.tb-wallet-amount {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1A190F;
+  font-family: var(--mono);
+  line-height: 1;
+}
+
+/* ── Need Help? pill (label on left, help icon on right) ── */
+.tb-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  cursor: pointer;
+  border: 1px solid #E4E2DC;
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1A190F;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.tb-help:hover { background: #F9F8F5; border-color: #D6D4CC; }
+.tb-help-lbl { line-height: 1; }
+.tb-help-ico {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.tb-help-ico svg { width: 16px; height: 16px; }
+
+/* ── Quick Actions: outline pill button with dropdown ── */
+.tb-qa-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.tb-qa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  cursor: pointer;
+  border: 1px solid #E4E2DC;
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1A190F;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.tb-qa:hover,
+.tb-qa.on { background: #F9F8F5; border-color: #D6D4CC; }
+.tb-qa-lbl { line-height: 1; }
+.tb-qa-chev {
+  color: #6B6960;
+  transition: transform .15s ease;
+  flex-shrink: 0;
+}
+.tb-qa.on .tb-qa-chev { transform: rotate(180deg); }
+
+/* Dropdown popover — visual language borrowed from `.date-dd` so the
+   menu surface feels native to the design system. */
+.tb-qa-dd {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 260px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #E2E0D8);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, .09));
+  z-index: 600;
+  padding: 6px 0;
+  display: none;
+  overflow: hidden;
+}
+.tb-qa-dd.sh { display: block; }
+.tb-qa-dd-head {
+  padding: 10px 16px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  color: var(--ink3, #9B998F);
+  text-transform: uppercase;
+}
+.tb-qa-dd-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 16px;
+  background: none;
+  border: 0;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink, #1A190F);
+  text-align: left;
+  cursor: pointer;
+  transition: background .1s;
+}
+.tb-qa-dd-opt:hover,
+.tb-qa-dd-opt:focus-visible {
+  background: var(--s2, #F8F7F3);
+  outline: none;
+}
+.tb-qa-dd-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--ink2, #5C5B52);
+}
+.tb-qa-dd-lbl { line-height: 1.2; }
+
+/* ── Account avatar: just the MR circle ── */
+.topbar .tb-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
+  border-radius: 50%;
+  margin-left: 0;
+}
+.tb-av-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FDECEA;
+  border: 1px solid #F7C4A4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #F07C00;
+  flex-shrink: 0;
+  letter-spacing: .3px;
+  font-family: var(--font);
+  transition: filter .12s;
+}
+.topbar .tb-av:hover .tb-av-circle { filter: brightness(.97); }
+
+/* ────────────────────────────────────────────────────────────────
+   Responsive Topbar
+   ──────────────────────────────────────────────────────────────── */
+
+/* Tablet (≤899px): drop the "Need Help?" label to save horizontal room
+   (the icon-only button still triggers the help action) */
+@media (max-width: 899px) {
+  .tb-help-lbl { display: none; }
+  .tb-help { padding: 0 10px; }
+  .tb-qa-lbl { display: none; }
+  .tb-qa { padding: 0 10px; }
+}
+
+/* Mobile (≤639px): show hamburger, hide pills */
+@media (max-width: 639px) {
+  .tb-burger { display: inline-flex; }
+  .tb-wallet { display: none; }
+  .tb-help { display: none; }
+  .tb-srch { max-width: none; }
+  /* Anchor the dropdown to the right edge with a small inset */
+  .tb-qa-dd { right: -4px; }
+}
+
+/* Very narrow (≤419px): drop Quick Actions, search becomes the focus */
+@media (max-width: 419px) {
+  .tb-qa-wrap { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Coming-soon placeholder page (used for unbuilt nav routes)
+   ────────────────────────────────────────────────────────────── */
+.page-placeholder {
+  text-align: center;
+  color: var(--ink3);
+  padding: 60px 24px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.page-placeholder .ph-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--s2);
+  border: 2px dashed var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.page-placeholder .ph-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--border2);
+}
+.page-placeholder h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin-bottom: 6px;
+}
+.page-placeholder p {
+  font-size: 12.5px;
+  line-height: 1.7;
+}

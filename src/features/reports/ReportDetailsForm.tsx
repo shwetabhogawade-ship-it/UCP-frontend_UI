@@ -40,12 +40,30 @@ export const ReportDetailsForm: React.FC<ReportDetailsFormProps> = ({
 
   const handleViewSample = (e: React.MouseEvent) => {
     e.preventDefault();
-    const map: Record<string, string> = { order: 'allorders', ndr: 'ndr', performance: 'performance' };
-    const titles: Record<string, string> = { order: 'Order Report', ndr: 'NDR Report', performance: 'Performance Report' };
+    const map: Record<string, string> = {
+      order: 'allorders',
+      ndr: 'ndr',
+      productwise: 'productwise',
+      performance: 'performance',
+    };
+    const titles: Record<string, string> = {
+      order: 'Order Report',
+      ndr: 'NDR Report',
+      productwise: 'Product Wise Summary',
+      performance: 'Performance Report',
+    };
     const typeKey = map[rType];
     if (typeKey) {
       openSample(typeKey, titles[rType]);
     }
+  };
+
+  const isNameEmailType =
+    rType === 'order' || rType === 'ndr' || rType === 'productwise';
+  const namePlaceholderByType: Record<string, string> = {
+    order: 'e.g. Weekly Order Summary',
+    ndr: 'e.g. NDR Escalation Report',
+    productwise: 'e.g. Weekly Product Summary',
   };
 
   return (
@@ -70,14 +88,19 @@ export const ReportDetailsForm: React.FC<ReportDetailsFormProps> = ({
           <option value="">Select report type</option>
           <option value="order">Order Report</option>
           <option value="ndr">NDR Report</option>
+          <option value="productwise">Product Wise Summary</option>
           <option value="performance">Performance Report</option>
         </select>
         {errors.rType && <span style={{ color: 'var(--red)', fontSize: '11px' }}>Report type is required</span>}
       </div>
 
       {rType && (
-        <div style={{ marginBottom: '16px', display: 'flex' }}>
-          <button className="btn btn-s btn-sm" onClick={handleViewSample}>
+        <div style={{ marginBottom: '16px' }}>
+          <button
+            type="button"
+            className="view-sample-link"
+            onClick={handleViewSample}
+          >
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" width="13" height="13">
               <path d="M2 7c2-4 8-4 10 0s-8 4-10 0z" />
               <circle cx="7" cy="7" r="2" />
@@ -87,15 +110,15 @@ export const ReportDetailsForm: React.FC<ReportDetailsFormProps> = ({
         </div>
       )}
 
-      {(rType === 'order' || rType === 'ndr') && (
+      {isNameEmailType && (
         <>
           <div className="mf">
             <div className="ml">Report Name</div>
             <input
               className="mi"
               type="text"
-              placeholder={rType === 'order' ? 'e.g. Weekly Order Summary' : 'e.g. NDR Escalation Report'}
-              {...register('rName', { required: rType === 'order' || rType === 'ndr' })}
+              placeholder={namePlaceholderByType[rType] || 'Report name'}
+              {...register('rName', { required: isNameEmailType })}
             />
             {errors.rName && <span style={{ color: 'var(--red)', fontSize: '11px' }}>Report name is required</span>}
           </div>

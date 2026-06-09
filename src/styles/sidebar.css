@@ -1,0 +1,417 @@
+/* ──────────────────────────────────────────────────────────────
+   XpressBees Sellportal — Left navigation
+   Adapted from "XB Nav bar 2026.html". Single source of navigation
+   for the whole Sellportal Web app.
+
+   Geometry tokens
+     --nav-w     collapsed rail width (56px → 44px touch target)
+     --nav-exp   expanded rail width
+     --nav-dur   width / opacity transition duration
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --nav-w: 56px;
+  --nav-exp: 232px;
+  --nav-dur: 200ms;
+  --nav-lbl-in-delay: 60ms;
+  --nav-ico-pad: 16px;
+  --nav-ico-w: 20px;
+  --nav-ico-gap: 12px;
+  --nav-sub-indent: calc(var(--nav-ico-pad) + var(--nav-ico-w) + var(--nav-ico-gap));
+
+  --sb-bg: #0F0E09;
+  --sb-hover: #1C1B14;
+  --sb-active: #252320;
+  --sb-border: #2A2920;
+  --sb-sep: #222118;
+  --sb-text: rgba(255, 255, 255, .62);
+  --sb-text-hover: rgba(255, 255, 255, .82);
+  --sb-text-active: #fff;
+}
+
+/* ── Shell & main area (override stale rules in reports.css) ──
+   The sidebar is a pure overlay (position: fixed). The main area reserves
+   only the collapsed-rail gutter and NEVER reacts to .nav.open, so hovering
+   the rail does not reflow, shrink, or shift the content area. */
+.shell {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+  margin-left: var(--nav-w);
+}
+
+/* ── Skip link (WCAG 2.4.1 Level A) ── */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 8px;
+  background: var(--orange);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 0 0 6px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  text-decoration: none;
+  z-index: 10000;
+  transition: top .15s ease;
+  white-space: nowrap;
+}
+.skip-link:focus { top: 0; outline: 3px solid #fff; outline-offset: 2px; }
+
+/* ── Sidebar ── */
+.nav {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: var(--nav-w);
+  background: var(--sb-bg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--font);
+  user-select: none;
+  transition: width var(--nav-dur) ease-out, transform var(--nav-dur) ease-out, box-shadow var(--nav-dur) ease-out;
+  will-change: width, transform;
+}
+.nav.open {
+  width: var(--nav-exp);
+  box-shadow: 6px 0 28px rgba(0, 0, 0, .35);
+}
+
+/* Mobile scrim — only visible when sidebar is in drawer mode */
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  z-index: 499;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--nav-dur) ease-out;
+}
+.nav-scrim.visible { opacity: 1; pointer-events: auto; }
+
+/* ── Logo (crossfade) ── */
+.nav-logo {
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--sb-border);
+  overflow: hidden;
+  position: relative;
+}
+.nav-logo-collapsed {
+  position: absolute;
+  left: calc((var(--nav-w) - 28px) / 2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  opacity: 1;
+  transition: opacity var(--nav-dur) ease-out;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.nav.open .nav-logo-collapsed { opacity: 0; pointer-events: none; }
+
+.nav-logo-expanded {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity var(--nav-dur) ease-out var(--nav-lbl-in-delay);
+  pointer-events: none;
+  max-width: calc(var(--nav-exp) - 28px);
+  overflow: hidden;
+  text-decoration: none;
+}
+.nav-logo-expanded svg { height: 20px; width: auto; max-width: 100%; display: block; }
+.nav.open .nav-logo-expanded { opacity: 1; pointer-events: auto; }
+
+/* ── Scroll body ── */
+.nav-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 0;
+  scrollbar-width: none;
+}
+.nav-body::-webkit-scrollbar { display: none; }
+
+/* ── Item row ── */
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 var(--nav-ico-pad);
+  gap: var(--nav-ico-gap);
+  cursor: pointer;
+  color: var(--sb-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+  outline: none;
+}
+.nav-item:hover { background: var(--sb-hover); color: var(--sb-text-hover); }
+.nav-item:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
+.nav-item.active,
+.nav-item[aria-current="page"] {
+  background: var(--sb-active);
+  color: var(--sb-text-active);
+}
+.nav-item.active::after,
+.nav-item[aria-current="page"]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  background: var(--orange);
+  border-radius: 0 2px 2px 0;
+}
+.nav-item.par-active { color: var(--orange); }
+.nav-item.par-active:hover { color: var(--orange); }
+
+/* ── Icon ── */
+.nav-ico {
+  width: var(--nav-ico-w);
+  min-width: var(--nav-ico-w);
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-ico svg { width: 18px; height: 18px; opacity: .72; transition: opacity .12s; }
+.nav-item:hover .nav-ico svg,
+.nav-item.active .nav-ico svg,
+.nav-item[aria-current="page"] .nav-ico svg { opacity: 1; }
+.nav-item.par-active .nav-ico svg { opacity: .88; }
+
+/* ── Label (fade-in delayed, fade-out immediate) ── */
+.nav-lbl {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: inherit;
+  opacity: 0;
+  transition: opacity calc(var(--nav-dur) - 40ms) ease-out var(--nav-lbl-in-delay);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.nav.open .nav-lbl { opacity: 1; pointer-events: auto; }
+.nav:not(.open) .nav-lbl { transition: opacity 80ms ease-out 0ms; }
+
+/* ── Chevron ── */
+.nav-chev {
+  width: 10px;
+  min-width: 10px;
+  height: 10px;
+  opacity: 0;
+  transition: opacity var(--nav-dur), transform .2s ease;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, .35);
+}
+.nav.open .nav-chev { opacity: 1; }
+.nav-item:hover .nav-chev { color: rgba(255, 255, 255, .55); }
+.nav-item.par-active .nav-chev { color: rgba(232, 82, 10, .7); }
+.nav-item[aria-expanded="true"] .nav-chev { transform: rotate(180deg); }
+
+/* ── Badge ── */
+.nav-badge {
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+  background: var(--red);
+  color: #fff;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--nav-dur);
+  white-space: nowrap;
+}
+.nav.open .nav-badge { opacity: 1; }
+
+/* Collapsed-state badge: small dot indicator on the icon */
+.nav:not(.open) .nav-badge { display: none; }
+.nav:not(.open) .nav-item:has(.nav-badge) .nav-ico {
+  position: relative;
+}
+.nav:not(.open) .nav-item:has(.nav-badge) .nav-ico::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1.5px solid var(--sb-bg);
+}
+
+/* ── Tooltip (collapsed only) ── */
+.nav-tip {
+  position: absolute;
+  left: calc(var(--nav-w) + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1C1B14;
+  color: rgba(255, 255, 255, .88);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 6px;
+  border: 1px solid #2A2920;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+}
+.nav-item:hover .nav-tip { opacity: 1; }
+.nav.open .nav-tip { display: none !important; }
+
+/* ── Sub-nav (accordion) ── */
+.nav-sub {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .2s ease-out;
+}
+.nav-sub.open { max-height: 240px; }
+
+/* Sub item */
+.nav-sub-item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--nav-ico-pad) 0 var(--nav-sub-indent);
+  gap: 8px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, .55);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+  position: relative;
+  outline: none;
+}
+.nav-sub-item:hover { background: var(--sb-hover); color: rgba(255, 255, 255, .78); }
+.nav-sub-item:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
+.nav-sub-item.active,
+.nav-sub-item[aria-current="page"] {
+  color: #fff;
+  font-weight: 600;
+  background: var(--sb-active);
+}
+.nav-sub-item.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  background: var(--orange);
+  border-radius: 0 2px 2px 0;
+}
+.nav-sub-dot {
+  width: 5px;
+  min-width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+  flex-shrink: 0;
+  transition: background .12s;
+}
+.nav-sub-item:hover .nav-sub-dot { background: rgba(255, 255, 255, .5); }
+.nav-sub-item.active .nav-sub-dot { background: var(--orange); }
+.nav-sub-lbl {
+  opacity: 0;
+  transition: opacity calc(var(--nav-dur) - 40ms) ease-out var(--nav-lbl-in-delay);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav.open .nav-sub-lbl { opacity: 1; }
+.nav:not(.open) .nav-sub-lbl { transition: opacity 80ms ease-out 0ms; }
+
+/* ── Bottom-pinned section ── */
+.nav-bottom {
+  flex-shrink: 0;
+  border-top: 1px solid var(--sb-sep);
+  padding: 4px 0;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Responsive
+   • Desktop / Tablet (≥640px): fixed-position rail overlays content on
+     hover-expand — main keeps its collapsed-rail gutter and never reflows.
+   • Mobile (<640px): off-canvas drawer triggered by topbar hamburger;
+     main occupies the full viewport width.
+   ──────────────────────────────────────────────────────────────── */
+
+/* Hide the mobile scrim on desktop */
+@media (min-width: 1024px) {
+  .nav-scrim { display: none; }
+}
+
+/* Mobile: off-canvas drawer, hidden until `.mobile-open` is set */
+@media (max-width: 639px) {
+  .nav {
+    width: var(--nav-exp);
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+  .nav.mobile-open {
+    transform: translateX(0);
+    box-shadow: 6px 0 28px rgba(0, 0, 0, .35);
+  }
+  .nav.mobile-open .nav-lbl,
+  .nav.mobile-open .nav-sub-lbl,
+  .nav.mobile-open .nav-chev,
+  .nav.mobile-open .nav-badge { opacity: 1; pointer-events: auto; }
+  .nav.mobile-open .nav-logo-collapsed { opacity: 0; pointer-events: none; }
+  .nav.mobile-open .nav-logo-expanded { opacity: 1; pointer-events: auto; }
+  .nav.mobile-open .nav-sub.open { max-height: 240px; }
+  /* Tooltips don't make sense in mobile drawer */
+  .nav.mobile-open .nav-tip { display: none !important; }
+
+  /* Main occupies full width; no left gutter */
+  .main { margin-left: 0; }
+}
