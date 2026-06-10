@@ -8,6 +8,7 @@ import NewForwardOrderPage from './features/orders/NewForwardOrderPage';
 import NewReverseOrderPage from './features/orders/NewReverseOrderPage';
 import EditForwardOrderPage from './features/orders/EditForwardOrderPage';
 import PickupRequestPage from './features/orders/PickupRequestPage';
+import ProfilePage from './features/profile/ProfilePage';
 import NdrPage from './features/ndr/NdrPage';
 import ComingSoonPage from './components/ui/ComingSoonPage';
 import './App.css';
@@ -36,6 +37,8 @@ function App() {
           <Route path="/orders/new-reverse" element={<NewReverseOrderPage />} />
           <Route path="/orders/:id/edit" element={<EditForwardOrderPage />} />
           <Route path="/orders/pickup-request" element={<PickupRequestPage />} />
+
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route path="/ndr" element={<NdrPage />} />
 
