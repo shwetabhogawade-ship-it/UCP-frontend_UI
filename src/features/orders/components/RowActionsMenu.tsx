@@ -88,9 +88,8 @@ export const RowActionsMenu: React.FC<RowActionsMenuProps> = ({
       <button type="button" role="menuitem" className="ord-row-menu-i" onClick={onPrintInvoice}>
         {Print} Print Invoice
       </button>
-      <button type="button" role="menuitem" className="ord-row-menu-i fut" onClick={onEditOrder}>
+      <button type="button" role="menuitem" className="ord-row-menu-i" onClick={onEditOrder}>
         {Edit} Edit Order
-        <span className="fut-tag">Soon</span>
       </button>
       <button type="button" role="menuitem" className="ord-row-menu-i" onClick={onAddTag}>
         {Tag} Add Order Tag

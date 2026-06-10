@@ -131,8 +131,33 @@
 .cdd-btn.placeholder { color: var(--ink3); }
 .cdd-btn.disabled { opacity: .35; pointer-events: none; }
 .cdd-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); z-index: 600; overflow: hidden; }
-.cdd-search { padding: 8px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); }
-.cdd-search input { width: 100%; height: 30px; border: 1.5px solid var(--border); border-radius: 6px; padding: 0 10px; font-size: 12px; font-family: var(--font); color: var(--ink); background: var(--s2); outline: none; }
+/* Sticky search header that visually belongs to the dropdown panel.
+   `position: sticky` keeps it pinned while the items list scrolls; the
+   z-index ensures it sits above scrolled items when they slide under
+   it. The bottom hairline separates the header from the items without
+   adding the heavy frame of a form field. */
+.cdd-search { padding: 10px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+/* The input is rendered as an integrated search bar — a slim 1px border
+   + inline SVG magnifier icon — so it reads as "search inside this
+   panel" instead of looking like another stacked form trigger sitting
+   on top of the dropdown. Padding-left makes room for the icon; the
+   focus state lifts the border to the orange token used everywhere
+   else for active form controls. */
+.cdd-search input {
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 12px 0 34px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface) url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23A0A29A' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='m10.5 10.5 3 3'/%3E%3C/svg%3E") no-repeat 12px center;
+  background-size: 14px 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
 .cdd-search input:focus { border-color: var(--orange); }
 .cdd-items { max-height: 260px; overflow-y: auto; }
 .cdd-item { padding: 10px 13px; cursor: pointer; transition: background .1s; border-bottom: .5px solid var(--border); }

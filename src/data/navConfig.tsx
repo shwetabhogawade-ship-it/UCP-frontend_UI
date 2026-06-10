@@ -109,7 +109,7 @@ export const NAV_CONFIG: NavConfigItem[] = [
     children: [
       { id: 'orders-list', label: 'All Orders', path: '/orders' },
       { id: 'orders-new-forward', label: 'New Forward Order', path: '/orders/new-forward' },
-      { id: 'orders-pickup', label: 'Pickup Requests', path: '/orders/pickup' },
+      { id: 'orders-pickup', label: 'Pickup Request', path: '/orders/pickup-request' },
     ],
   },
   {

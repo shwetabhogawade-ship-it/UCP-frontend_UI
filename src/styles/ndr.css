@@ -507,6 +507,13 @@
 .ndr-vd-badge.prepaid  { background: var(--gl); color: var(--green); }
 .ndr-vd-badge.air      { background: var(--bl); color: var(--blue);  }
 .ndr-vd-badge.surface  { background: var(--s3); color: var(--ink2);  }
+/* Lifecycle status variants — mirror .ord-status tokens so the drawer's
+   status pill renders with the same colour as the table cell. */
+.ndr-vd-badge.green    { background: var(--gl); color: var(--green); }
+.ndr-vd-badge.blue     { background: var(--bl); color: var(--blue);  }
+.ndr-vd-badge.amber    { background: var(--al); color: var(--amber); }
+.ndr-vd-badge.red      { background: var(--rl); color: var(--red);   }
+.ndr-vd-badge.grey     { background: var(--s3); color: var(--ink2);  }
 .ndr-vd-sla {
   font-size: 11px;
   font-weight: 700;

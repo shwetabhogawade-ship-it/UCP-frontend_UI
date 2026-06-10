@@ -19,6 +19,15 @@ import ShipmentsGrid, {
 import AddTagModal from './components/AddTagModal';
 import CancelOrderModal from './components/CancelOrderModal';
 import OrderDetailsDrawer from './components/OrderDetailsDrawer';
+import BulkPickupLocationModal from './components/BulkPickupLocationModal';
+import BulkPackageDetailsModal, {
+  type BulkPackageDetails,
+} from './components/BulkPackageDetailsModal';
+import BulkPaymentModeModal, {
+  type BulkPaymentMode,
+} from './components/BulkPaymentModeModal';
+import BulkConfirmModal from './components/BulkConfirmModal';
+import type { SavedPickup } from './data/forwardOrderData';
 import {
   BULK_ACTIONS,
   DEFAULT_TAGS,
@@ -129,11 +138,32 @@ export const OrdersPage: React.FC = () => {
   /* ─── Modal state ────────────────────────────────────────── */
   const [addTagFor, setAddTagFor] = useState<Order | Shipment | null>(null);
   const [cancelFor, setCancelFor] = useState<(Order | Shipment)[] | null>(null);
-  /* Read-only Order Details drawer — only opened from the All Orders tab
-     when a user clicks the "View Details" hyperlink in the Order Details
-     cell. Holds the selected shipment so the drawer can render it as
-     plain text. */
-  const [viewShipmentFor, setViewShipmentFor] = useState<Shipment | null>(null);
+
+  /* ─── Bulk-action modal state ─────────────────────────────────
+     Each bulk-edit dialog stores the in-flight action so a single
+     state variable can drive every modal in the page. Action-style
+     bulk operations (Ship, Print, Book Pickup, …) flow through
+     `bulkConfirm` which renders the shared <BulkConfirmModal /> with
+     action-specific copy. */
+  const [bulkPickupOpen,   setBulkPickupOpen]   = useState(false);
+  const [bulkPackageOpen,  setBulkPackageOpen]  = useState(false);
+  const [bulkPaymentOpen,  setBulkPaymentOpen]  = useState(false);
+  const [bulkConfirm, setBulkConfirm] = useState<{
+    actionId: string;
+    title: string;
+    subtitle?: string;
+    confirmLabel: string;
+    variant?: 'primary' | 'danger';
+    noun?: string;
+    bodyText?: React.ReactNode;
+  } | null>(null);
+  /* Read-only Order Details drawer source — opened from the Pending grid
+     when a user clicks an Order ID hyperlink, or from the All Orders
+     grid via the "View Details" hyperlink. Holds either an `Order` (when
+     opened from the Pending tab) or a `Shipment` (every other tab). The
+     drawer branches on the discriminator and renders the same set of
+     read-only sections. */
+  const [viewOrderFor, setViewOrderFor] = useState<Order | Shipment | null>(null);
 
   /* ─── Derived: filtered orders (Pending tab) ─────────────── */
   const filteredOrders = useMemo(() => {
@@ -268,8 +298,18 @@ export const OrdersPage: React.FC = () => {
   const handlePrintInvoice = (o: { id: string }) =>
     showToast(`🖨️ Invoice for ${o.id} sent to printer`);
 
-  const handleEditOrder = (o: { id: string }) =>
+  /* Pending tab's edit flow lands on the dedicated EditForwardOrderPage
+     which mirrors the New Order composer with the order's details
+     pre-filled. Shipment tabs (post-pending lifecycle) keep their
+     "coming soon" toast — editing a shipped order would require a
+     correction workflow that isn't in scope. */
+  const handleEditOrder = (o: { id: string }) => {
+    if (activeTab === 'pending') {
+      navigate(`/orders/${o.id}/edit`);
+      return;
+    }
     showToast(`✏️ Edit ${o.id} — coming soon`);
+  };
 
   const handleCloneOrder = (o: { id: string }) =>
     showToast(`📋 Clone ${o.id} — coming soon`);
@@ -309,18 +349,113 @@ export const OrdersPage: React.FC = () => {
     setCancelFor(null);
   };
 
-  /* ─── Bulk action handler ────────────────────────────────── */
+  /* ─── Bulk action handler ────────────────────────────────────
+     Each action id is routed to its own modal. Input-style actions
+     (update pickup/package/payment) open dedicated modals built on
+     the same form primitives as the New Order Creation screen so
+     editing feels consistent. Every other action (Ship, Print, Book
+     Pickup, …) flows through the shared <BulkConfirmModal /> with
+     action-specific copy + CTA labels — keeps the bulk surface
+     uniform without duplicating one modal per fire-and-forget
+     command. */
   const handleBulkAction = (action: BulkAction) => {
     if (selected.size === 0) {
       showToast(`Select one or more rows to ${action.label.toLowerCase()}`);
       return;
     }
-    if (activeTab === 'pending' && action.id === 'cancel') {
+
+    /* Cancel keeps its existing dedicated modal — it owns the danger
+       framing + per-row total-value summary. Only the Pending tab
+       exposes Cancel as a bulk action in BULK_ACTIONS. */
+    if (action.id === 'cancel') {
       const picked = orders.filter((o) => selected.has(o.id));
       setCancelFor(picked);
       return;
     }
-    showToast(`✓ ${action.label} → ${selected.size} item${selected.size > 1 ? 's' : ''}`);
+
+    /* Input-style edits on the Pending tab — each opens its own modal. */
+    if (action.id === 'update-pickup')  { setBulkPickupOpen(true);  return; }
+    if (action.id === 'update-package') { setBulkPackageOpen(true); return; }
+    if (action.id === 'update-payment') { setBulkPaymentOpen(true); return; }
+
+    /* Everything else is an action-style operation — route to the
+       shared confirm modal with action-specific copy. */
+    const spec = buildBulkConfirmSpec(action.id, action.label);
+    setBulkConfirm({ actionId: action.id, ...spec });
+  };
+
+  /* ─── Bulk modal confirm handlers ─────────────────────────────
+     Each handler closes the originating modal, fires the toast and
+     (where applicable) mutates state. The mutations are deliberately
+     conservative — we only mock-update visible fields on the Pending
+     orders so the bulk action's effect is visible without an API. */
+  const selectedCount = selected.size;
+
+  const applyBulkPickup = (pickup: SavedPickup) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        selected.has(o.id)
+          ? {
+              ...o,
+              pickupLocation: pickup.id,
+              pickup: { city: pickup.city, pin: pickup.pincode },
+            }
+          : o,
+      ),
+    );
+    setBulkPickupOpen(false);
+    showToast(
+      `✓ Warehouse updated to "${pickup.name}" for ${selectedCount} order${selectedCount > 1 ? 's' : ''}`,
+    );
+    setSelected(new Set());
+  };
+
+  const applyBulkPackage = (details: BulkPackageDetails) => {
+    /* Convert grams → "X kg" string to match the existing Order.package.deadWt format. */
+    const weightKg = (details.weightGrams / 1000).toFixed(2);
+    setOrders((prev) =>
+      prev.map((o) =>
+        selected.has(o.id)
+          ? {
+              ...o,
+              package: {
+                ...o.package,
+                deadWt: `${weightKg} kg`,
+                dims: `${details.length}×${details.breadth}×${details.height} (cm)`,
+              },
+            }
+          : o,
+      ),
+    );
+    setBulkPackageOpen(false);
+    showToast(
+      `✓ Package details updated for ${selectedCount} order${selectedCount > 1 ? 's' : ''}`,
+    );
+    setSelected(new Set());
+  };
+
+  const applyBulkPayment = (mode: BulkPaymentMode) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        selected.has(o.id)
+          ? { ...o, payment: { ...o.payment, mode: mode === 'COD' ? 'COD' : 'Prepaid' } }
+          : o,
+      ),
+    );
+    setBulkPaymentOpen(false);
+    showToast(
+      `✓ Payment mode set to ${mode} for ${selectedCount} order${selectedCount > 1 ? 's' : ''}`,
+    );
+    setSelected(new Set());
+  };
+
+  const applyBulkConfirm = () => {
+    if (!bulkConfirm) return;
+    showToast(
+      `✓ ${bulkConfirm.title} applied to ${selectedCount} ${bulkConfirm.noun ?? 'order'}${selectedCount > 1 ? 's' : ''}`,
+    );
+    setBulkConfirm(null);
+    setSelected(new Set());
   };
 
   /* Reset all filters back to defaults (used by Clear all + Reset all). */
@@ -358,7 +493,7 @@ export const OrdersPage: React.FC = () => {
           <button
             type="button"
             className="ord-cta ord-cta-s"
-            onClick={() => showToast('+ Reverse Order — flow coming soon')}
+            onClick={() => navigate('/orders/new-reverse')}
           >
             + Reverse Order
           </button>
@@ -453,7 +588,7 @@ export const OrdersPage: React.FC = () => {
           onAddTag={openAddTag}
           onCloneOrder={handleCloneOrder}
           onCancelOrder={openCancel}
-          onOrderIdClick={(o) => showToast(`Opening order ${o.id} detail — coming soon`)}
+          onOrderIdClick={(o) => setViewOrderFor(o)}
           sort={pendingSort}
           onSortChange={setPendingSort}
           onSelectAllPages={() => showToast(`Selecting all orders across pages…`)}
@@ -477,7 +612,7 @@ export const OrdersPage: React.FC = () => {
                Other lifecycle tabs keep their existing toast behaviour
                until each one gets its own detail view. */
             if (activeTab === 'all') {
-              setViewShipmentFor(s);
+              setViewOrderFor(s);
             } else {
               showToast(`Opening shipment ${s.id} detail — coming soon`);
             }
@@ -518,10 +653,48 @@ export const OrdersPage: React.FC = () => {
         />
       )}
 
-      {viewShipmentFor && (
+      {bulkPickupOpen && (
+        <BulkPickupLocationModal
+          selectedCount={selectedCount}
+          onClose={() => setBulkPickupOpen(false)}
+          onConfirm={applyBulkPickup}
+        />
+      )}
+
+      {bulkPackageOpen && (
+        <BulkPackageDetailsModal
+          selectedCount={selectedCount}
+          onClose={() => setBulkPackageOpen(false)}
+          onConfirm={applyBulkPackage}
+        />
+      )}
+
+      {bulkPaymentOpen && (
+        <BulkPaymentModeModal
+          selectedCount={selectedCount}
+          onClose={() => setBulkPaymentOpen(false)}
+          onConfirm={applyBulkPayment}
+        />
+      )}
+
+      {bulkConfirm && (
+        <BulkConfirmModal
+          title={bulkConfirm.title}
+          subtitle={bulkConfirm.subtitle}
+          selectedCount={selectedCount}
+          noun={bulkConfirm.noun}
+          bodyText={bulkConfirm.bodyText}
+          confirmLabel={bulkConfirm.confirmLabel}
+          variant={bulkConfirm.variant}
+          onClose={() => setBulkConfirm(null)}
+          onConfirm={applyBulkConfirm}
+        />
+      )}
+
+      {viewOrderFor && (
         <OrderDetailsDrawer
-          shipment={viewShipmentFor}
-          onClose={() => setViewShipmentFor(null)}
+          source={viewOrderFor}
+          onClose={() => setViewOrderFor(null)}
         />
       )}
 
@@ -533,6 +706,123 @@ export const OrdersPage: React.FC = () => {
 /* ──────────────────────────────────────────────────────────────
  * Helpers — kept at module scope so the component body stays light.
  * ────────────────────────────────────────────────────────────── */
+
+/**
+ * Builds the per-action copy bundle consumed by the shared
+ * <BulkConfirmModal />. Centralising the strings here keeps action
+ * additions to a one-line entry instead of a new modal file and
+ * matches the labels already declared in `BULK_ACTIONS`.
+ *
+ * `noun` controls the body's "X order(s)" / "X shipment(s)" copy; we
+ * default to "order" for the pending tab actions and switch to
+ * "shipment" for the post-pending lifecycle tabs.
+ */
+function buildBulkConfirmSpec(actionId: string, label: string): {
+  title: string;
+  subtitle?: string;
+  confirmLabel: string;
+  variant?: 'primary' | 'danger';
+  noun?: string;
+  bodyText?: React.ReactNode;
+} {
+  switch (actionId) {
+    case 'ship':
+      return {
+        title: 'Ship Orders',
+        subtitle: 'Generate AWBs and hand selected orders over to a courier',
+        confirmLabel: 'Ship Now',
+      };
+    case 'print-invoice':
+      return {
+        title: 'Print Invoice',
+        subtitle: 'Generate a combined invoice PDF for the selected rows',
+        confirmLabel: 'Print',
+      };
+    case 'book-pickup':
+      return {
+        title: 'Book Pickup',
+        subtitle: 'Schedule a single pickup for all selected shipments',
+        confirmLabel: 'Book Pickup',
+        noun: 'shipment',
+      };
+    case 'print-label':
+      return {
+        title: 'Print Label',
+        subtitle: 'Generate shipping labels for the selected shipments',
+        confirmLabel: 'Print Labels',
+        noun: 'shipment',
+      };
+    case 'mark-handed':
+      return {
+        title: 'Mark Handed Over',
+        subtitle: 'Record that the selected shipments were handed to the courier',
+        confirmLabel: 'Mark Handed',
+        noun: 'shipment',
+      };
+    case 'print-manifest':
+      return {
+        title: 'Print Manifest',
+        subtitle: 'Generate the consolidated manifest for the selected pickups',
+        confirmLabel: 'Print Manifest',
+        noun: 'shipment',
+      };
+    case 'reschedule':
+      return {
+        title: 'Reschedule Pickup',
+        subtitle: 'Notify the courier to reschedule pickup for these shipments',
+        confirmLabel: 'Reschedule',
+        noun: 'shipment',
+      };
+    case 'track':
+      return {
+        title: 'Track Shipments',
+        subtitle: 'Open the consolidated tracking view for the selected shipments',
+        confirmLabel: 'Open Tracking',
+        noun: 'shipment',
+      };
+    case 'download-pod':
+      return {
+        title: 'Download POD',
+        subtitle: 'Download Proof of Delivery PDFs for the selected shipments',
+        confirmLabel: 'Download',
+        noun: 'shipment',
+      };
+    case 'download-csv':
+      return {
+        title: 'Download CSV',
+        subtitle: 'Export the selected rows as a CSV file',
+        confirmLabel: 'Download CSV',
+      };
+    case 'request-rto':
+      return {
+        title: 'Request RTO',
+        subtitle: 'Initiate Return-to-Origin for the selected shipments',
+        confirmLabel: 'Request RTO',
+        variant: 'danger',
+        noun: 'shipment',
+      };
+    case 'accept-rto':
+      return {
+        title: 'Accept RTO',
+        subtitle: 'Accept the courier-initiated RTO for these shipments',
+        confirmLabel: 'Accept RTO',
+        noun: 'shipment',
+      };
+    case 'dispute-rto':
+      return {
+        title: 'Dispute RTO',
+        subtitle: 'File a dispute against the RTO for these shipments',
+        confirmLabel: 'Dispute',
+        variant: 'danger',
+        noun: 'shipment',
+      };
+    default:
+      return {
+        title: label,
+        confirmLabel: 'Confirm',
+      };
+  }
+}
 
 /**
  * Maps the active KPI bucket id to a Shipment[] filter. Each tab uses
