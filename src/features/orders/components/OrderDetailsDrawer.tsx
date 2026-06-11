@@ -1,29 +1,40 @@
 import React, { useEffect } from 'react';
 import { SHIPMENT_STATUS_META } from '../data/shipmentsData';
-import type { Shipment } from '../types';
+import type { Order, Shipment, StatusVariant } from '../types';
 
 interface OrderDetailsDrawerProps {
-  shipment: Shipment;
+  /** Either a Pending `Order` (no AWB / lifecycle data yet) or a fully
+   *  populated `Shipment` from any of the shipment tabs. The drawer
+   *  branches on the discriminator and renders the same set of read-only
+   *  sections, dropping post-shipping rows for Pending orders. */
+  source: Order | Shipment;
   onClose: () => void;
 }
 
+/* A Shipment carries an `awb` field; an Order does not — used as the
+   structural discriminator throughout the file. */
+const isShipment = (v: Order | Shipment): v is Shipment => 'awb' in v;
+
 /**
- * Read-only "Order Details" side drawer. Opens from the right rail on
- * the All Orders grid when a user clicks the "View Details" hyperlink
- * in the Order Details cell.
+ * Read-only "Order Details" side drawer.
  *
- * Visual + structural parity with `NdrViewDetailsDrawer` is intentional —
- * we re-use the existing `.ndr-vd-*` class set so the drawer width
- * (900px), section cards, header/badges, activity log rail, and footer
- * inherit the platform's drawer system instead of growing a parallel
- * style sheet. Every field is rendered as plain text (no inputs, no
- * action CTAs other than "Close") to keep the surface strictly
- * informational.
+ * Opens from the right rail when a user clicks an Order ID hyperlink in
+ * the Pending grid, or the "View Details" hyperlink in the All Orders
+ * grid. Visual + structural parity with `NdrViewDetailsDrawer` is
+ * intentional — we re-use the existing `.ndr-vd-*` class set so the
+ * drawer width (900px), section cards, header/badges, activity log rail,
+ * and footer inherit the platform's drawer system instead of growing a
+ * parallel style sheet. Every field is rendered as plain text (no
+ * inputs, no action CTAs other than "Close") to keep the surface
+ * strictly informational.
  */
 export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
-  shipment: s,
+  source,
   onClose,
 }) => {
+  const s = source;
+  const ship = isShipment(s) ? s : null;
+  const order = !isShipment(s) ? s : null;
   /* Close on Escape — matches every other drawer in the app. */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -33,28 +44,35 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const statusMeta = SHIPMENT_STATUS_META[s.status];
+  /* Status meta — Pending orders aren't part of `ShipmentStatus` yet,
+     so they get a synthetic "Pending" pill that mirrors the table's
+     NEW/OLD tag visually. */
+  const statusMeta: { label: string; variant: StatusVariant } = ship
+    ? SHIPMENT_STATUS_META[ship.status]
+    : { label: order!.age === 'NEW' ? 'Pending (New)' : 'Pending', variant: 'amber' };
+
   const paymentBadgeClass = s.payment.mode === 'COD' ? 'cod' : 'prepaid';
   const paymentBadgeLabel = s.payment.mode;
+
+  const transport = ship?.transportMode;
   const modeClass =
-    s.transportMode === 'air'
-      ? 'air'
-      : s.transportMode === 'surface'
-        ? 'surface'
-        : 'none';
-  const modeLabel = s.transportMode
-    ? s.transportMode === 'air'
+    transport === 'air' ? 'air' : transport === 'surface' ? 'surface' : 'none';
+  const modeLabel = transport
+    ? transport === 'air'
       ? 'Air'
       : 'Surface'
     : '—';
+
   const amountDisplay = '₹' + s.payment.amount.toLocaleString('en-IN');
   const deliveryAddress = `${s.customer.name}, ${s.delivery.city} — ${s.delivery.pin}`;
   const pickupAddress = `${s.pickup.city} — ${s.pickup.pin}`;
 
-  /* Activity log entries — derived from the shipment's lifecycle stamps.
-     Falls back to dashed placeholders when a stage's data isn't yet
-     available so the timeline shape stays consistent across rows. */
-  const activityLog = buildActivityLog(s);
+  /* Activity log entries — derived from the shipment's lifecycle stamps
+     when present, or a minimal "order created" placeholder when the
+     surface is a Pending Order (no carrier handshake yet). */
+  const activityLog = ship
+    ? buildActivityLog(ship)
+    : buildOrderActivityLog(order!);
 
   return (
     <div
@@ -74,13 +92,13 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
               {s.id}
             </div>
             <div className="ndr-vd-badges">
-              <span className={`ndr-vd-badge ${statusMeta.variant === 'red' ? 'critical' : statusMeta.variant === 'amber' ? 'seller' : 'none'}`}>
+              <span className={`ndr-vd-badge ${statusMeta.variant}`}>
                 {statusMeta.label}
               </span>
               <span className={`ndr-vd-badge ${paymentBadgeClass}`}>
                 {paymentBadgeLabel}
               </span>
-              {s.transportMode && (
+              {transport && (
                 <span className={`ndr-vd-badge ${modeClass}`}>{modeLabel}</span>
               )}
             </div>
@@ -194,112 +212,134 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
               </div>
             </div>
 
-            {/* Shipment Details */}
+            {/* Shipment Details — branches on the source type so Pending
+                orders don't render empty AWB/PDD rows. */}
             <div className="ndr-vd-sec">
               <div className="ndr-vd-sec-title">Shipment Details</div>
-              <div className="ndr-vd-grid cols-4">
-                <Field label="Carrier">
-                  <span className="ndr-vd-field-val">
-                    {s.shippingCourier ?? 'XpressBees'}
-                  </span>
-                </Field>
-                <Field label="AWB No.">
-                  <span
-                    className="ndr-vd-field-val mono"
-                    style={{ color: 'var(--blue)', fontSize: 12 }}
-                  >
-                    {s.awb}
-                  </span>
-                </Field>
-                <Field label="Mode">
-                  {s.transportMode ? (
-                    <span className={`ndr-vd-badge ${modeClass}`}>{modeLabel}</span>
-                  ) : (
-                    <span className="ndr-vd-field-val muted">—</span>
+              {ship ? (
+                <>
+                  <div className="ndr-vd-grid cols-4">
+                    <Field label="Carrier">
+                      <span className="ndr-vd-field-val">
+                        {ship.shippingCourier ?? 'XpressBees'}
+                      </span>
+                    </Field>
+                    <Field label="AWB No.">
+                      <span
+                        className="ndr-vd-field-val mono"
+                        style={{ color: 'var(--blue)', fontSize: 12 }}
+                      >
+                        {ship.awb}
+                      </span>
+                    </Field>
+                    <Field label="Mode">
+                      {transport ? (
+                        <span className={`ndr-vd-badge ${modeClass}`}>{modeLabel}</span>
+                      ) : (
+                        <span className="ndr-vd-field-val muted">—</span>
+                      )}
+                    </Field>
+                    <Field label="Service Zone">
+                      <span className="ndr-vd-field-val">
+                        {ship.shippingZone ?? '—'}
+                      </span>
+                    </Field>
+                    <Field label="Manifested">
+                      <span className="ndr-vd-field-val">
+                        {ship.manifestedDate ?? '—'}
+                        {ship.manifestedTime && (
+                          <span
+                            className="ndr-vd-field-val muted"
+                            style={{ display: 'block', fontSize: 11 }}
+                          >
+                            {ship.manifestedTime}
+                          </span>
+                        )}
+                      </span>
+                    </Field>
+                    <Field label="PDD (Promised)">
+                      <span className="ndr-vd-field-val">
+                        {ship.pddDate ?? '—'}
+                        {ship.pddTime && (
+                          <span
+                            className="ndr-vd-field-val muted"
+                            style={{ display: 'block', fontSize: 11 }}
+                          >
+                            {ship.pddTime}
+                          </span>
+                        )}
+                      </span>
+                    </Field>
+                    <Field label="Delivered On">
+                      <span className="ndr-vd-field-val">
+                        {ship.deliveryDate ?? '—'}
+                        {ship.deliveryTime && (
+                          <span
+                            className="ndr-vd-field-val muted"
+                            style={{ display: 'block', fontSize: 11 }}
+                          >
+                            {ship.deliveryTime}
+                          </span>
+                        )}
+                      </span>
+                    </Field>
+                    <Field label="Days in Transit">
+                      <span className="ndr-vd-field-val">
+                        {ship.daysInTransit ? `Day ${ship.daysInTransit}` : '—'}
+                      </span>
+                    </Field>
+                  </div>
+                  {ship.pddBreached && (
+                    <div
+                      className="ndr-vd-tip"
+                      style={{
+                        background: 'var(--rl)',
+                        borderColor: 'var(--rm)',
+                        color: 'var(--red)',
+                      }}
+                    >
+                      <b style={{ color: 'var(--red)' }}>PDD breached.</b> Promised
+                      delivery date has passed for this shipment.
+                    </div>
                   )}
-                </Field>
-                <Field label="Service Zone">
-                  <span className="ndr-vd-field-val">
-                    {s.shippingZone ?? '—'}
-                  </span>
-                </Field>
-                <Field label="Manifested">
-                  <span className="ndr-vd-field-val">
-                    {s.manifestedDate ?? '—'}
-                    {s.manifestedTime && (
-                      <span
-                        className="ndr-vd-field-val muted"
-                        style={{ display: 'block', fontSize: 11 }}
-                      >
-                        {s.manifestedTime}
-                      </span>
-                    )}
-                  </span>
-                </Field>
-                <Field label="PDD (Promised)">
-                  <span className="ndr-vd-field-val">
-                    {s.pddDate ?? '—'}
-                    {s.pddTime && (
-                      <span
-                        className="ndr-vd-field-val muted"
-                        style={{ display: 'block', fontSize: 11 }}
-                      >
-                        {s.pddTime}
-                      </span>
-                    )}
-                  </span>
-                </Field>
-                <Field label="Delivered On">
-                  <span className="ndr-vd-field-val">
-                    {s.deliveryDate ?? '—'}
-                    {s.deliveryTime && (
-                      <span
-                        className="ndr-vd-field-val muted"
-                        style={{ display: 'block', fontSize: 11 }}
-                      >
-                        {s.deliveryTime}
-                      </span>
-                    )}
-                  </span>
-                </Field>
-                <Field label="Days in Transit">
-                  <span className="ndr-vd-field-val">
-                    {s.daysInTransit ? `Day ${s.daysInTransit}` : '—'}
-                  </span>
-                </Field>
-              </div>
-              {s.pddBreached && (
-                <div
-                  className="ndr-vd-tip"
-                  style={{
-                    background: 'var(--rl)',
-                    borderColor: 'var(--rm)',
-                    color: 'var(--red)',
-                  }}
-                >
-                  <b style={{ color: 'var(--red)' }}>PDD breached.</b> Promised
-                  delivery date has passed for this shipment.
+                </>
+              ) : (
+                <div className="ndr-vd-tip">
+                  <b>Pending — not yet shipped.</b> Carrier, AWB, PDD and other
+                  shipping details will appear here once this order is shipped.
                 </div>
               )}
             </div>
 
-            {/* Package Details */}
+            {/* Package Details — Pending orders carry the actual dims + dead/vol
+                weights captured at order entry; shipment rows only know the
+                shipping weight, so the unmeasured rows stay dashed. */}
             <div className="ndr-vd-sec">
               <div className="ndr-vd-sec-title">Package Details</div>
               <div className="ndr-vd-grid cols-4">
-                <Field label="Weight">
+                <Field label="Dead Weight">
                   <span className="ndr-vd-field-val">
-                    {s.shippingWeight ?? '—'}
+                    {order?.package.deadWt ?? ship?.shippingWeight ?? '—'}
                   </span>
                 </Field>
                 <Field label="Dimensions">
-                  <span className="ndr-vd-field-val muted">—</span>
+                  <span
+                    className={`ndr-vd-field-val ${order ? '' : 'muted'}`}
+                  >
+                    {order?.package.dims ?? '—'}
+                  </span>
                 </Field>
                 <Field label="Volumetric Weight">
-                  <span className="ndr-vd-field-val muted">—</span>
+                  <span
+                    className={`ndr-vd-field-val ${order ? '' : 'muted'}`}
+                  >
+                    {order?.package.volWt ?? '—'}
+                  </span>
                 </Field>
                 <Field label="Applied Weight">
-                  <span className="ndr-vd-field-val muted">—</span>
+                  <span className="ndr-vd-field-val muted">
+                    {ship?.shippingWeight ?? '—'}
+                  </span>
                 </Field>
               </div>
             </div>
@@ -312,7 +352,7 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
                   <tr>
                     <th>Product</th>
                     <th>Category</th>
-                    <th>SKU</th>
+                    <th>SKU / HSN</th>
                     <th>Qty</th>
                     <th>Unit Price</th>
                     <th>Total</th>
@@ -320,10 +360,14 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Product — {s.id}</td>
+                    <td>{order?.product.name ?? `Product — ${s.id}`}</td>
                     <td>General</td>
-                    <td>SKU-{s.id}</td>
-                    <td>1</td>
+                    <td>
+                      {order
+                        ? `${order.product.sku} · HSN ${order.product.hsn}`
+                        : `SKU-${s.id}`}
+                    </td>
+                    <td>{order?.product.qty ?? 1}</td>
                     <td>{amountDisplay}</td>
                     <td>{amountDisplay}</td>
                   </tr>
@@ -345,18 +389,18 @@ export const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
             {/* RTO context — only rendered when this shipment is in an RTO
                 lifecycle stage so the cost of an empty block is avoided
                 for the more common forward-delivery cases. */}
-            {s.rtoInitiatedDate && (
+            {ship?.rtoInitiatedDate && (
               <div className="ndr-vd-sec">
                 <div className="ndr-vd-sec-title">RTO Details</div>
                 <div className="ndr-vd-grid cols-2">
                   <Field label="RTO Initiated">
                     <span className="ndr-vd-field-val">
-                      {s.rtoInitiatedDate}
+                      {ship.rtoInitiatedDate}
                     </span>
                   </Field>
                   <Field label="Reason">
                     <span className="ndr-vd-field-val muted">
-                      {s.rtoReason ?? '—'}
+                      {ship.rtoReason ?? '—'}
                     </span>
                   </Field>
                 </div>
@@ -481,6 +525,28 @@ function buildActivityLog(s: Shipment): ActivityEvent[] {
     ts: `${s.date}${s.time ? ' · ' + s.time : ''}`,
   });
 
+  return events;
+}
+
+/**
+ * Activity timeline shown when the drawer is opened from the Pending
+ * grid. The order hasn't been handed to a carrier yet, so we only
+ * surface the "Order Created" event with a sitting hint when the row is
+ * flagged with `needsAttention` (sitting >24 hrs).
+ */
+function buildOrderActivityLog(o: Order): ActivityEvent[] {
+  const events: ActivityEvent[] = [
+    {
+      cur: true,
+      ev: o.needsAttention ? 'Pending — Sitting >24 hrs' : 'Pending — Awaiting Ship',
+      ts: `${o.date}${o.time ? ' · ' + o.time : ''}`,
+    },
+    {
+      cur: false,
+      ev: `Order Created on ${o.channel}`,
+      ts: `${o.date}${o.time ? ' · ' + o.time : ''}`,
+    },
+  ];
   return events;
 }
 

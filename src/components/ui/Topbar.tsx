@@ -112,6 +112,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onMobileMenuClick }) => {
   const [qaOpen, setQaOpen] = useState(false);
   const qaWrapRef = useRef<HTMLDivElement>(null);
 
+  /* Profile dropdown — mirrors the Quick Actions popover so the
+     visual language and keyboard behaviour stay consistent. */
+  const [pfOpen, setPfOpen] = useState(false);
+  const pfWrapRef = useRef<HTMLDivElement>(null);
+
   // Close Quick Actions dropdown on outside click / Escape
   useEffect(() => {
     if (!qaOpen) return;
@@ -131,6 +136,25 @@ export const Topbar: React.FC<TopbarProps> = ({ onMobileMenuClick }) => {
     };
   }, [qaOpen]);
 
+  // Close Profile dropdown on outside click / Escape
+  useEffect(() => {
+    if (!pfOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (pfWrapRef.current && !pfWrapRef.current.contains(e.target as Node)) {
+        setPfOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPfOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [pfOpen]);
+
   const handleQuickAction = (action: QuickAction) => {
     setQaOpen(false);
     if (action.path) {
@@ -138,6 +162,30 @@ export const Topbar: React.FC<TopbarProps> = ({ onMobileMenuClick }) => {
     } else {
       showToast(`Coming soon: ${action.label}`);
     }
+  };
+
+  /* Profile menu actions — Profile lands on the dedicated screen;
+     Logout clears any session data we own (currently `sessionStorage`
+     only — no auth state in the store yet) and bounces the user to
+     the app landing page (`/`, which redirects to /dashboard while
+     no real auth flow is wired). When a true auth layer is added
+     later it should replace this branch but the call-site here is
+     already routing through a single `handleLogout` for that swap. */
+  const handleProfile = () => {
+    setPfOpen(false);
+    navigate('/profile');
+  };
+
+  const handleLogout = () => {
+    setPfOpen(false);
+    try {
+      sessionStorage.clear();
+      localStorage.removeItem('xb.session');
+    } catch {
+      /* storage access can throw in private-mode browsers — ignore. */
+    }
+    showToast('You have been logged out');
+    navigate('/');
   };
 
   return (
@@ -232,15 +280,57 @@ export const Topbar: React.FC<TopbarProps> = ({ onMobileMenuClick }) => {
           </div>
         </div>
 
-        {/* Account avatar */}
-        <button
-          type="button"
-          className="tb-av"
-          aria-label="Account menu"
-          onClick={() => showToast('Account settings')}
-        >
-          <span className="tb-av-circle" aria-hidden="true">MR</span>
-        </button>
+        {/* Account avatar — dropdown trigger.
+            Visual recipe is borrowed from `.tb-qa-*` so the popover
+            surface matches the Quick Actions menu pixel-for-pixel. */}
+        <div className="tb-qa-wrap tb-pf-wrap" ref={pfWrapRef}>
+          <button
+            type="button"
+            className={`tb-av ${pfOpen ? 'on' : ''}`}
+            aria-label="Account menu"
+            aria-haspopup="menu"
+            aria-expanded={pfOpen}
+            onClick={() => setPfOpen((p) => !p)}
+          >
+            <span className="tb-av-circle" aria-hidden="true">MR</span>
+          </button>
+
+          <div
+            className={`tb-qa-dd tb-pf-dd ${pfOpen ? 'sh' : ''}`}
+            role="menu"
+            aria-label="Account menu"
+          >
+            <div className="tb-qa-dd-head">ACCOUNT</div>
+            <button
+              type="button"
+              role="menuitem"
+              className="tb-qa-dd-opt"
+              onClick={handleProfile}
+            >
+              <span className="tb-qa-dd-ico">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+                  <circle cx="10" cy="7" r="3.25" />
+                  <path d="M3.75 17c1-3.4 3.7-5 6.25-5s5.25 1.6 6.25 5" />
+                </svg>
+              </span>
+              <span className="tb-qa-dd-lbl">Profile</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="tb-qa-dd-opt tb-qa-dd-opt-danger"
+              onClick={handleLogout}
+            >
+              <span className="tb-qa-dd-ico">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
+                  <path d="M12.5 14.5V16a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 16V4A1.5 1.5 0 015 2.5h6A1.5 1.5 0 0112.5 4v1.5" />
+                  <path d="M8.5 10h9M14 6.5l3.5 3.5L14 13.5" />
+                </svg>
+              </span>
+              <span className="tb-qa-dd-lbl">Logout</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );

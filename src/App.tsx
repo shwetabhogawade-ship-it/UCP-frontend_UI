@@ -5,6 +5,10 @@ import DashboardPage from './features/dashboard/DashboardPage';
 import SupportPage from './features/support/SupportPage';
 import OrdersPage from './features/orders/OrdersPage';
 import NewForwardOrderPage from './features/orders/NewForwardOrderPage';
+import NewReverseOrderPage from './features/orders/NewReverseOrderPage';
+import EditForwardOrderPage from './features/orders/EditForwardOrderPage';
+import PickupRequestPage from './features/orders/PickupRequestPage';
+import ProfilePage from './features/profile/ProfilePage';
 import NdrPage from './features/ndr/NdrPage';
 import ComingSoonPage from './components/ui/ComingSoonPage';
 import './App.css';
@@ -30,11 +34,15 @@ function App() {
 
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/orders/new-forward" element={<NewForwardOrderPage />} />
+          <Route path="/orders/new-reverse" element={<NewReverseOrderPage />} />
+          <Route path="/orders/:id/edit" element={<EditForwardOrderPage />} />
+          <Route path="/orders/pickup-request" element={<PickupRequestPage />} />
+
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route path="/ndr" element={<NdrPage />} />
 
           {/* Placeholders — keep paths in sync with `data/navConfig.tsx` */}
-          <Route path="/orders/pickup" element={<ComingSoonPage title="Pickup Requests" />} />
           <Route path="/info/pincode" element={<ComingSoonPage title="Pincode Serviceability" />} />
           <Route path="/info/rate-calculator" element={<ComingSoonPage title="Rate Calculator" />} />
           <Route path="/info/rate-card" element={<ComingSoonPage title="Rate Card" />} />

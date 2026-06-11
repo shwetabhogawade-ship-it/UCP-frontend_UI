@@ -226,24 +226,41 @@
 }
 .tb-qa-dd-lbl { line-height: 1.2; }
 
-/* ── Account avatar: just the MR circle ── */
+/* ── Account avatar: trigger button for the Profile dropdown ──
+   Now an interactive dropdown anchor — gets the same hover /
+   focus / active treatment as the other top-bar action pills so
+   the click affordance is obvious. */
 .topbar .tb-av {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   cursor: pointer;
-  border: 0;
+  border: 1px solid transparent;
   background: transparent;
   flex-shrink: 0;
   border-radius: 50%;
   margin-left: 0;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+.topbar .tb-av:hover {
+  background: #F9F8F5;
+  border-color: #E4E2DC;
+}
+.topbar .tb-av:focus-visible {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--ol);
+}
+.topbar .tb-av.on {
+  background: #F9F8F5;
+  border-color: #D6D4CC;
 }
 .tb-av-circle {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #FDECEA;
   border: 1px solid #F7C4A4;
@@ -257,8 +274,23 @@
   letter-spacing: .3px;
   font-family: var(--font);
   transition: filter .12s;
+  user-select: none;
 }
-.topbar .tb-av:hover .tb-av-circle { filter: brightness(.97); }
+.topbar .tb-av:hover .tb-av-circle,
+.topbar .tb-av.on .tb-av-circle { filter: brightness(.97); }
+
+/* Profile dropdown — re-uses the `.tb-qa-dd*` recipe so the menu
+   surface is identical to the Quick Actions popover. The only
+   profile-specific tweak is a slightly narrower min-width (no need
+   for 260px when the menu only carries 2 short items) and a danger
+   colour treatment for the Logout entry. */
+.tb-pf-dd { min-width: 200px; }
+.tb-qa-dd-opt.tb-qa-dd-opt-danger { color: var(--red, #C52E18); }
+.tb-qa-dd-opt.tb-qa-dd-opt-danger .tb-qa-dd-ico { color: var(--red, #C52E18); }
+.tb-qa-dd-opt.tb-qa-dd-opt-danger:hover,
+.tb-qa-dd-opt.tb-qa-dd-opt-danger:focus-visible {
+  background: var(--rl, #FDECEA);
+}
 
 /* ────────────────────────────────────────────────────────────────
    Responsive Topbar

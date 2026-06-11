@@ -741,7 +741,13 @@ table.ord-tbl {
   width: 420px;
   max-width: 92vw;
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  /* `overflow: visible` so the SavedAddressSelect dropdown (and any
+     other floating menus rendered inside the modal body) can extend
+     beyond the modal box without being clipped mid-content. The header
+     and footer below carry their own border-radius so the modal's
+     rounded outer shape is preserved without relying on overflow
+     clipping. */
+  overflow: visible;
   animation: ordPop .2s ease;
 }
 @keyframes ordPop {
@@ -754,8 +760,32 @@ table.ord-tbl {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Match the modal's outer radius so the header keeps the rounded top
+     edge when `.ord-modal` allows overflow (see comment on `.ord-modal`). */
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
 }
 .ord-modal-title { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -.2px; }
+/* Subtitle directly under .ord-modal-title — used by the bulk-action
+   modals to surface "Bulk … Change · N orders selected" context. */
+.ord-modal-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink3);
+  margin-top: 3px;
+}
+/* Inline informational hint rendered inside .ord-modal-body. Mirrors
+   the muted-surface treatment used by the New Order Package tip. */
+.ord-modal-note {
+  margin-top: 12px;
+  padding: 9px 12px;
+  background: var(--s2);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--ink3);
+  line-height: 1.55;
+}
 .ord-modal-x {
   width: 28px; height: 28px;
   border-radius: 7px;
@@ -777,6 +807,11 @@ table.ord-tbl {
   justify-content: flex-end;
   gap: 10px;
   background: var(--s2);
+  /* Round the bottom corners directly so the modal's outer radius is
+     preserved without `.ord-modal { overflow: hidden }` — which would
+     otherwise clip any dropdown opened inside the body. */
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
 }
 
 /* Cancel-order specific danger card */
@@ -2004,3 +2039,319 @@ table.ord-tbl {
   border: 1px dashed var(--border);
   border-radius: 10px;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   Edit Order screen
+   ─────────────────────────────────────────────────────────────────
+   The Edit screen reuses the New Order composer's card layout, drawers
+   and form controls; the rules below only cover the deltas needed for
+   the edit context — a monospace order id in the header and a soft
+   "locked" container for the Product Details card (which is the only
+   section that cannot be modified post-creation). */
+.ord-edit-id {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink2);
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+.ord-edit-id.mono { font-family: var(--mono); }
+
+/* Read-only Product Details container — sits inside the card body and
+   visually separates "this is informational" from the live form fields
+   above and below. Tokens match other muted surfaces (.ndr-vd-tip,
+   readonly inputs) so the page reads as one design language. */
+.ord-edit-locked {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: 9px;
+  background: var(--s2);
+  border: 1px dashed var(--border2);
+}
+.ord-edit-locked-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+@media (max-width: 720px) {
+  .ord-edit-locked-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
+  .ord-edit-locked-grid { grid-template-columns: 1fr; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Reverse Order — Product Verification block
+   ──────────────────────────────────────────────────────────────
+   Lives inside an `.ord-nf-card` so it inherits the card padding
+   and shadow tokens from the form. Only adds the bits the
+   forward page doesn't need: a 4-tile image-upload grid, an
+   on/off pill switch for QC, and a compact Yes/No radio row.
+   All colour, radius and spacing tokens are reused from the
+   existing ord-nf design system so the section feels at home
+   alongside the Pickup / Customer / Package cards. */
+
+/* 4-up image upload tiles — gracefully collapse to 2 columns on
+   narrow viewports so the tiles stay square-ish. */
+.ord-rv-images {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 4px 0 18px;
+}
+@media (max-width: 720px) {
+  .ord-rv-images { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Each tile is the outer container. The dashed border + radius
+   reuses the same border + radius tokens used by the `.ord-nf-card`
+   so the section reads as part of the form. */
+.ord-rv-img-slot {
+  position: relative;
+  background: var(--s2);
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  min-height: 124px;
+  overflow: hidden;
+  transition: border-color .15s, background .15s;
+}
+.ord-rv-img-slot:hover { border-color: var(--ink3); }
+/* The required tile gets a slightly stronger background so the
+   "(Required)" affordance reads even without the helper text — it
+   visually nudges the operator toward the first slot first. */
+.ord-rv-img-slot.req { background: var(--s2); }
+/* When an image is uploaded the tile flips to a solid orange
+   border so the user can spot the filled slots at a glance. */
+.ord-rv-img-slot.on  { border-style: solid; border-color: var(--orange); background: var(--surface); }
+
+/* The unstyled button covers the entire tile so the click target
+   matches the tile bounds exactly. The flex column centres the
+   icon + label + (Required) caption. */
+.ord-rv-img-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 124px;
+  padding: 16px 8px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.ord-rv-img-ico {
+  width: 28px;
+  height: 28px;
+  color: var(--ink2);
+  display: inline-flex;
+}
+.ord-rv-img-ico svg { width: 100%; height: 100%; }
+.ord-rv-img-lbl {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink2);
+}
+.ord-rv-img-req {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+/* Filled state — the uploaded image fills the tile and the
+   small × button in the top-right corner lets the user clear it. */
+.ord-rv-img-preview {
+  width: 100%;
+  height: 100%;
+  min-height: 124px;
+  object-fit: cover;
+  display: block;
+}
+.ord-rv-img-x {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  border: 0;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  transition: background .15s;
+}
+.ord-rv-img-x:hover { background: rgba(0, 0, 0, .75); }
+
+/* QC Questions header — switch + title pair. Sits flush against
+   the left edge of the card body so it lines up with the field
+   labels above and below. */
+.ord-rv-qc-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 14px;
+}
+.ord-rv-qc-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* iOS-style pill switch. Uses the brand orange token when active
+   so it picks up the same accent as the form's primary CTAs. */
+.ord-rv-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--border);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.ord-rv-switch.on { background: var(--orange); }
+.ord-rv-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+  transition: transform .2s;
+}
+.ord-rv-switch.on .ord-rv-switch-thumb { transform: translateX(16px); }
+
+/* Selectable QC chips — replaces the previous 2-col Yes/No grid.
+   Each chip is a single-tap toggle: untouched chips read as a
+   neutral pill (+ icon), tapped chips flip to orange-on-light
+   (✓ icon). Flex-wrap so the row reflows on narrow viewports
+   without forcing a fixed 2-column layout. */
+.ord-rv-qc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+.ord-rv-qc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  transition: border-color .15s, background .15s, color .15s;
+}
+.ord-rv-qc-chip:hover { border-color: var(--ink3); color: var(--ink); }
+.ord-rv-qc-chip.on {
+  background: rgba(232, 89, 41, .08);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.ord-rv-qc-chip:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.ord-rv-qc-chip-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+.ord-rv-qc-chip-ico svg { width: 100%; height: 100%; }
+.ord-rv-qc-chip-lbl { white-space: nowrap; }
+
+/* ── Compact CTA used inline (e.g. row-level "Escalate" on the
+   Pickup Request grid). Same look as `.ord-cta-s` (secondary,
+   bordered) but shrunk to row-action height so it sits flush
+   alongside `.ord-icobtn` in the actions cell. */
+.ord-cta.ord-cta-sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+
+/* ── Inline search input (e.g. "Search by Pickup ID" on the
+   Pickup Request screen). Sized to match `.ord-fc` chips so it
+   reads as part of the same toolbar visual language, but renders
+   as a real text input rather than a dropdown trigger. */
+.ord-srch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--ink2);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 240px;
+  transition: border-color .12s;
+}
+.ord-srch:focus-within {
+  border-color: var(--orange);
+}
+.ord-srch-ico {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  color: var(--ink3);
+  flex-shrink: 0;
+}
+.ord-srch-ico svg { width: 100%; height: 100%; }
+.ord-srch input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0;
+}
+.ord-srch input::placeholder { color: var(--ink3); font-weight: 500; }
+.ord-srch-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: var(--s3);
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: var(--font);
+  flex-shrink: 0;
+}
+.ord-srch-x:hover { background: var(--border2); color: var(--ink); }
+
