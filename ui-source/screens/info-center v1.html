@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1440"/>
+<title>Information Center · XpressBees Seller Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--surface:#FFF;--s2:#F8F7F3;--s3:#EEECEA;
+  --border:#E2E0D8;--border2:#C5C3BB;
+  --ink:#1A190F;--ink2:#5C5B52;--ink3:#9B998F;
+  --orange:#E8520A;--ol:#FEF0E8;--om:#F5C09A;
+  --red:#C52E18;--rl:#FDECEA;
+  --green:#1A6B3A;--gl:#E7F5ED;--gm:#8DD4A9;
+  --amber:#9E5A00;--al:#FFF5E5;--am:#F5C878;
+  --blue:#1246A0;--bl:#EAF0FD;--bm:#8EAFF0;
+  --gray:#6B6A62;--gray-l:#EEECE9;--gray-m:#C3C1B8;
+  --sb-bg:#0F0E09;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --radius:10px;--radius-sm:7px;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh;position:relative;}
+
+/* ── SIDEBAR ICONS ── */
+.sb-icons{width:54px;background:var(--sb-bg);flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 0 18px;gap:2px;z-index:300}
+.sb-logo{width:34px;height:34px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;flex-shrink:0;cursor:pointer}
+.sb-logo svg{width:20px;height:20px;fill:#fff}
+.sb-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#46443C;transition:all .15s;flex-shrink:0;position:relative}
+.sb-icon:hover{background:#1C1B14;color:#8A8878}.sb-icon.active{background:var(--orange);color:#fff}
+.sb-icon svg{width:17px;height:17px}
+.sb-sep{width:26px;height:1px;background:#222118;margin:5px 0}
+.sb-flex{flex:1}
+.badge{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--sb-bg)}
+
+/* ── NAV PANEL — hover-reveal overlay ── */
+/* ── NAV PANEL: hover-overlay (JS-controlled) ── */
+.sb-nav{
+  position:fixed;left:54px;top:0;bottom:0;
+  width:224px;background:#1A1914;
+  display:flex;flex-direction:column;overflow:hidden;
+  border-right:1px solid #2A2920;
+  z-index:400;
+  transform:translateX(-100%);opacity:0;pointer-events:none;
+  transition:transform .2s cubic-bezier(.4,0,.2,1),opacity .2s ease;
+  box-shadow:4px 0 20px rgba(0,0,0,.28);
+}
+.sb-nav.open{transform:translateX(0);opacity:1;pointer-events:auto;}
+.sb-icons{position:relative;z-index:500;}
+.nav-hover-zone{position:fixed;left:0;top:0;bottom:0;width:54px;z-index:450;}
+.sb-nav-logo{padding:14px 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #2A2920}
+.sb-nav-body{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:none}
+.sb-nav-body::-webkit-scrollbar{display:none}
+.nav-group{margin-bottom:2px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;color:#8A8878;font-size:12.5px;font-weight:500;transition:all .12s;user-select:none;position:relative}
+.nav-item:hover{color:#D0CEC7;background:#252320}
+.nav-item.active{color:#fff;background:#252320}
+.nav-item.parent-active{color:var(--orange)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.nav-item-label{flex:1}
+.nav-chevron{width:12px;height:12px;transition:transform .2s;flex-shrink:0;opacity:.6}
+.nav-chevron.open{transform:rotate(180deg)}
+.nav-highlight{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange);border-radius:0 2px 2px 0;opacity:0;transition:opacity .15s}
+.nav-item.active .nav-highlight,.nav-item.parent-active .nav-highlight{opacity:1}
+.sub-nav{overflow:hidden;max-height:0;transition:max-height .25s ease}
+.sub-nav.open{max-height:200px}
+.sub-nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px 7px 38px;cursor:pointer;color:#6A6860;font-size:12px;font-weight:400;transition:all .12s;position:relative}
+.sub-nav-item:hover{color:#D0CEC7;background:#252320}
+.sub-nav-item.active{color:#fff;font-weight:600;background:#252320}
+.sub-nav-dot{width:5px;height:5px;border-radius:50%;background:#46443C;flex-shrink:0;transition:background .12s}
+.sub-nav-item.active .sub-nav-dot{background:var(--orange)}
+.sub-nav-item:hover .sub-nav-dot{background:#8A8878}
+.sub-nav-hl{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange);border-radius:0 2px 2px 0;opacity:0}
+.sub-nav-item.active .sub-nav-hl{opacity:1}
+.nav-dashboard{display:flex;align-items:center;gap:9px;padding:8px 12px 8px 16px;margin:4px 8px;border-radius:8px;cursor:pointer;background:#2A2920;color:#D0CEC7;font-size:12.5px;font-weight:600;transition:all .12s}
+.nav-dashboard:hover{background:#353330}
+.nav-dashboard svg{width:15px;height:15px}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tb-srch{flex:1;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;height:34px;padding:0 12px;transition:all .15s}
+.tb-srch:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.tb-srch input{border:none;background:transparent;outline:none;font-family:var(--font);font-size:12px;color:var(--ink);width:100%}
+.tb-srch input::placeholder{color:var(--ink3)}
+.tb-sep{width:1px;height:20px;background:var(--border)}
+.tb-r{display:flex;align-items:center;gap:8px;margin-left:auto}
+.tbtn{display:inline-flex;align-items:center;gap:5px;padding:0 13px;height:32px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-family:var(--font);transition:all .15s;white-space:nowrap}
+.tbtn:hover{border-color:var(--border2)}
+.tbtn-p{background:var(--orange);color:#fff;border-color:var(--orange)}.tbtn-p:hover{opacity:.88}
+.av{width:30px;height:30px;border-radius:50%;background:var(--ol);border:1.5px solid var(--om);font-size:11px;font-weight:700;color:var(--orange);display:flex;align-items:center;justify-content:center}
+.wallet-pill{display:flex;align-items:center;gap:6px;padding:0 12px;height:32px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;color:var(--ink);background:var(--surface);cursor:pointer}
+.wallet-amount{color:var(--green);font-family:var(--mono)}
+.page{flex:1;overflow-y:auto;padding:24px 28px 60px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.page::-webkit-scrollbar{width:5px}.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.screen{display:none}.screen.active{display:block}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink3);margin-bottom:16px}
+.breadcrumb-sep{color:var(--border2)}.breadcrumb-current{color:var(--ink);font-weight:600}
+
+/* ── RATE CALCULATOR ── */
+.rc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.rc-title{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.rc-subtitle{font-size:12px;color:var(--ink3);margin-top:3px}
+.rc-layout{display:grid;grid-template-columns:1fr 390px;gap:20px;align-items:start}
+.form-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+.section-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+/* Zone badge with tooltip */
+.zone-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--gl);border:1px solid var(--gm);border-radius:20px;font-size:11px;font-weight:700;color:var(--green);cursor:pointer;position:relative}
+.zone-badge svg{width:12px;height:12px}
+.zone-badge:hover .zone-tooltip{display:block}
+.zone-tooltip{display:none;position:absolute;top:calc(100%+10px);left:50%;transform:translateX(-20%);background:#2D3748;border-radius:10px;padding:16px 18px;min-width:360px;z-index:500;box-shadow:0 12px 40px rgba(0,0,0,.25);cursor:default}
+.zone-tooltip::before{content:'';position:absolute;top:-7px;left:24%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid #2D3748}
+.zone-tooltip-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:12px}
+.zone-row{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:6px;transition:background .1s}
+.zone-row.active-zone{background:rgba(255,255,255,.12)}
+.zone-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.zone-name{font-size:12px;font-weight:600;color:#E2E8F0;min-width:60px}
+.zone-sep{color:#4A5568;font-size:12px}
+.zone-desc{font-size:12px;color:#A0AEC0}
+.zone-row.active-zone .zone-name{color:#fff;font-weight:700}
+.zone-row.active-zone .zone-desc{color:#E2E8F0;font-weight:600}
+/* Pincode */
+.pincode-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-bottom:20px}
+.pincode-col{display:flex;flex-direction:column;gap:6px}
+.input-label{font-size:11px;font-weight:600;color:var(--blue);margin-bottom:0}
+.pincode-input-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);overflow:hidden;height:44px;transition:all .15s}
+.pincode-input-wrap:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.pin-icon{width:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pin-icon svg{width:14px;height:14px}
+.pincode-input-wrap input{flex:1;border:none;outline:none;font-family:var(--font);font-size:14px;font-weight:600;color:var(--ink);background:transparent;padding:0 4px}
+.pin-state{padding:0 12px;font-size:12px;font-weight:700;color:var(--ink3);flex-shrink:0}
+.pin-city{font-size:11px;color:var(--ink2);margin-top:4px;padding-left:4px}
+.pin-arrow{display:flex;align-items:center;justify-content:center;padding-top:26px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+/* Package */
+.pkg-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px}
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:12px;font-weight:600;color:var(--ink2);display:flex;align-items:center;gap:5px}
+.field-hint{font-size:10.5px;color:var(--ink3);margin-top:3px}
+/* Weight input */
+.weight-input-row{display:flex;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;height:44px;background:var(--surface);transition:all .15s}
+.weight-input-row:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.weight-input-row input{flex:1;border:none;outline:none;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);padding:0 14px;background:transparent}
+.weight-unit-sel{border-left:1px solid var(--border);background:var(--s2);padding:0 10px;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:700;color:var(--ink2);flex-shrink:0;position:relative;user-select:none}
+.weight-unit-sel svg{width:10px;height:10px;color:var(--ink3);transition:transform .15s}
+.weight-unit-sel.open svg{transform:rotate(180deg)}
+.weight-unit-dd{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);min-width:80px;z-index:200;overflow:hidden}
+.weight-unit-sel.open .weight-unit-dd{display:block}
+.wud-opt{padding:9px 14px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background .1s}
+.wud-opt:hover{background:var(--s2)}.wud-opt.active{color:var(--orange);font-weight:700;background:var(--ol)}
+/* Dimensions */
+.dim-row{display:flex;gap:8px;align-items:center}
+.dim-input-wrap{flex:1;display:flex;align-items:center;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;height:44px;background:var(--surface);transition:border-color .15s}
+.dim-input-wrap:focus-within{border-color:var(--orange)}
+.dim-input-wrap input{flex:1;border:none;outline:none;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);padding:0 10px;background:transparent;min-width:0}
+.dim-unit{padding:0 8px;font-size:11px;font-weight:700;color:var(--ink3);flex-shrink:0;border-left:1px solid var(--border)}
+.dim-x{font-size:13px;font-weight:500;color:var(--ink3);flex-shrink:0}
+/* Weight result */
+.weight-results{display:flex;gap:10px;margin-top:14px}
+.wr-card{flex:1;padding:10px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:9px;cursor:pointer;position:relative}
+.wr-card:hover .wrc-tooltip{display:block}
+.wr-card.highlighted{background:var(--ol);border-color:var(--om)}
+.wrc-label{font-size:11px;font-weight:600;color:var(--ink2)}
+.wrc-val{font-size:14px;font-weight:800;color:var(--ink);font-family:var(--mono);letter-spacing:-.3px}
+.wrc-val.hl{color:var(--orange)}
+.wr-info{width:16px;height:16px;border-radius:50%;background:var(--s3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
+.wr-info svg{width:10px;height:10px;color:var(--ink3)}
+.wrc-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:8px;padding:10px 14px;font-size:11px;line-height:1.6;white-space:nowrap;z-index:300;box-shadow:0 6px 24px rgba(0,0,0,.2);min-width:200px;text-align:left}
+.wrc-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid var(--ink)}
+/* Radio */
+.radio-row{display:flex;align-items:center;gap:20px}
+.radio-opt{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--ink2);font-weight:500}
+.radio-opt input[type=radio]{accent-color:var(--orange);width:16px;height:16px;cursor:pointer}
+.radio-opt.selected{color:var(--ink);font-weight:600}
+/* Input field */
+.input-field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;height:44px;background:var(--surface);transition:all .15s}
+.input-field:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--ol)}
+.input-field .prefix{padding:0 12px;font-size:13px;color:var(--ink3);border-right:1px solid var(--border);height:100%;display:flex;align-items:center;background:var(--s2)}
+.input-field input{flex:1;border:none;outline:none;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);padding:0 12px;background:transparent}
+/* Info icon */
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--gray-l);border:1px solid var(--gray-m);cursor:pointer;position:relative;flex-shrink:0}
+.info-icon svg{width:10px;height:10px;color:var(--gray)}
+.info-icon:hover .info-tip{display:block}
+.info-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:8px;padding:8px 12px;font-size:11px;line-height:1.5;white-space:nowrap;z-index:400;box-shadow:0 4px 16px rgba(0,0,0,.2);min-width:220px;text-align:left;font-weight:400}
+.info-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid var(--ink)}
+/* Buttons */
+.btn-row{display:flex;align-items:center;gap:12px;margin-top:24px}
+.btn-calc{padding:0 28px;height:42px;border-radius:9px;background:var(--orange);color:#fff;border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-calc:hover{opacity:.88}
+.btn-reset{padding:0 22px;height:42px;border-radius:9px;background:var(--surface);color:var(--ink);border:1.5px solid var(--border);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-reset:hover{border-color:var(--border2)}
+/* Result panel */
+.result-panel{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.result-tabs{display:flex;border-bottom:2px solid var(--border)}
+.res-tab{flex:1;padding:14px 16px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;text-align:center;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s;user-select:none}
+.res-tab:hover{color:var(--ink2)}.res-tab.active{color:var(--ink);border-bottom-color:var(--orange)}
+.forward-banner{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--al);border-bottom:1px solid #f0ddb8;font-size:12px;color:var(--amber);font-weight:500}
+.carrier-card{padding:18px;border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+.carrier-card:last-child{border-bottom:none}.carrier-card:hover{background:var(--s2)}
+.cc-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.cc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cc-icon.surface{background:#FFF3E0}.cc-icon.express{background:#E8F5E9}
+.cc-name{font-size:14px;font-weight:700;color:var(--ink);flex:1}
+.cc-price{font-size:18px;font-weight:800;color:var(--ink);font-family:var(--mono);letter-spacing:-.4px}
+.cc-price-sub{font-size:10.5px;color:var(--ink3);margin-top:1px;text-align:right}
+.cc-breakdown{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;margin-top:2px;padding-left:48px}
+.cc-breakdown svg{width:10px;height:10px;transition:transform .15s}
+.cc-breakdown.open svg{transform:rotate(180deg)}
+.breakdown-detail{display:none;padding:12px 18px 4px 48px;border-top:1px solid var(--border);margin-top:10px}
+.breakdown-detail.open{display:block}
+.bd-row{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:.5px solid var(--border);color:var(--ink2)}
+.bd-row:last-child{border-bottom:none;font-weight:700;color:var(--ink);padding-top:8px;border-top:1px solid var(--border);margin-top:4px}
+.bd-row .val{font-family:var(--mono);font-weight:600}
+.result-empty{padding:48px 24px;text-align:center}
+.result-empty svg{width:52px;height:52px;color:var(--border2);margin:0 auto 16px;display:block}
+.result-empty-title{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.result-empty-sub{font-size:12px;color:var(--ink3);line-height:1.6}
+/* TnC */
+.tnc-section{margin-top:22px}
+.tnc-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;padding:12px 18px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--ink2);transition:all .15s;user-select:none}
+.tnc-toggle:hover{border-color:var(--border2);background:var(--s2)}
+.tnc-toggle svg.t-chevron{width:14px;height:14px;margin-left:auto;transition:transform .2s;color:var(--ink3)}
+.tnc-toggle.open svg.t-chevron{transform:rotate(180deg)}
+.tnc-body{display:none;background:var(--surface);border:1.5px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:18px}
+.tnc-body.open{display:block}
+.tnc-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.tnc-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:.5px solid var(--border);font-size:12px;color:var(--ink2);line-height:1.65}
+.tnc-item:last-child{border-bottom:none}
+.tnc-bullet{width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:6px}
+.tnc-contact{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.tnc-contact-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--blue);font-weight:500}
+
+/* ── RATE CARD SCREEN ── */
+.rc-screen-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.rc-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rc-select{height:36px;border:1.5px solid var(--border);border-radius:8px;padding:0 32px 0 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:var(--s2);outline:none;cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239B998F' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .15s}
+.rc-select:focus{border-color:var(--orange)}
+/* Mode tabs */
+/* Mode tabs — matches 2nd_Level_Nav.svg active state */
+.mode-tabs{display:flex;background:#fff;border:1.5px solid #E4E2DC;border-radius:8px;padding:4px;gap:3px}
+.mode-tab{padding:4px 18px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;color:#6B6960;transition:all .15s;user-select:none;white-space:nowrap}
+.mode-tab:hover{color:#1A1916;background:rgba(26,25,22,.06)}
+.mode-tab.on{background:#1A1916;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+/* GST toggle */
+.gst-toggle-wrap{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink2)}
+.toggle-sw{position:relative;width:38px;height:22px;cursor:pointer}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{display:block;width:38px;height:22px;border-radius:11px;background:var(--gray-m);transition:background .15s}
+.toggle-sw input:checked+.toggle-track{background:var(--orange)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none}
+.toggle-sw input:checked~.toggle-thumb{transform:translateX(16px)}
+/* Rate Card table */
+.rc-table-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden}
+.rc-plan-header{padding:12px 18px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.rc-plan-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.rc-plan-badge.bronze{background:#FEF3E2;color:#B7791F}
+.rc-plan-badge.silver{background:#EDF2F7;color:#718096}
+.rc-plan-badge.gold{background:#FEFCBF;color:#975A16}
+.rc-plan-badge.platinum{background:#EBF8FF;color:#2B6CB0}
+table.rc-tbl{width:100%;border-collapse:collapse}
+.rc-tbl thead tr{background:var(--s2)}
+.rc-tbl th{padding:10px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.45px;border-bottom:1px solid var(--border);white-space:nowrap}
+.rc-tbl th:first-child{text-align:left}
+.rc-tbl th.zone-header{text-align:center}
+.rc-tbl td{padding:11px 14px;border-bottom:.5px solid var(--border);font-size:12px;color:var(--ink2);vertical-align:middle;text-align:right}
+.rc-tbl td:first-child{text-align:left;font-weight:600;color:var(--ink)}
+.rc-tbl tr:last-child td{border-bottom:none}
+.rc-tbl tr:hover td{background:var(--s2)}
+.rc-tbl tr.addl-row td{color:var(--ink3);font-style:italic;font-size:11px}
+.rc-tbl tr.addl-row td:first-child{color:var(--ink3)}
+.zone-cols td{text-align:center}
+.z-price{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink)}
+.z-price.na{color:var(--ink3);font-weight:400}
+.cod-row{background:var(--ol)}
+.cod-row td{color:var(--orange) !important;font-weight:600}
+/* Zone header badges */
+.zh{display:flex;flex-direction:column;align-items:center;gap:2px}
+.zh-dot{width:7px;height:7px;border-radius:50%;margin-bottom:2px}
+.zh-label{font-size:10px;font-weight:700}
+.zh-desc{font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink3)}
+
+/* ── PINCODE SERVICEABILITY ── */
+.ps-layout{display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:start}
+.ps-form{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px}
+.ps-result{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+.ps-result-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ps-result-title{font-size:14px;font-weight:700;color:var(--ink)}
+.ps-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.ps-pill.serviceable{background:var(--gl);color:var(--green)}
+.ps-pill.unserviceable{background:var(--rl);color:var(--red)}
+.ps-pill.partial{background:var(--al);color:var(--amber)}
+.ps-service-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:.5px solid var(--border)}
+.ps-service-row:last-child{border-bottom:none}
+.ps-service-name{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+.ps-service-detail{font-size:11px;color:var(--ink3);margin-top:2px}
+.ps-check-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ps-check-icon.ok{background:var(--gl)}.ps-check-icon.na{background:var(--s3)}.ps-check-icon.partial-ok{background:var(--al)}
+.ps-empty{padding:48px 24px;text-align:center}
+.ps-empty svg{width:52px;height:52px;color:var(--border2);margin:0 auto 16px;display:block}
+
+
+
+/* ── Rate Card improved styles ── */
+.rc-slab-group{background:var(--s2);border-bottom:2px solid var(--border)}
+.rc-slab-group td{background:var(--s2) !important}
+.rc-mode-row-surf td{border-bottom:.3px solid var(--border)}
+.rc-mode-row-air td{border-bottom:1px solid var(--border);background:rgba(26,107,58,.025) !important}
+.rc-slab-label{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3}
+.rc-slab-sub{font-size:11px;font-weight:400;color:var(--ink3)}
+.rc-mode-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.rc-mode-tag.surf{background:#FFF3E0;color:#9C4221}
+.rc-mode-tag.air{background:#E8F5E9;color:#276749}
+.z-fwd{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink)}
+.z-rto{font-family:var(--mono);font-size:12px;font-weight:300;color:var(--ink2)}
+.z-sep{color:var(--border2);font-size:11px;margin:0 3px}
+
+
+/* ════ RATE CARD v3 — New Table Format ════ */
+/* Matches New_Table_format image exactly */
+
+.rc-v3-wrap{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+/* Dark plan bar at top */
+.rc-v3-plan-bar{
+  padding:12px 20px;
+  background:#1A1914;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.rc-v3-active-lbl{
+  font-size:10px;font-weight:600;color:rgba(255,255,255,.45);
+  border:1px solid rgba(255,255,255,.18);border-radius:4px;
+  padding:2px 8px;letter-spacing:.3px;text-transform:uppercase;
+}
+.rc-v3-plan-name{
+  font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;
+}
+.rc-v3-plan-name.bronze{background:#FEF3E2;color:#B7791F}
+.rc-v3-plan-name.silver{background:#EDF2F7;color:#718096}
+.rc-v3-plan-name.gold{background:#FEFCBF;color:#975A16}
+.rc-v3-plan-name.platinum{background:#EBF8FF;color:#2B6CB0}
+.rc-v3-gst-note{margin-left:auto;font-size:11px;color:rgba(255,255,255,.45)}
+.rc-v3-gst-note b{color:rgba(255,255,255,.75)}
+
+/* Table scroll wrapper */
+.rc-v3-scroll{overflow-x:auto}
+.rc-v3-scroll::-webkit-scrollbar{height:4px}
+.rc-v3-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Main table */
+table.rc-v3-tbl{
+  width:100%;
+  border-collapse:collapse;
+  min-width:820px;
+  font-family:var(--font);
+}
+
+/* Column headers — "Services as per weight slab." + Zone 1..5 */
+.rc-v3-tbl thead tr{border-bottom:2px solid var(--border)}
+.rc-v3-tbl th{
+  padding:11px 16px;
+  font-size:13px;font-weight:700;color:var(--ink);
+  text-align:left;
+  white-space:nowrap;
+  background:var(--surface);
+  border-bottom:2px solid var(--ink);
+}
+.rc-v3-tbl th.th-zone{
+  text-align:center;
+  min-width:120px;
+  padding:10px 16px;
+}
+.th-zone-label{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.th-zone-sub{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:2px}
+.th-fwd{font-size:10px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+.th-rto{font-size:10px;font-weight:400;color:var(--ink3);letter-spacing:.2px}
+.th-sep{font-size:10px;color:var(--border2);font-weight:400}
+
+/* Service group header row */
+.rc-v3-tbl tr.tr-svc-hdr td{
+  padding:9px 16px;
+  background:var(--s3);       /* subtle darker shade */
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  font-size:13px;font-weight:700;color:var(--ink);
+}
+.rc-v3-tbl tr.tr-svc-hdr td:first-child{ /* flex applied inline via div inside */ }
+
+/* Service mode tag inside header */
+.svc-mode-tag{
+  display:inline-flex;align-items:center;padding:2px 7px;
+  border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+}
+.svc-mode-tag.air{background:#D1FAE5;color:#065F46}
+.svc-mode-tag.sfc{background:#FEF3C7;color:#92400E}
+.svc-mode-tag.both{background:#E0E7FF;color:#3730A3}
+.svc-mode-tag.rev{background:#FEE2E2;color:#991B1B}
+
+/* Data rows — Base Fare + Every Additional */
+.rc-v3-tbl tr.tr-data{background:var(--surface)}
+.rc-v3-tbl tr.tr-data:hover{background:var(--s2)}
+.rc-v3-tbl tr.tr-data td{
+  padding:9px 16px;
+  font-size:13px;color:var(--ink2);
+  border-bottom:.5px solid var(--border);
+}
+/* Row label cell (first column) */
+.rc-v3-tbl .td-row-lbl{
+  color:var(--ink2);font-size:13px;font-weight:400;
+}
+/* Zone price cell */
+.rc-v3-tbl .td-price{
+  text-align:center;font-size:13px;
+  white-space:nowrap;
+}
+/* FWD price — bold */
+.v3-fwd{font-weight:700;color:var(--ink);font-family:var(--mono)}
+/* RTO price — lighter but same size */
+.v3-rto{font-weight:300;color:var(--ink2);font-family:var(--mono)}
+/* Separator between FWD and RTO */
+.v3-sep{
+  color:var(--border2);margin:0 4px;
+  font-weight:400;font-size:12px;
+}
+/* NA value */
+.v3-na{color:var(--ink3);font-weight:400;font-style:italic;font-size:12px}
+
+/* Last data row in a group — slightly stronger bottom border */
+.rc-v3-tbl tr.tr-data.tr-last td{
+  border-bottom:1px solid var(--border2);
+}
+
+/* COD footer row */
+.rc-v3-tbl tr.tr-cod td{
+  padding:10px 16px;
+  font-size:12px;color:var(--ink2);
+  background:var(--s2);
+  border-top:2px solid var(--border);
+}
+.tr-cod .cod-highlight{color:var(--ink);font-weight:600}
+
+
+
+/* ── Standalone collapsible T&C below rate card ── */
+.rc-tnc-wrap{
+  margin-top:12px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.rc-tnc-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;
+  cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--ink2);
+  user-select:none;
+  transition:background .14s;
+}
+.rc-tnc-toggle:hover{background:var(--s2)}
+.rc-tnc-chevron{
+  color:var(--ink3);
+  transition:transform .2s ease;
+  flex-shrink:0;
+}
+.rc-tnc-toggle.open .rc-tnc-chevron{transform:rotate(180deg)}
+.rc-tnc-body{
+  display:none;
+  padding:14px 18px 16px;
+  border-top:1px solid var(--border);
+  background:var(--s2);
+}
+.rc-tnc-body.open{display:block}
+.rc-tnc-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px 24px;
+}
+.rc-tnc-item{
+  display:flex;gap:8px;
+  font-size:11.5px;color:var(--ink3);
+  line-height:1.55;
+  padding:6px 0;
+  border-bottom:.5px solid var(--border);
+}
+.rc-tnc-item:nth-last-child(-n+2){border-bottom:none}
+.rc-tnc-lbl{
+  font-weight:600;color:var(--ink2);
+  white-space:nowrap;min-width:148px;
+  flex-shrink:0;
+}
+
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:500;z-index:9999;transition:transform .25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.2)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ICON SIDEBAR -->
+<div class="nav-hover-zone" onmouseenter="openNav()" onmouseleave="closeNavCheck(event)"></div>
+<nav class="sb-icons" onmouseenter="openNav()" onmouseleave="closeNavCheck(event)">
+  <div class="sb-logo"><svg viewBox="0 0 24 24" fill="none"><path d="M3 5l5 7-5 7h4l3.5-5L14 19h4l-5-7 5-7h-4l-3.5 5L7 5H3z" fill="#fff"/></svg></div>
+  <div class="sb-icon active" onclick="setScreen('rate-calculator')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7h.01" stroke-linecap="round"/></svg></div>
+  <div class="sb-icon" onclick="toast('Orders')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 7h6M7 10h4" stroke-linecap="round"/></svg></div>
+  <div class="sb-icon" onclick="toast('NDR')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l7 13H3l7-13z" stroke-linejoin="round"/><path d="M10 9v3M10 14h.01" stroke-linecap="round"/></svg><div class="badge"></div></div>
+  <div class="sb-icon" onclick="toast('Finance')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 8h16M6 12h2" stroke-linecap="round"/></svg></div>
+  <div class="sb-sep"></div>
+  <div class="sb-icon" onclick="toast('Reports')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h10a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M7 8h6M7 11h4M7 14h2" stroke-linecap="round"/></svg></div>
+  <div class="sb-icon" onclick="toast('Manage')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5.05 5.05l1.42 1.42M13.54 13.54l1.42 1.42M5.05 14.95l1.42-1.42M13.54 6.46l1.42-1.42"/></svg></div>
+  <div class="sb-flex"></div>
+  <div class="sb-sep"></div>
+  <div class="sb-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3.5"/><path d="M3 18c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg></div>
+</nav>
+
+<!-- NAV PANEL (hover-reveal overlay) -->
+<div class="sb-nav" id="sbNav" onmouseenter="openNav()" onmouseleave="closeNav()">
+  <div class="sb-nav-logo">
+    <svg width="140" height="28" viewBox="0 0 140 28" fill="none">
+      <path d="M6 4h7l4 6-4 6H6l4-6-4-6z" fill="#E8520A"/>
+      <path d="M11 4h7l-4 6 4 6h-7l-4-6 4-6z" fill="#E8520A" opacity=".6"/>
+      <text x="22" y="19" font-family="DM Sans" font-weight="800" font-size="14" fill="white" letter-spacing="-0.5">XPRESSBEES</text>
+    </svg>
+  </div>
+  <div class="sb-nav-body">
+    <div class="nav-group">
+      <div class="nav-dashboard" onclick="toast('Dashboard')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="toggleNav('nav-orders',this)">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 7h6M7 10h4" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">Orders</span>
+        <svg class="nav-chevron" id="chev-nav-orders" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sub-nav" id="nav-orders">
+        <div class="sub-nav-item" onclick="toast('Orders')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Orders</div>
+        <div class="sub-nav-item" onclick="toast('Pickup')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Pickup Requests</div>
+      </div>
+    </div>
+    <!-- INFORMATION CENTER — ACTIVE -->
+    <div class="nav-group">
+      <div class="nav-item parent-active" onclick="toggleNav('nav-info',this)">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 7h.01" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">Information Center</span>
+        <svg class="nav-chevron open" id="chev-nav-info" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sub-nav open" id="nav-info">
+        <div class="sub-nav-item active" id="snav-rate-calculator" onclick="setScreen('rate-calculator')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Rate Calculator</div>
+        <div class="sub-nav-item" id="snav-rate-card" onclick="setScreen('rate-card')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Rate Card</div>
+        <div class="sub-nav-item" id="snav-pincode-serviceability" onclick="setScreen('pincode-serviceability')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Pincode Serviceability</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="toast('NDR')">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l7 13H3l7-13z" stroke-linejoin="round"/><path d="M10 9v3M10 14h.01" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">NDR</span>
+        <span style="background:var(--rl);color:var(--red);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">28</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="toggleNav('nav-finance',this)">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 8h16M6 12h2" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">Finance</span>
+        <svg class="nav-chevron" id="chev-nav-finance" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sub-nav" id="nav-finance">
+        <div class="sub-nav-item" onclick="toast('Wallet')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Wallet</div>
+        <div class="sub-nav-item" onclick="toast('Remittance')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Remittance</div>
+        <div class="sub-nav-item" onclick="toast('Invoice')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Invoice &amp; Credits</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="linkReports()">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M7 8h6M7 11h4M7 14h2" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">Reports</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="toggleNav('nav-manage',this)">
+        <div class="nav-highlight"></div>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+        <span class="nav-item-label">Manage</span>
+        <svg class="nav-chevron" id="chev-nav-manage" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sub-nav" id="nav-manage">
+        <div class="sub-nav-item" onclick="toast('Channels')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Channels</div>
+        <div class="sub-nav-item" onclick="toast('Products')"><div class="sub-nav-hl"></div><div class="sub-nav-dot"></div>Product Catalogue</div>
+      </div>
+    </div>
+    <div style="padding:8px 16px;margin-top:4px;border-top:1px solid #2A2920;padding-top:12px">
+      <div class="nav-item" onclick="toast('Settings')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2" stroke-linecap="round"/></svg>
+        <span class="nav-item-label">Settings</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-srch">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search orders, AWB, customer..."/>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-r">
+      <div class="wallet-pill">
+        <svg viewBox="0 0 14 14" fill="none" stroke="var(--green)" stroke-width="1.3" width="13" height="13"><rect x="1" y="3" width="12" height="9" rx="1.5"/><path d="M1 7h12M9.5 5.5h1" stroke-linecap="round"/></svg>
+        Wallet: <span class="wallet-amount">₹1,741.32</span>
+      </div>
+      <button class="tbtn" onclick="toast('Quick Actions')">Quick Actions</button>
+      <button class="tbtn tbtn-p" onclick="toast('Create Shipment')">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M7 2v10M2 7h10" stroke-linecap="round"/></svg>
+        Create Shipment
+      </button>
+      <div class="av">MR</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- ═══════════════════════════════════════
+         SCREEN 1: RATE CALCULATOR
+    ═══════════════════════════════════════ -->
+    <div class="screen active" id="scr-rate-calculator">
+      <div class="breadcrumb"><span>Information Center</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Rate Calculator</span></div>
+      <div class="rc-header">
+        <div><div class="rc-title">Rate Calculator</div><div class="rc-subtitle">Estimate shipping charges before creating a shipment</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="tbtn" onclick="toast('Pincode list')">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M7 1C5.34 1 4 2.34 4 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z"/><circle cx="7" cy="4" r="1.2"/></svg>
+            Pincode list
+          </button>
+          <!-- PRIMARY CTA: View Rate Card -->
+          <button class="tbtn tbtn-p" onclick="setScreen('rate-card')">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="1" y="1" width="12" height="12" rx="2"/><path d="M3 5h8M3 8h5" stroke-linecap="round"/></svg>
+            View Rate Card
+          </button>
+        </div>
+      </div>
+
+      <div class="rc-layout">
+        <div>
+          <div class="form-card">
+            <div class="section-label">
+              Pickup and delivery pincode
+              <div class="zone-badge" id="zoneBadge">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="12" height="12"><path d="M6 1C4.34 1 3 2.34 3 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z"/></svg>
+                <span id="zoneText">Zone C · Metro-Metro</span>
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="12" height="12"><circle cx="6" cy="6" r="5"/><path d="M6 5v3.5M6 4h.01" stroke-linecap="round"/></svg>
+                <div class="zone-tooltip" onclick="event.stopPropagation()">
+                  <div class="zone-tooltip-title">Zone Mapping</div>
+                  <div class="zone-row"><div class="zone-dot" style="background:#48BB78"></div><div class="zone-name">Zone A</div><div class="zone-sep">—</div><div class="zone-desc">Within-city</div></div>
+                  <div class="zone-row"><div class="zone-dot" style="background:#63B3ED"></div><div class="zone-name">Zone B</div><div class="zone-sep">—</div><div class="zone-desc">Regional (Single Connection And Less than 500 Kms)</div></div>
+                  <div class="zone-row active-zone"><div class="zone-dot" style="background:#ED8936"></div><div class="zone-name">Zone C</div><div class="zone-sep">—</div><div class="zone-desc">Metro-Metro</div></div>
+                  <div class="zone-row"><div class="zone-dot" style="background:#ECC94B"></div><div class="zone-name">Zone D</div><div class="zone-sep">—</div><div class="zone-desc">Rest of India</div></div>
+                  <div class="zone-row"><div class="zone-dot" style="background:#FC8181"></div><div class="zone-name">Zone E</div><div class="zone-sep">—</div><div class="zone-desc">Jammu, HP, North East Excluding Manipur</div></div>
+                  <div class="zone-row"><div class="zone-dot" style="background:#F56565"></div><div class="zone-name">Zone F</div><div class="zone-sep">—</div><div class="zone-desc">Kashmir, Manipur, Ladakh, Andman &amp; Nicobar</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pincode-row">
+              <div class="pincode-col">
+                <div class="input-label">Pickup pincode</div>
+                <div class="pincode-input-wrap">
+                  <div class="pin-icon"><svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M7 1C5.34 1 4 2.34 4 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z" fill="#E8520A"/><circle cx="7" cy="4" r="1.2" fill="#fff"/></svg></div>
+                  <input type="text" value="411006" id="pickupPin" maxlength="6" oninput="onPinInput('pickup')"/>
+                  <div class="pin-state" id="pickupState">MH</div>
+                </div>
+                <div class="pin-city" id="pickupCity">Pune, Maharashtra</div>
+              </div>
+              <div class="pin-arrow">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M4 10h12M12 6l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="pincode-col">
+                <div class="input-label">Drop pincode</div>
+                <div class="pincode-input-wrap">
+                  <div class="pin-icon"><svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M7 1C5.34 1 4 2.34 4 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z" fill="#38A169"/><circle cx="7" cy="4" r="1.2" fill="#fff"/></svg></div>
+                  <input type="text" value="560025" id="dropPin" maxlength="6" oninput="onPinInput('drop')"/>
+                  <div class="pin-state" id="dropState">KA</div>
+                </div>
+                <div class="pin-city" id="dropCity">Bangalore, Karnataka</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="pkg-label">Package Details</div>
+            <div class="pkg-grid">
+              <div class="field">
+                <div class="field-label">Actual Weight</div>
+                <div class="weight-input-row">
+                  <input type="number" value="0.5" min="0.01" step="0.01" id="actualWeight" oninput="calcVolumetric()"/>
+                  <div class="weight-unit-sel" id="weightUnitSel" onclick="toggleWeightUnit(event)">
+                    <span id="weightUnit">KG</span>
+                    <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+                    <div class="weight-unit-dd" id="weightUnitDd">
+                      <div class="wud-opt active" onclick="selectUnit('KG',event)">KG</div>
+                      <div class="wud-opt" onclick="selectUnit('GM',event)">GM</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="field-hint" id="weightHint">Note: Minimum chargeable weight is 0.5 kg</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Dimensions <span style="font-size:11px;font-weight:400;color:var(--ink3)">(Optional)</span></div>
+                <div class="dim-row">
+                  <div class="dim-input-wrap"><input type="number" value="10" id="dimL" oninput="calcVolumetric()" placeholder="L"/><div class="dim-unit">CM</div></div>
+                  <div class="dim-x">×</div>
+                  <div class="dim-input-wrap"><input type="number" value="10" id="dimB" oninput="calcVolumetric()" placeholder="B"/><div class="dim-unit">CM</div></div>
+                  <div class="dim-x">×</div>
+                  <div class="dim-input-wrap"><input type="number" value="12" id="dimH" oninput="calcVolumetric()" placeholder="H"/><div class="dim-unit">CM</div></div>
+                </div>
+                <div class="field-hint">Note: Dimensional value should be greater than 0.5 cm</div>
+              </div>
+            </div>
+
+            <div class="weight-results" id="weightResults">
+              <div class="wr-card">
+                <div><div class="wrc-label">Volumetric Weight</div><div class="wrc-val" id="volWeightDisplay">0.24 KG</div></div>
+                <div class="wr-info"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="10" height="10"><circle cx="6" cy="6" r="5"/><path d="M6 5v3.5M6 4h.01" stroke-linecap="round"/></svg></div>
+                <div class="wrc-tooltip">Volumetric Weight = L × B × H ÷ 5000<br>(10 × 10 × 12) ÷ 5000 = <b>0.24 KG</b></div>
+              </div>
+              <div class="wr-card highlighted">
+                <div><div class="wrc-label">Applicable Weight</div><div class="wrc-val hl" id="appWeightDisplay">0.50 KG</div></div>
+                <div class="wr-info"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="10" height="10"><circle cx="6" cy="6" r="5"/><path d="M6 5v3.5M6 4h.01" stroke-linecap="round"/></svg></div>
+                <div class="wrc-tooltip" style="min-width:240px">Applicable = Higher of actual (0.50 KG) vs volumetric (0.24 KG)</div>
+              </div>
+            </div>
+
+            <div style="height:18px"></div>
+
+            <!-- Plan selector for RC -->
+            <div class="pkg-grid" style="margin-top:2px">
+              <div class="field">
+                <div class="field-label">XB Plan</div>
+                <select class="rc-select" id="rcPlan" style="width:100%;height:44px;border-radius:9px;font-size:13px" onchange="onRCPlanChange()">
+                  <option value="bronze">XB Bronze</option>
+                  <option value="silver">XB Silver</option>
+                  <option value="gold" selected>XB Gold</option>
+                  <option value="platinum">XB Platinum</option>
+                </select>
+              </div>
+              <div class="field">
+                <div class="field-label">Shipping Mode</div>
+                <div class="mode-tabs" style="margin-top:5px" id="rcModeTabs">
+                  <div class="mode-tab on" id="rc-mode-sfc" onclick="selectRCMode('sfc')">Surface</div>
+                  <div class="mode-tab" id="rc-mode-air" onclick="selectRCMode('air')">Air</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:16px"></div>
+
+            <div class="pkg-grid">
+              <div class="field">
+                <div class="field-label">Payment Type</div>
+                <div class="radio-row" style="margin-top:8px">
+                  <label class="radio-opt selected"><input type="radio" name="payType" value="cod" checked onchange="onPayTypeChange(this)"/> Cash on Delivery</label>
+                  <label class="radio-opt"><input type="radio" name="payType" value="prepaid" onchange="onPayTypeChange(this)"/> Prepaid</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label">Shipment Value (₹)</div>
+                <div class="input-field">
+                  <div class="prefix">₹</div>
+                  <input type="number" value="4000" id="shipValue" min="0" oninput="updateCalcIfShown()"/>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:16px"></div>
+
+            <div class="pkg-grid">
+              <div class="field">
+                <div class="field-label">Shipping Dangerous Goods?
+                  <div class="info-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="10" height="10"><circle cx="6" cy="6" r="5"/><path d="M6 5v3.5M6 4h.01" stroke-linecap="round"/></svg>
+                    <div class="info-tip">Items classified as hazardous. Separate pricing applies.</div></div>
+                </div>
+                <div class="radio-row" style="margin-top:8px">
+                  <label class="radio-opt"><input type="radio" name="dangerous" value="yes"/> Yes</label>
+                  <label class="radio-opt selected"><input type="radio" name="dangerous" value="no" checked/> No</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label">Secure Shipment
+                  <div class="info-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" width="10" height="10"><circle cx="6" cy="6" r="5"/><path d="M6 5v3.5M6 4h.01" stroke-linecap="round"/></svg>
+                    <div class="info-tip">Additional insurance against loss/damage.</div></div>
+                </div>
+                <div class="radio-row" style="margin-top:8px">
+                  <label class="radio-opt"><input type="radio" name="secure" value="yes"/> Yes</label>
+                  <label class="radio-opt selected"><input type="radio" name="secure" value="no" checked/> No</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-calc" onclick="calculateRates()">Calculate</button>
+              <button class="btn-reset" onclick="resetForm()">Reset</button>
+            </div>
+          </div>
+
+          <div class="tnc-section">
+            <div class="tnc-toggle" id="tncToggle" onclick="toggleTnC()">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M4 3h8a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M6 7h4M6 10h2" stroke-linecap="round"/></svg>
+              Terms &amp; Conditions
+              <svg class="t-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+            </div>
+            <div class="tnc-body" id="tncBody">
+              <div class="tnc-title">Terms &amp; Conditions — XpressBees Shipping Rate Calculator</div>
+              <div class="tnc-item"><div class="tnc-bullet"></div><div>Freight charges (GST inclusive) are based on the <strong>higher of dead/dry or volumetric weight</strong>. RTO shipment will be charged differently from the forward delivery rate.</div></div>
+              <div class="tnc-item"><div class="tnc-bullet"></div><div>Fixed COD charge or COD % of the order value — <strong>whichever is higher</strong> — will be taken while calculating the COD fee.</div></div>
+              <div class="tnc-item"><div class="tnc-bullet"></div><div>Volumetric weight is calculated as <strong>L × B × H ÷ 5000</strong>. For Air courier it may differ. All measurements must be in centimetres (CM).</div></div>
+              <div class="tnc-item"><div class="tnc-bullet"></div><div>All rates shown are <strong>inclusive of 18% GST</strong> as per the PDF rate card.</div></div>
+              <div class="tnc-contact">
+                <div class="tnc-contact-item">
+                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" width="13" height="13"><rect x="1" y="3" width="12" height="9" rx="1.5"/><path d="M1 5l6 4 6-4" stroke-linecap="round"/></svg>
+                  support@xpressbees.com
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Result Panel -->
+        <div class="result-panel">
+          <div class="result-tabs">
+            <div class="res-tab active" id="tab-forward" onclick="switchResultTab('forward')">Forward</div>
+            <div class="res-tab" id="tab-return" onclick="switchResultTab('return')">Return (RTO)</div>
+          </div>
+          <div id="result-empty">
+            <div class="result-empty">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="52" height="52" style="color:var(--border2);margin:0 auto 16px;display:block"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M16 24h16M16 30h10" stroke-linecap="round"/><circle cx="24" cy="16" r="3"/></svg>
+              <div class="result-empty-title">Enter shipment details</div>
+              <div class="result-empty-sub">Fill in pincodes, package weight, and click Calculate to see rates.</div>
+            </div>
+          </div>
+          <div id="result-filled" style="display:none">
+            <div id="forward-content">
+              <div class="forward-banner">
+                <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M7 1l1.2 3.6H12L9.1 7l1.2 3.6L7 8.5l-3.3 2.1L4.9 7 2 4.6h3.8L7 1z" fill="var(--amber)"/></svg>
+                Forward: Deliveries from seller to your customer
+              </div>
+              <div class="carrier-card">
+                <div class="cc-top">
+                  <div class="cc-icon surface"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="1" y="6" width="13" height="12" rx="2" fill="#ED8936"/><path d="M14 9h4l3 4v5h-7V9z" fill="#ED8936"/><circle cx="6" cy="19" r="2" fill="#C05621"/><circle cx="18" cy="19" r="2" fill="#C05621"/></svg></div>
+                  <div class="cc-name">Surface</div>
+                  <div><div class="cc-price" id="surfacePrice">₹—</div><div class="cc-price-sub">incl. GST &amp; all charges</div></div>
+                </div>
+                <div class="cc-breakdown" id="bd-surface-toggle" onclick="toggleBreakdown('surface')">View breakdown <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg></div>
+                <div class="breakdown-detail" id="bd-surface">
+                  <div class="bd-row"><span>Base freight</span><span class="val" id="surf-base">—</span></div>
+                  <div class="bd-row"><span>COD charge</span><span class="val" id="surf-cod">—</span></div>
+                  <div class="bd-row"><span>Fuel surcharge</span><span class="val" id="surf-fuel">—</span></div>
+                  <div class="bd-row"><span>GST (18%)</span><span class="val" id="surf-gst">—</span></div>
+                  <div class="bd-row"><span>Total</span><span class="val" id="surf-total">—</span></div>
+                </div>
+              </div>
+              <div class="carrier-card">
+                <div class="cc-top">
+                  <div class="cc-icon express"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 12h16M14 7l5 5-5 5" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/><path d="M8 4l4 8-4 8" stroke="#66BB6A" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+                  <div class="cc-name">Air Express</div>
+                  <div><div class="cc-price" id="expressPrice">₹—</div><div class="cc-price-sub">incl. GST &amp; all charges</div></div>
+                </div>
+                <div class="cc-breakdown" id="bd-express-toggle" onclick="toggleBreakdown('express')">View breakdown <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg></div>
+                <div class="breakdown-detail" id="bd-express">
+                  <div class="bd-row"><span>Base freight (Air)</span><span class="val" id="expr-base">—</span></div>
+                  <div class="bd-row"><span>COD charge</span><span class="val" id="expr-cod">—</span></div>
+                  <div class="bd-row"><span>Fuel surcharge</span><span class="val" id="expr-fuel">—</span></div>
+                  <div class="bd-row"><span>GST (18%)</span><span class="val" id="expr-gst">—</span></div>
+                  <div class="bd-row"><span>Total</span><span class="val" id="expr-total">—</span></div>
+                </div>
+              </div>
+            </div>
+            <div id="return-content" style="display:none">
+              <div class="forward-banner" style="background:var(--rl);border-color:var(--red);color:var(--red)">
+                <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M12 6A5 5 0 1 0 11 9.2" stroke="var(--red)" stroke-width="1.3" stroke-linecap="round"/><path d="M12 2v4H8" stroke="var(--red)" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Return (RTO): Package returned from customer to you
+              </div>
+              <div class="carrier-card">
+                <div class="cc-top">
+                  <div class="cc-icon surface"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="1" y="6" width="13" height="12" rx="2" fill="#ED8936"/><path d="M14 9h4l3 4v5h-7V9z" fill="#ED8936"/><circle cx="6" cy="19" r="2" fill="#C05621"/><circle cx="18" cy="19" r="2" fill="#C05621"/></svg></div>
+                  <div class="cc-name">Surface RTO</div>
+                  <div><div class="cc-price" id="rtoSurfPrice">₹—</div><div class="cc-price-sub">incl. GST</div></div>
+                </div>
+                <div class="cc-breakdown" onclick="toggleBreakdown('rto-s')">View breakdown <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg></div>
+                <div class="breakdown-detail" id="bd-rto-s">
+                  <div class="bd-row"><span>Base RTO freight</span><span class="val" id="rtos-base">—</span></div>
+                  <div class="bd-row"><span>GST (18%)</span><span class="val" id="rtos-gst">—</span></div>
+                  <div class="bd-row"><span>Total</span><span class="val" id="rtos-total">—</span></div>
+                </div>
+              </div>
+              <div class="carrier-card">
+                <div class="cc-top">
+                  <div class="cc-icon express"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 12h16M14 7l5 5-5 5" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/></svg></div>
+                  <div class="cc-name">Air Express RTO</div>
+                  <div><div class="cc-price" id="rtoAirPrice">₹—</div><div class="cc-price-sub">incl. GST</div></div>
+                </div>
+                <div class="cc-breakdown" onclick="toggleBreakdown('rto-a')">View breakdown <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg></div>
+                <div class="breakdown-detail" id="bd-rto-a">
+                  <div class="bd-row"><span>Base RTO freight (Air)</span><span class="val" id="rtoa-base">—</span></div>
+                  <div class="bd-row"><span>GST (18%)</span><span class="val" id="rtoa-gst">—</span></div>
+                  <div class="bd-row"><span>Total</span><span class="val" id="rtoa-total">—</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SCREEN 2: RATE CARD
+    ═══════════════════════════════════════ -->
+    <div class="screen" id="scr-rate-card">
+      <div class="breadcrumb"><span>Information Center</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Rate Card</span></div>
+      <div class="rc-screen-header">
+        <div><div class="rc-title">Rate Card</div><div class="rc-subtitle">Pricing slabs by weight and zone — all prices inclusive of 18% GST</div></div>
+        <div class="rc-controls">
+          <label style="font-size:12px;font-weight:600;color:var(--ink2)">Plan:</label>
+          <select class="rc-select" id="rcPlanCard" onchange="renderRateCard()">
+            <option value="bronze">XB Bronze</option>
+            <option value="silver">XB Silver</option>
+            <option value="gold" selected>XB Gold</option>
+            <option value="platinum">XB Platinum</option>
+          </select>
+          <label style="font-size:12px;font-weight:600;color:var(--ink2)">Mode:</label>
+          <div class="mode-tabs" id="rcModeCardTabs">
+            <div class="mode-tab on" id="rcm-all" onclick="selectRCCardMode('all')">All</div>
+            <div class="mode-tab" id="rcm-air" onclick="selectRCCardMode('air')">Air</div>
+            <div class="mode-tab" id="rcm-sfc" onclick="selectRCCardMode('sfc')">Surface</div>
+          </div>
+          <div class="gst-toggle-wrap">
+            <label class="toggle-sw">
+              <input type="checkbox" id="gstToggle" onchange="renderRateCard()"/>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            Show Rates Inclusive of GST
+          </div>
+          <button class="tbtn tbtn-p" onclick="setScreen('rate-calculator')">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="1" y="1" width="12" height="12" rx="2"/><path d="M7 4v6M4 7h6" stroke-linecap="round"/></svg>
+            Try Rate Calculator
+          </button>
+        </div>
+      </div>
+
+      <div class="rc-table-wrap" id="rcTableWrap">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- T&C — standalone collapsible, separate from rate card table -->
+      <div class="rc-tnc-wrap" id="rcTncWrap">
+        <div class="rc-tnc-toggle" id="rcTncToggle" onclick="toggleRcTnc()">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M4 3h8a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M6 7h4M6 10h2" stroke-linecap="round"/></svg>
+            Terms &amp; Conditions
+          </div>
+          <svg class="rc-tnc-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M1 1l4 4 4-4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="rc-tnc-body" id="rcTncBody">
+          <div class="rc-tnc-grid">
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">Chargeable Weight</span><span>Physical or Volumetric Weight — whichever is higher</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">Volumetric Weight</span><span>L × B × H (cm) / 5000 — applicable for both Surface and Air</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">Fuel Surcharge</span><span>NIL</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">GST</span><span>Included in all displayed prices</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">Liability — Forward</span><span>₹2,000 or product value — whichever is lower</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">Liability — RVP</span><span>₹2,000 or 50% of product value — whichever is lower</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">COD Remittance</span><span>Twice every week</span></div>
+            <div class="rc-tnc-item"><span class="rc-tnc-lbl">QC Parameters</span><span>Express Reverse with QC supports up to 3 QC parameters</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SCREEN 3: PINCODE SERVICEABILITY
+    ═══════════════════════════════════════ -->
+    <div class="screen" id="scr-pincode-serviceability">
+      <div class="breadcrumb"><span>Information Center</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Pincode Serviceability</span></div>
+      <div class="rc-header">
+        <div><div class="rc-title">Pincode Serviceability</div><div class="rc-subtitle">Check delivery serviceability for any pincode across India</div></div>
+      </div>
+
+      <div class="ps-layout">
+        <div class="ps-form">
+          <div class="mf">
+            <div class="field-label" style="margin-bottom:8px">Origin Pincode</div>
+            <div class="pincode-input-wrap">
+              <div class="pin-icon"><svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M7 1C5.34 1 4 2.34 4 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z" fill="#E8520A"/><circle cx="7" cy="4" r="1.2" fill="#fff"/></svg></div>
+              <input type="text" id="psOrigin" placeholder="e.g. 411006" maxlength="6"/>
+              <div class="pin-state" id="psOriginState" style="opacity:0">--</div>
+            </div>
+            <div class="pin-city" id="psOriginCity"></div>
+          </div>
+          <div class="mf" style="margin-top:16px">
+            <div class="field-label" style="margin-bottom:8px">Destination Pincode</div>
+            <div class="pincode-input-wrap">
+              <div class="pin-icon"><svg viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M7 1C5.34 1 4 2.34 4 4c0 2.5 3 6 3 6s3-3.5 3-6c0-1.66-1.34-3-3-3z" fill="#38A169"/><circle cx="7" cy="4" r="1.2" fill="#fff"/></svg></div>
+              <input type="text" id="psDest" placeholder="e.g. 560025" maxlength="6"/>
+              <div class="pin-state" id="psDestState" style="opacity:0">--</div>
+            </div>
+            <div class="pin-city" id="psDestCity"></div>
+          </div>
+          <button class="btn-search" onclick="checkServiceability()">Check Serviceability</button>
+
+          
+        </div>
+
+        <div class="ps-result">
+          <div class="ps-result-header">
+            <div class="ps-result-title" id="psResultTitle">Serviceability Check</div>
+            <div id="psResultBadge"></div>
+          </div>
+          <div id="psResultBody">
+            <div class="ps-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="52" height="52" style="color:var(--border2);margin:0 auto 16px;display:block"><path d="M12 2C8.68 2 6 4.68 6 8c0 5 6 12 6 12s6-7 6-12c0-3.32-2.68-6-6-6z"/><circle cx="12" cy="8" r="2.5"/></svg>
+              <div class="result-empty-title">Enter pincodes to check serviceability</div>
+              <div class="result-empty-sub">Enter origin and destination pincodes to see available shipping services, estimated delivery times, and COD availability.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<div id="toast"></div>
+
+<script>
+// ── HOVER NAV JS ──
+var _navTimer = null;
+function openNav(){
+  clearTimeout(_navTimer);
+  var nav=document.getElementById('sbNav');
+  if(nav){nav.classList.add('open');}
+}
+function closeNav(){
+  _navTimer=setTimeout(function(){
+    var nav=document.getElementById('sbNav');
+    if(nav){nav.classList.remove('open');}
+  },80);
+}
+function closeNavCheck(e){
+  if(e.relatedTarget && (e.relatedTarget.closest&&e.relatedTarget.closest('#sbNav'))){return;}
+  closeNav();
+}
+function linkReports(){
+  closeNav();
+  window.location.href='reports.html';
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE DATA (from XB NEW RATE CARD PDF — GST inclusive)
+// Zones: z1=Within City(A), z2=Regional(B), z3=Metro-Metro(C), z4=Rest of India(D), z5=Special(E)
+// ═══════════════════════════════════════════════════════
+var RATES = {"bronze":{"sfc":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":33,"z2":36,"z3":50,"z4":58,"z5":70},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":31,"z2":33,"z3":44,"z4":50,"z5":59,"addl":true},{"wt":"1 kg","min":1,"max":1,"z1":60,"z2":65,"z3":90,"z4":100,"z5":120},{"wt":"+1 kg","min":1,"max":2,"z1":54,"z2":57,"z3":80,"z4":87,"z5":100,"addl":true},{"wt":"2 kg","min":2,"max":2,"z1":101,"z2":118,"z3":165,"z4":182,"z5":215},{"wt":"+1 kg","min":2,"max":5,"z1":28,"z2":31,"z3":40,"z4":45,"z5":53,"addl":true},{"wt":"5 kg","min":5,"max":5,"z1":150,"z2":180,"z3":230,"z4":250,"z5":285},{"wt":"+1 kg","min":5,"max":10,"z1":21,"z2":24,"z3":28,"z4":31,"z5":35,"addl":true},{"wt":"10 kg","min":10,"max":10,"z1":220,"z2":280,"z3":350,"z4":380,"z5":425},{"wt":"+1 kg","min":10,"max":999,"z1":18,"z2":20,"z3":22,"z4":26,"z5":28,"addl":true}],"cod_fixed":34,"cod_pct":1.8},"air":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":33,"z2":36,"z3":75,"z4":94,"z5":105},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":31,"z2":33,"z3":65,"z4":81,"z5":95,"addl":true},{"wt":"1 kg","min":1,"max":1,"z1":64,"z2":69,"z3":140,"z4":175,"z5":200,"derived":true},{"wt":"+1 kg (Air)","min":1,"max":999,"z1":31,"z2":33,"z3":65,"z4":81,"z5":95,"addl":true}],"cod_fixed":34,"cod_pct":1.8}},"silver":{"sfc":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":32,"z2":34,"z3":47,"z4":54,"z5":65},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":30,"z2":32,"z3":42,"z4":47,"z5":57,"addl":true},{"wt":"1 kg","min":1,"max":1,"z1":58,"z2":63,"z3":84,"z4":94,"z5":110},{"wt":"+1 kg","min":1,"max":2,"z1":48,"z2":50,"z3":76,"z4":85,"z5":92,"addl":true},{"wt":"2 kg","min":2,"max":2,"z1":106,"z2":112,"z3":157,"z4":174,"z5":202},{"wt":"+1 kg","min":2,"max":5,"z1":27,"z2":30,"z3":39,"z4":44,"z5":51,"addl":true},{"wt":"5 kg","min":5,"max":5,"z1":138,"z2":165,"z3":210,"z4":230,"z5":260},{"wt":"+1 kg","min":5,"max":10,"z1":21,"z2":22,"z3":27,"z4":30,"z5":34,"addl":true},{"wt":"10 kg","min":10,"max":10,"z1":205,"z2":260,"z3":325,"z4":350,"z5":400},{"wt":"+1 kg","min":10,"max":999,"z1":18,"z2":20,"z3":22,"z4":25,"z5":27,"addl":true}],"cod_fixed":32,"cod_pct":1.75},"air":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":32,"z2":34,"z3":72,"z4":88,"z5":100},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":30,"z2":32,"z3":62,"z4":77,"z5":91,"addl":true},{"wt":"+1 kg","min":1,"max":999,"z1":30,"z2":32,"z3":62,"z4":77,"z5":91,"addl":true}],"cod_fixed":32,"cod_pct":1.75}},"gold":{"sfc":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":31,"z2":32,"z3":42,"z4":50,"z5":59},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":30,"z2":31,"z3":40,"z4":45,"z5":53,"addl":true},{"wt":"1 kg","min":1,"max":1,"z1":55,"z2":56,"z3":77,"z4":88,"z5":100},{"wt":"+1 kg","min":1,"max":2,"z1":48,"z2":50,"z3":73,"z4":84,"z5":92,"addl":true},{"wt":"2 kg","min":2,"max":2,"z1":96,"z2":101,"z3":144,"z4":159,"z5":186},{"wt":"+1 kg","min":2,"max":5,"z1":26,"z2":28,"z3":37,"z4":41,"z5":48,"addl":true},{"wt":"5 kg","min":5,"max":5,"z1":126,"z2":151,"z3":195,"z4":212,"z5":238},{"wt":"+1 kg","min":5,"max":10,"z1":20,"z2":21,"z3":26,"z4":28,"z5":32,"addl":true},{"wt":"10 kg","min":10,"max":10,"z1":189,"z2":238,"z3":301,"z4":326,"z5":363},{"wt":"+1 kg","min":10,"max":999,"z1":17,"z2":19,"z3":21,"z4":24,"z5":26,"addl":true}],"cod_fixed":29,"cod_pct":1.6},"air":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":31,"z2":32,"z3":65,"z4":82,"z5":95},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":30,"z2":31,"z3":61,"z4":75,"z5":88,"addl":true},{"wt":"+1 kg","min":1,"max":999,"z1":30,"z2":31,"z3":61,"z4":75,"z5":88,"addl":true}],"cod_fixed":29,"cod_pct":1.6}},"platinum":{"sfc":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":30,"z2":31,"z3":40,"z4":47,"z5":55},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":28,"z2":30,"z3":38,"z4":42,"z5":51,"addl":true},{"wt":"1 kg","min":1,"max":1,"z1":54,"z2":55,"z3":73,"z4":84,"z5":98},{"wt":"+1 kg","min":1,"max":2,"z1":41,"z2":47,"z3":69,"z4":76,"z5":85,"addl":true},{"wt":"2 kg","min":2,"max":2,"z1":91,"z2":96,"z3":136,"z4":151,"z5":176},{"wt":"+1 kg","min":2,"max":5,"z1":25,"z2":27,"z3":34,"z4":39,"z5":46,"addl":true},{"wt":"5 kg","min":5,"max":5,"z1":118,"z2":142,"z3":183,"z4":201,"z5":224},{"wt":"+1 kg","min":5,"max":10,"z1":18,"z2":20,"z3":24,"z4":26,"z5":30,"addl":true},{"wt":"10 kg","min":10,"max":10,"z1":177,"z2":224,"z3":283,"z4":307,"z5":342},{"wt":"+1 kg","min":10,"max":999,"z1":14,"z2":17,"z3":19,"z4":21,"z5":24,"addl":true}],"cod_fixed":28,"cod_pct":1.5},"air":{"slabs":[{"wt":"0.5 kg","min":0,"max":0.5,"z1":30,"z2":31,"z3":61,"z4":76,"z5":87},{"wt":"+0.5 kg","min":0.5,"max":1,"z1":28,"z2":30,"z3":56,"z4":69,"z5":81,"addl":true},{"wt":"+1 kg","min":1,"max":999,"z1":28,"z2":30,"z3":56,"z4":69,"z5":81,"addl":true}],"cod_fixed":28,"cod_pct":1.5}}};
+
+var rcMode = 'sfc';    // sfc | air (rate calculator mode)
+var rcCardMode = 'sfc'; // rate card screen mode
+var curZone = 'z3';    // currently detected zone
+
+// Zone detection (simplified — real system would use API)
+var METRO_CODES = ['400','110','560','600','700','500'];
+function detectZone(pickup, drop){
+  if(!pickup || !drop || pickup.length<3 || drop.length<3) return 'z3';
+  var p3 = pickup.substring(0,3), d3 = drop.substring(0,3);
+  if(p3 === d3) return 'z1';
+  var pState = pinState(pickup), dState = pinState(drop);
+  if(pState === dState) return 'z2';
+  var pMetro = METRO_CODES.indexOf(p3.substring(0,3)) > -1;
+  var dMetro = METRO_CODES.indexOf(d3.substring(0,3)) > -1;
+  if(pMetro && dMetro) return 'z3';
+  return 'z4';
+}
+
+var PIN_DB = {
+  '411006':['Pune','Maharashtra','MH'],'411001':['Pune','Maharashtra','MH'],
+  '560025':['Bangalore','Karnataka','KA'],'560001':['Bangalore','Karnataka','KA'],
+  '400001':['Mumbai','Maharashtra','MH'],'400093':['Mumbai','Maharashtra','MH'],
+  '110001':['New Delhi','Delhi','DL'],'110085':['New Delhi','Delhi','DL'],
+  '600001':['Chennai','Tamil Nadu','TN'],'600020':['Chennai','Tamil Nadu','TN'],
+  '700001':['Kolkata','West Bengal','WB'],'500001':['Hyderabad','Telangana','TS'],
+  '302001':['Jaipur','Rajasthan','RJ'],'380001':['Ahmedabad','Gujarat','GJ'],
+  '226001':['Lucknow','Uttar Pradesh','UP'],'800001':['Patna','Bihar','BR'],
+};
+function pinInfo(pin){ return PIN_DB[pin]||null; }
+function pinState(pin){ var d=pinInfo(pin); return d?d[2]:''; }
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function toggleNav(id,el){
+  var sub=document.getElementById(id);
+  var chev=document.getElementById('chev-'+id);
+  var isOpen=sub.classList.contains('open');
+  sub.classList.toggle('open');
+  if(chev) chev.classList.toggle('open',!isOpen);
+}
+
+function setScreen(id){
+  document.querySelectorAll('.sub-nav-item').forEach(function(el){el.classList.remove('active');});
+  var snavEl=document.getElementById('snav-'+id);
+  if(snavEl) snavEl.classList.add('active');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var scr=document.getElementById('scr-'+id);
+  if(scr) scr.classList.add('active');
+  if(id==='rate-card') renderRateCard();
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE CALCULATOR
+// ═══════════════════════════════════════════════════════
+function onPinInput(type){
+  var pin = document.getElementById(type==='pickup'?'pickupPin':'dropPin').value.trim();
+  var d = pinInfo(pin);
+  if(type==='pickup'){
+    document.getElementById('pickupCity').textContent = d ? d[0]+', '+d[1] : '';
+    document.getElementById('pickupState').textContent = d ? d[2] : '';
+  } else {
+    document.getElementById('dropCity').textContent = d ? d[0]+', '+d[1] : '';
+    document.getElementById('dropState').textContent = d ? d[2] : '';
+  }
+  // Update zone
+  var pu = document.getElementById('pickupPin').value;
+  var dr = document.getElementById('dropPin').value;
+  curZone = detectZone(pu, dr);
+  var zNames = {z1:'Zone A · Within City',z2:'Zone B · Regional',z3:'Zone C · Metro-Metro',z4:'Zone D · Rest of India',z5:'Zone E · Special Destination'};
+  document.getElementById('zoneText').textContent = zNames[curZone]||'Zone C · Metro-Metro';
+  // Update active zone in tooltip
+  document.querySelectorAll('.zone-row').forEach(function(r){r.classList.remove('active-zone');});
+  var zIdx = {z1:0,z2:1,z3:2,z4:3,z5:4};
+  var rows = document.querySelectorAll('.zone-row');
+  if(rows[zIdx[curZone]]) rows[zIdx[curZone]].classList.add('active-zone');
+}
+
+function toggleWeightUnit(e){ e.stopPropagation(); document.getElementById('weightUnitSel').classList.toggle('open'); }
+function selectUnit(unit,e){
+  e.stopPropagation();
+  document.getElementById('weightUnitSel').classList.remove('open');
+  document.getElementById('weightUnit').textContent=unit;
+  document.querySelectorAll('.wud-opt').forEach(function(o){o.classList.remove('active');});
+  e.target.classList.add('active');
+  document.getElementById('weightHint').textContent = unit==='KG' ? 'Note: Minimum chargeable weight is 0.5 kg' : 'Note: Minimum chargeable weight is 500 gm';
+  calcVolumetric();
+}
+
+function calcVolumetric(){
+  var l=parseFloat(document.getElementById('dimL').value)||0;
+  var b=parseFloat(document.getElementById('dimB').value)||0;
+  var h=parseFloat(document.getElementById('dimH').value)||0;
+  var w=parseFloat(document.getElementById('actualWeight').value)||0;
+  var unit=document.getElementById('weightUnit').textContent;
+  var actualKg = unit==='GM' ? w/1000 : w;
+  var volKg = (l*b*h)/5000;
+  var appKg = Math.max(actualKg, volKg, 0.5);
+  document.getElementById('volWeightDisplay').textContent = volKg.toFixed(2)+' KG';
+  document.getElementById('appWeightDisplay').textContent = appKg.toFixed(2)+' KG';
+  updateCalcIfShown();
+}
+
+function selectRCMode(mode){
+  rcMode=mode;
+  ['sfc','air'].forEach(function(m){
+    var el=document.getElementById('rc-mode-'+m);
+    if(el) el.classList.toggle('on', m===mode);
+  });
+  updateCalcIfShown();
+}
+
+function onRCPlanChange(){ updateCalcIfShown(); }
+function onPayTypeChange(el){
+  document.querySelectorAll('.radio-opt').forEach(function(r){r.classList.remove('selected');});
+  el.parentElement.classList.add('selected');
+  updateCalcIfShown();
+}
+
+function updateCalcIfShown(){
+  if(document.getElementById('result-filled').style.display!=='none') calculateRates(true);
+}
+
+// Get base rate from PDF data
+function getBaseRate(plan, mode, weightKg, zone){
+  var data = RATES[plan][mode];
+  if(!data) return 0;
+  var slabs = data.slabs;
+  // Find applicable rate
+  if(weightKg <= 0.5){
+    var s = slabs.find(function(s){ return !s.addl && s.max===0.5; });
+    return s ? s[zone] : 0;
+  }
+  // For weights > 0.5kg, use the slab structure
+  // Find the base slab and add-on per kg
+  var base = 0;
+  var addKg = 0;
+  if(weightKg <= 1){
+    var s1 = slabs.find(function(s){ return !s.addl && s.max===0.5; });
+    var a1 = slabs.find(function(s){ return s.addl && s.min===0.5 && s.max===1; });
+    base = s1 ? s1[zone] : 0;
+    if(a1) base += a1[zone]; // add the second 0.5kg
+    return base;
+  }
+  // For 1kg+ (SFC): use the weight slabs
+  if(mode === 'sfc'){
+    if(weightKg <= 2){
+      var s2 = slabs.find(function(s){ return !s.addl && s.max===1; });
+      var a2 = slabs.find(function(s){ return s.addl && s.min===1 && s.max===2; });
+      base = s2 ? s2[zone] : 0;
+      var extra = Math.ceil(weightKg - 1);
+      base += extra * (a2 ? a2[zone] : 0);
+      return base;
+    }
+    if(weightKg <= 5){
+      var s3 = slabs.find(function(s){ return !s.addl && s.max===2; });
+      var a3 = slabs.find(function(s){ return s.addl && s.min===2 && s.max===5; });
+      base = s3 ? s3[zone] : 0;
+      var extra2 = Math.ceil(weightKg - 2);
+      base += extra2 * (a3 ? a3[zone] : 0);
+      return base;
+    }
+    if(weightKg <= 10){
+      var s4 = slabs.find(function(s){ return !s.addl && s.max===5; });
+      var a4 = slabs.find(function(s){ return s.addl && s.min===5 && s.max===10; });
+      base = s4 ? s4[zone] : 0;
+      var extra3 = Math.ceil(weightKg - 5);
+      base += extra3 * (a4 ? a4[zone] : 0);
+      return base;
+    }
+    var s5 = slabs.find(function(s){ return !s.addl && s.max===10; });
+    var a5 = slabs.find(function(s){ return s.addl && s.min===10; });
+    base = s5 ? s5[zone] : 0;
+    var extra4 = Math.ceil(weightKg - 10);
+    base += extra4 * (a5 ? a5[zone] : 0);
+    return base;
+  }
+  // Air: simple per kg after 1kg
+  var airBase = slabs.find(function(s){ return !s.addl && s.max===0.5; });
+  var airAdd = slabs.find(function(s){ return s.addl; });
+  base = airBase ? airBase[zone] : 0;
+  base += Math.ceil(weightKg - 0.5) * (airAdd ? airAdd[zone] : 0);
+  return base;
+}
+
+function calculateRates(silent){
+  var pu = document.getElementById('pickupPin').value.trim();
+  var dr = document.getElementById('dropPin').value.trim();
+  if(!silent){
+    if(pu.length!==6 || isNaN(pu)){ toast('⚠ Please enter a valid 6-digit pickup pincode'); return; }
+    if(dr.length!==6 || isNaN(dr)){ toast('⚠ Please enter a valid 6-digit drop pincode'); return; }
+  }
+
+  var plan = document.getElementById('rcPlan').value;
+  var planData = RATES[plan];
+  if(!planData) return;
+
+  var w = parseFloat(document.getElementById('actualWeight').value)||0.5;
+  var unit = document.getElementById('weightUnit').textContent;
+  var actualKg = unit==='GM' ? w/1000 : w;
+  var l=parseFloat(document.getElementById('dimL').value)||0;
+  var b_=parseFloat(document.getElementById('dimB').value)||0;
+  var hh=parseFloat(document.getElementById('dimH').value)||0;
+  var volKg = l*b_*hh/5000;
+  var appKg = Math.max(actualKg, volKg, 0.5);
+
+  var isCod = document.querySelector('input[name="payType"]:checked').value==='cod';
+  var shipVal = parseFloat(document.getElementById('shipValue').value)||0;
+
+  curZone = detectZone(pu, dr);
+
+  // Surface calc (SFC)
+  var surfBase = getBaseRate(plan, 'sfc', appKg, curZone);
+  var codCharge = 0;
+  if(isCod){
+    var codPct = planData.sfc.cod_pct * shipVal / 100;
+    codCharge = Math.max(planData.sfc.cod_fixed, codPct);
+  }
+  // Surface total already includes GST (PDF says "Including GST")
+  // We'll show breakdown: base = surfBase - cod, fuel is already inside base in PDF
+  // For display, treat base as surfBase, COD as separate
+  var surfTotal = surfBase + codCharge;
+  var surfGST = surfBase * 0.18 / 1.18; // back-compute GST portion
+  var surfEx = surfBase / 1.18;
+
+  document.getElementById('surfacePrice').textContent = '₹'+surfTotal.toFixed(2);
+  document.getElementById('surf-base').textContent = '₹'+surfEx.toFixed(2);
+  document.getElementById('surf-cod').textContent = isCod ? '₹'+codCharge.toFixed(2) : '₹0 (Prepaid)';
+  document.getElementById('surf-fuel').textContent = 'Included';
+  document.getElementById('surf-gst').textContent = '₹'+surfGST.toFixed(2)+' (incl.)';
+  document.getElementById('surf-total').textContent = '₹'+surfTotal.toFixed(2);
+
+  // Air calc
+  var airBase = getBaseRate(plan, 'air', appKg, curZone);
+  var airCodCharge = 0;
+  if(isCod){
+    var airCodPct = planData.air.cod_pct * shipVal / 100;
+    airCodCharge = Math.max(planData.air.cod_fixed, airCodPct);
+  }
+  var airTotal = airBase + airCodCharge;
+  var airGST = airBase * 0.18 / 1.18;
+  var airEx = airBase / 1.18;
+
+  document.getElementById('expressPrice').textContent = '₹'+airTotal.toFixed(2);
+  document.getElementById('expr-base').textContent = '₹'+airEx.toFixed(2);
+  document.getElementById('expr-cod').textContent = isCod ? '₹'+airCodCharge.toFixed(2) : '₹0 (Prepaid)';
+  document.getElementById('expr-fuel').textContent = 'Included';
+  document.getElementById('expr-gst').textContent = '₹'+airGST.toFixed(2)+' (incl.)';
+  document.getElementById('expr-total').textContent = '₹'+airTotal.toFixed(2);
+
+  // RTO: approx 70% of forward freight
+  var rtoSurf = surfBase * 0.70;
+  var rtoAir = airBase * 0.70;
+  document.getElementById('rtoSurfPrice').textContent = '₹'+rtoSurf.toFixed(2);
+  document.getElementById('rtos-base').textContent = '₹'+(rtoSurf/1.18).toFixed(2);
+  document.getElementById('rtos-gst').textContent = '₹'+(rtoSurf*0.18/1.18).toFixed(2)+' (incl.)';
+  document.getElementById('rtos-total').textContent = '₹'+rtoSurf.toFixed(2);
+  document.getElementById('rtoAirPrice').textContent = '₹'+rtoAir.toFixed(2);
+  document.getElementById('rtoa-base').textContent = '₹'+(rtoAir/1.18).toFixed(2);
+  document.getElementById('rtoa-gst').textContent = '₹'+(rtoAir*0.18/1.18).toFixed(2)+' (incl.)';
+  document.getElementById('rtoa-total').textContent = '₹'+rtoAir.toFixed(2);
+
+  document.getElementById('result-empty').style.display='none';
+  document.getElementById('result-filled').style.display='block';
+  if(!silent) toast('Rates calculated ✓');
+}
+
+function resetForm(){
+  ['pickupPin','dropPin','actualWeight','dimL','dimB','dimH','shipValue'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('pickupCity').textContent='';
+  document.getElementById('dropCity').textContent='';
+  document.getElementById('volWeightDisplay').textContent='— KG';
+  document.getElementById('appWeightDisplay').textContent='— KG';
+  document.getElementById('result-empty').style.display='block';
+  document.getElementById('result-filled').style.display='none';
+  toast('Form reset');
+}
+
+function switchResultTab(tab){
+  document.querySelectorAll('.res-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('forward-content').style.display = tab==='forward'?'block':'none';
+  document.getElementById('return-content').style.display = tab==='return'?'block':'none';
+}
+
+function toggleBreakdown(type){
+  var toggle=document.getElementById('bd-'+type+'-toggle');
+  var detail=document.getElementById('bd-'+type);
+  if(!detail)return;
+  detail.classList.toggle('open');
+  if(toggle)toggle.classList.toggle('open');
+}
+
+function toggleTnC(){
+  document.getElementById('tncToggle').classList.toggle('open');
+  document.getElementById('tncBody').classList.toggle('open');
+}
+
+function toggleRcTnc(){
+  var toggle = document.getElementById('rcTncToggle');
+  var body   = document.getElementById('rcTncBody');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE CARD SCREEN
+// ═══════════════════════════════════════════════════════
+
+function selectRCCardMode(mode){
+  rcCardModeCurrent = mode;
+  ['all','sfc','air'].forEach(function(m){
+    var el=document.getElementById('rcm-'+m);
+    if(el)el.classList.toggle('on', m===mode);
+  });
+  renderRateCard();
+}
+
+// ═══ RATE CARD DATA (from XB Rate Card image + PDF — all GST inclusive) ═══
+var RC_PLANS = {
+  bronze:{label:'XB Bronze',cod_fixed:34,cod_pct:1.8,groups:[
+    {name:'Air Xpressbees 0.5 KG',mode:'air',rows:[{type:'FWD',z1:33,z2:36,z3:36,z4:75,z5:94,z6:null},{type:'RTO',z1:33,z2:36,z3:36,z4:75,z5:94,z6:null},{type:'Add Wt.',z1:31,z2:33,z3:33,z4:65,z5:81,z6:null}]},
+    {name:'Surface Xpressbees 0.5 KG',mode:'surface',rows:[{type:'FWD',z1:33,z2:36,z3:36,z4:50,z5:70,z6:58},{type:'RTO',z1:33,z2:36,z3:36,z4:50,z5:70,z6:58},{type:'Add Wt.',z1:31,z2:33,z3:33,z4:44,z5:59,z6:50}]},
+    {name:'Xpressbees 1 KG',mode:'both',rows:[{type:'FWD',z1:60,z2:65,z3:65,z4:90,z5:120,z6:100},{type:'RTO',z1:60,z2:65,z3:65,z4:90,z5:120,z6:100},{type:'Add Wt.',z1:54,z2:57,z3:57,z4:80,z5:100,z6:87}]},
+    {name:'Xpressbees 2 KG',mode:'both',rows:[{type:'FWD',z1:101,z2:118,z3:118,z4:165,z5:215,z6:182},{type:'RTO',z1:101,z2:118,z3:118,z4:165,z5:215,z6:182},{type:'Add Wt.',z1:28,z2:31,z3:31,z4:40,z5:53,z6:45}]},
+    {name:'Xpressbees 5 KG',mode:'both',rows:[{type:'FWD',z1:150,z2:180,z3:180,z4:230,z5:285,z6:250},{type:'RTO',z1:150,z2:180,z3:180,z4:230,z5:285,z6:250},{type:'Add Wt.',z1:21,z2:24,z3:24,z4:28,z5:35,z6:31}]},
+    {name:'Xpressbees 10 KG',mode:'both',rows:[{type:'FWD',z1:220,z2:280,z3:280,z4:350,z5:425,z6:380},{type:'RTO',z1:220,z2:280,z3:280,z4:350,z5:425,z6:380},{type:'Add Wt.',z1:18,z2:20,z3:20,z4:22,z5:28,z6:26}]},
+    {name:'Express Reverse (DTO)',mode:'air',isReverse:true,cod_fixed:50,cod_note:'QC charges',rows:[{type:'REV',z1:'NA',z2:'NA',z3:'NA',z4:'NA',z5:'NA',z6:'NA'},{type:'Add Wt.',z1:40,z2:43,z3:43,z4:57,z5:77,z6:64}]}
+  ]},
+  silver:{label:'XB Silver',cod_fixed:32,cod_pct:1.75,groups:null},
+  gold:{label:'XB Gold',cod_fixed:29,cod_pct:1.6,groups:null},
+  platinum:{label:'XB Platinum',cod_fixed:28,cod_pct:1.5,groups:null}
+};
+// Gold from PDF
+RC_PLANS.gold.groups=[
+  {name:'Air Xpressbees 0.5 KG',mode:'air',rows:[{type:'FWD',z1:31,z2:32,z3:32,z4:65,z5:95,z6:82},{type:'RTO',z1:31,z2:32,z3:32,z4:65,z5:95,z6:82},{type:'Add Wt.',z1:30,z2:31,z3:31,z4:61,z5:88,z6:75}]},
+  {name:'Surface Xpressbees 0.5 KG',mode:'surface',rows:[{type:'FWD',z1:31,z2:32,z3:32,z4:42,z5:59,z6:50},{type:'RTO',z1:31,z2:32,z3:32,z4:42,z5:59,z6:50},{type:'Add Wt.',z1:30,z2:31,z3:31,z4:40,z5:53,z6:45}]},
+  {name:'Xpressbees 1 KG',mode:'both',rows:[{type:'FWD',z1:55,z2:56,z3:56,z4:77,z5:100,z6:88},{type:'RTO',z1:55,z2:56,z3:56,z4:77,z5:100,z6:88},{type:'Add Wt.',z1:48,z2:50,z3:50,z4:73,z5:92,z6:84}]},
+  {name:'Xpressbees 2 KG',mode:'both',rows:[{type:'FWD',z1:96,z2:101,z3:101,z4:144,z5:186,z6:159},{type:'RTO',z1:96,z2:101,z3:101,z4:144,z5:186,z6:159},{type:'Add Wt.',z1:26,z2:28,z3:28,z4:37,z5:48,z6:41}]},
+  {name:'Xpressbees 5 KG',mode:'both',rows:[{type:'FWD',z1:126,z2:151,z3:151,z4:195,z5:238,z6:212},{type:'RTO',z1:126,z2:151,z3:151,z4:195,z5:238,z6:212},{type:'Add Wt.',z1:20,z2:21,z3:21,z4:26,z5:32,z6:28}]},
+  {name:'Xpressbees 10 KG',mode:'both',rows:[{type:'FWD',z1:189,z2:238,z3:238,z4:301,z5:363,z6:326},{type:'RTO',z1:189,z2:238,z3:238,z4:301,z5:363,z6:326},{type:'Add Wt.',z1:17,z2:19,z3:19,z4:21,z5:26,z6:24}]},
+  {name:'Express Reverse (DTO)',mode:'air',isReverse:true,cod_fixed:50,cod_note:'QC charges',rows:[{type:'REV',z1:'NA',z2:'NA',z3:'NA',z4:'NA',z5:'NA',z6:'NA'},{type:'Add Wt.',z1:35,z2:38,z3:38,z4:50,z5:68,z6:56}]}
+];
+// Platinum from XB image
+RC_PLANS.platinum.groups=[
+  {name:'Air Xpressbees 0.5 KG',mode:'air',rows:[{type:'FWD',z1:30,z2:31,z3:31,z4:61,z5:87,z6:76},{type:'RTO',z1:30,z2:31,z3:31,z4:61,z5:87,z6:76},{type:'Add Wt.',z1:28,z2:30,z3:30,z4:56,z5:81,z6:69}]},
+  {name:'Surface Xpressbees 0.5 KG',mode:'surface',rows:[{type:'FWD',z1:30,z2:31,z3:31,z4:40,z5:55,z6:47},{type:'RTO',z1:30,z2:31,z3:31,z4:40,z5:55,z6:47},{type:'Add Wt.',z1:28,z2:30,z3:30,z4:38,z5:51,z6:42}]},
+  {name:'Xpressbees 1 KG',mode:'both',rows:[{type:'FWD',z1:54,z2:55,z3:55,z4:73,z5:98,z6:84},{type:'RTO',z1:54,z2:55,z3:55,z4:73,z5:98,z6:84},{type:'Add Wt.',z1:41,z2:47,z3:47,z4:69,z5:85,z6:76}]},
+  {name:'Xpressbees 2 KG',mode:'both',rows:[{type:'FWD',z1:91,z2:96,z3:96,z4:136,z5:176,z6:151},{type:'RTO',z1:91,z2:96,z3:96,z4:136,z5:176,z6:151},{type:'Add Wt.',z1:25,z2:27,z3:27,z4:34,z5:46,z6:39}]},
+  {name:'Xpressbees 5 KG',mode:'both',rows:[{type:'FWD',z1:118,z2:142,z3:142,z4:183,z5:224,z6:201},{type:'RTO',z1:118,z2:142,z3:142,z4:183,z5:224,z6:201},{type:'Add Wt.',z1:18,z2:20,z3:20,z4:24,z5:30,z6:26}]},
+  {name:'Xpressbees 10 KG',mode:'both',rows:[{type:'FWD',z1:177,z2:224,z3:224,z4:283,z5:342,z6:307},{type:'RTO',z1:177,z2:224,z3:224,z4:283,z5:342,z6:307},{type:'Add Wt.',z1:14,z2:17,z3:17,z4:19,z5:24,z6:21}]},
+  {name:'Express Reverse (DTO)',mode:'air',isReverse:true,cod_fixed:50,cod_note:'QC charges',rows:[{type:'REV',z1:'NA',z2:'NA',z3:'NA',z4:'NA',z5:'NA',z6:'NA'},{type:'Add Wt.',z1:40,z2:43,z3:43,z4:57,z5:77,z6:64}]}
+];
+// Silver — intermediate between Bronze and Gold
+RC_PLANS.silver.groups=[
+  {name:'Air Xpressbees 0.5 KG',mode:'air',rows:[{type:'FWD',z1:32,z2:34,z3:34,z4:72,z5:100,z6:88},{type:'RTO',z1:32,z2:34,z3:34,z4:72,z5:100,z6:88},{type:'Add Wt.',z1:30,z2:32,z3:32,z4:62,z5:91,z6:77}]},
+  {name:'Surface Xpressbees 0.5 KG',mode:'surface',rows:[{type:'FWD',z1:32,z2:34,z3:34,z4:47,z5:65,z6:54},{type:'RTO',z1:32,z2:34,z3:34,z4:47,z5:65,z6:54},{type:'Add Wt.',z1:30,z2:32,z3:32,z4:42,z5:57,z6:47}]},
+  {name:'Xpressbees 1 KG',mode:'both',rows:[{type:'FWD',z1:58,z2:63,z3:63,z4:84,z5:110,z6:94},{type:'RTO',z1:58,z2:63,z3:63,z4:84,z5:110,z6:94},{type:'Add Wt.',z1:48,z2:50,z3:50,z4:76,z5:92,z6:85}]},
+  {name:'Xpressbees 2 KG',mode:'both',rows:[{type:'FWD',z1:106,z2:112,z3:112,z4:157,z5:202,z6:174},{type:'RTO',z1:106,z2:112,z3:112,z4:157,z5:202,z6:174},{type:'Add Wt.',z1:27,z2:30,z3:30,z4:39,z5:51,z6:44}]},
+  {name:'Xpressbees 5 KG',mode:'both',rows:[{type:'FWD',z1:138,z2:165,z3:165,z4:210,z5:260,z6:230},{type:'RTO',z1:138,z2:165,z3:165,z4:210,z5:260,z6:230},{type:'Add Wt.',z1:21,z2:22,z3:22,z4:27,z5:34,z6:30}]},
+  {name:'Xpressbees 10 KG',mode:'both',rows:[{type:'FWD',z1:205,z2:260,z3:260,z4:325,z5:400,z6:350},{type:'RTO',z1:205,z2:260,z3:260,z4:325,z5:400,z6:350},{type:'Add Wt.',z1:18,z2:20,z3:20,z4:22,z5:27,z6:25}]},
+  {name:'Express Reverse (DTO)',mode:'air',isReverse:true,cod_fixed:50,cod_note:'QC charges',rows:[{type:'REV',z1:'NA',z2:'NA',z3:'NA',z4:'NA',z5:'NA',z6:'NA'},{type:'Add Wt.',z1:38,z2:41,z3:41,z4:54,z5:73,z6:60}]}
+];
+
+var rcCardModeCurrent = 'all';
+
+function selectRCCardMode(mode){
+  rcCardModeCurrent = mode;
+  ['all','air','sfc'].forEach(function(m){
+    var el=document.getElementById('rcm-'+m);
+    if(el) el.classList.toggle('on', m===mode);
+  });
+  renderRateCard();
+}
+
+var ZONE_COL_LABELS = ['WITHIN CITY','WITHIN STATE','REGIONAL','METRO TO METRO','NE, J&K, KL, AN','REST OF INDIA'];
+
+
+// ═══════════════════════════════════════════════════════════════
+// RATE DATA — exact from Xpressbees Wallet Commercials PDF
+// Zones: z1=Local, z2=Regional, z3=Metro to Metro, z4=ROI, z5=Special Destinations
+// All prices GST INCLUSIVE
+// ═══════════════════════════════════════════════════════════════
+
+// Express Reverse (DTO) — FIXED across ALL plans (from prompt spec, NOT from PDF)
+var DTO_NOQC = { base:[41,44,61,71,84], addl:[40,43,57,64,77] };
+var DTO_QC   = { base:[91,94,111,121,134], addl:[40,43,57,64,77] };
+
+var PDF_DATA = {
+  bronze: {
+    label:'XB Bronze', cls:'bronze',
+    commitment:'No Monthly Commitment',
+    cod_fixed:32, cod_pct:1.8,
+    sfc: {
+      s05:  [32,34,47,54,65],   s05a:[31,33,44,50,59],
+      s2:   [106,112,159,177,207], s2a:[28,31,40,45,53],
+      s5:   [139,168,216,236,264], s5a:[21,24,28,31,35],
+      s10:  [209,264,334,361,404], s10a:[18,20,22,26,28]
+    },
+    air: {
+      s05:  [32,34,71,88,102],  s05a:[31,33,65,81,95]
+    }
+  },
+  silver: {
+    label:'XB Silver', cls:'silver',
+    commitment:'Min 1,000 Shipments/Month',
+    cod_fixed:30, cod_pct:1.75,
+    sfc: {
+      s05:  [31,33,45,52,63],   s05a:[30,32,42,47,57],
+      s2:   [101,107,152,169,197], s2a:[27,30,39,44,51],
+      s5:   [133,159,205,224,251], s5a:[21,22,27,30,34],
+      s10:  [199,251,317,343,384], s10a:[18,20,22,25,27]
+    },
+    air: {
+      s05:  [31,33,68,84,98],   s05a:[30,32,62,77,91]
+    }
+  },
+  gold: {
+    label:'XB Gold', cls:'gold',
+    commitment:'Min 4,000 Shipments/Month',
+    cod_fixed:29, cod_pct:1.6,
+    sfc: {
+      s05:  [31,32,42,50,59],   s05a:[30,31,40,45,53],
+      s2:   [96,101,144,159,186], s2a:[26,28,37,41,48],
+      s5:   [126,151,195,212,238], s5a:[20,21,26,28,32],
+      s10:  [189,238,301,326,363], s10a:[17,19,21,24,26]
+    },
+    air: {
+      s05:  [31,32,65,82,95],   s05a:[30,31,61,75,88]
+    }
+  },
+  platinum: {
+    label:'XB Platinum', cls:'platinum',
+    commitment:'Min 7,000 Shipments/Month',
+    cod_fixed:28, cod_pct:1.5,
+    sfc: {
+      s05:  [30,31,40,47,55],   s05a:[28,30,38,42,51],
+      s2:   [91,96,136,151,176], s2a:[25,27,34,39,46],
+      s5:   [118,142,183,201,224], s5a:[18,20,24,26,30],
+      s10:  [177,224,283,307,342], s10a:[14,17,19,21,24]
+    },
+    air: {
+      s05:  [30,31,61,76,87],   s05a:[28,30,56,69,81]
+    }
+  }
+};
+
+var rcCardModeCurrent = 'all';
+
+function selectRCCardMode(mode){
+  rcCardModeCurrent = mode;
+  ['all','air','sfc'].forEach(function(m){
+    var el=document.getElementById('rcm-'+m);
+    if(el) el.classList.toggle('on', m===mode);
+  });
+  renderRateCard();
+}
+
+var ZONE_COL_LABELS = ['Zone 1','Zone 2','Zone 3','Zone 4','Zone 5'];
+
+function renderRateCard(){
+  var planKey = document.getElementById('rcPlanCard').value;
+  var plan    = PDF_DATA[planKey] || PDF_DATA.gold;
+  var mode    = rcCardModeCurrent;
+  var showGST = document.getElementById('gstToggle').checked;
+
+  function z(arr){ return {z1:arr[0],z2:arr[1],z3:arr[2],z4:arr[3],z5:arr[4]}; }
+  function fmt(v, gst){
+    if(v===null||v===undefined) return null;
+    return gst ? Math.round(v) : Math.round(v/1.18);
+  }
+  function priceCell(fwd, rto, showGST, reverseOnly){
+    var f = fmt(fwd, showGST);
+    var r = fmt(rto, showGST);
+    if(f===null) return '<span class="v3-na">NA</span>';
+    if(reverseOnly) return '<span class="v3-fwd">&#8377;'+f+'</span>';
+    return '<span class="v3-fwd">&#8377;'+f+'</span><span class="v3-sep">|</span><span class="v3-rto">&#8377;'+r+'</span>';
+  }
+
+  // Build services list based on mode
+  var services = [];
+
+  var addSvc = function(name, modeTag, baseArr, addlArr, baseFareDesc, addlDesc, isReverse){
+    services.push({name:name, modeTag:modeTag, base:baseArr, addl:addlArr,
+      baseFareDesc:baseFareDesc, addlDesc:addlDesc, isReverse:isReverse||false});
+  };
+
+  var sfcSlabs = [
+    { suffix:'0.5 KG', base:'s05', addl:'s05a',
+      baseFareDesc:'Base Fare (upto 0.5 kg)',
+      addlDesc:'Every Additional 500 gms (upto 1.5 kg)' },
+    { suffix:'2 KG',  base:'s2',  addl:'s2a',
+      baseFareDesc:'Base Fare (upto 2 kg)',
+      addlDesc:'Every Additional 1 kg (upto 5 kg)' },
+    { suffix:'5 KG',  base:'s5',  addl:'s5a',
+      baseFareDesc:'Base Fare (upto 5 kg)',
+      addlDesc:'Every Additional 1 kg (upto 10 kg)' },
+    { suffix:'10 KG', base:'s10', addl:'s10a',
+      baseFareDesc:'Base Fare (upto 10 kg)',
+      addlDesc:'Every Additional 1 kg' }
+  ];
+
+  // Note: AIR only has 0.5 KG slab in PDF
+  var airSlabs = [
+    { suffix:'0.5 KG', base:'s05', addl:'s05a',
+      baseFareDesc:'Base Fare (upto 0.5 kg)',
+      addlDesc:'Every Additional 500 gms (upto 1.5 kg)' }
+  ];
+
+  if(mode === 'all' || mode === 'air'){
+    airSlabs.forEach(function(sl){
+      addSvc('Air Xpressbees '+sl.suffix, 'AIR',
+        z(plan.air[sl.base]), z(plan.air[sl.addl]),
+        sl.baseFareDesc, sl.addlDesc, false);
+    });
+  }
+  if(mode === 'all' || mode === 'sfc'){
+    sfcSlabs.forEach(function(sl){
+      addSvc('Surface Xpressbees '+sl.suffix, 'SFC',
+        z(plan.sfc[sl.base]), z(plan.sfc[sl.addl]),
+        sl.baseFareDesc, sl.addlDesc, false);
+    });
+  }
+  // Express Reverse — always shown, values fixed per prompt spec
+  // DTO (without QC)
+  services.push({
+    name:'Express Reverse (DTO)',
+    modeTag:'REVERSE',
+    base:z(DTO_NOQC.base), addl:z(DTO_NOQC.addl),
+    baseFareDesc:'Base Fare (upto 0.5 kg)',
+    addlDesc:'Every Additional 500 gms (upto 1.5 kg)',
+    isReverse:true
+  });
+  // DTO with QC
+  services.push({
+    name:'Express Reverse (DTO) with QC',
+    modeTag:'REVERSE',
+    base:z(DTO_QC.base), addl:z(DTO_QC.addl),
+    baseFareDesc:'Base Fare (upto 0.5 kg)',
+    addlDesc:'Every Additional 500 gms (upto 1.5 kg)',
+    isReverse:true
+  });
+
+  var planClsMap = {bronze:'bronze',silver:'silver',gold:'gold',platinum:'platinum'};
+  var gstNote = showGST ? 'GST Inclusive' : 'Ex-GST &nbsp;(&#215;1.18 incl. GST)';
+  var modeDisplay = mode==='all' ? 'AIR + SFC + REVERSE' : mode==='air' ? 'AIR' : 'SFC';
+
+  var h = '<div class="rc-v3-wrap">';
+
+  // Plan bar
+  h += '<div class="rc-v3-plan-bar">';
+  h += '<span class="rc-v3-active-lbl">Active Plan</span>';
+  h += '<span class="rc-v3-plan-name '+planClsMap[planKey]+'">'+plan.label+'</span>';
+  h += '<span style="color:rgba(255,255,255,.3);margin:0 8px">&#183;</span>';
+  h += '<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.65)">'+modeDisplay+'</span>';
+  if(plan.commitment){
+    h += '<span style="font-size:10px;color:rgba(255,255,255,.35);margin-left:10px;border:1px solid rgba(255,255,255,.15);padding:2px 8px;border-radius:4px">'+plan.commitment+'</span>';
+  }
+  h += '<span class="rc-v3-gst-note"><b>'+gstNote+'</b></span>';
+  h += '</div>';
+
+  // Table
+  h += '<div class="rc-v3-scroll">';
+  h += '<table class="rc-v3-tbl"><thead><tr>';
+  h += '<th style="min-width:280px">Services as per weight slab.</th>';
+  var zoneHeader = function(n){
+    return '<th class="th-zone">'
+      +'<div class="th-zone-label">Zone '+n+'</div>'
+      +'<div class="th-zone-sub"><span class="th-fwd">FWD</span><span class="th-sep">|</span><span class="th-rto">RTO</span></div>'
+      +'</th>';
+  };
+  h += zoneHeader(1)+zoneHeader(2)+zoneHeader(3)+zoneHeader(4)+zoneHeader(5);
+  h += '</tr></thead><tbody>';
+
+  services.forEach(function(svc){
+    var zkeys = ['z1','z2','z3','z4','z5'];
+
+    // Service header row
+    h += '<tr class="tr-svc-hdr"><td colspan="6">';
+    h += '<div style="display:flex;align-items:center;gap:8px">';
+    // Mode tag chip — text only, no icon
+    var tagCls = svc.modeTag==='AIR'?'air':svc.modeTag==='SFC'?'sfc':'rev';
+    h += '<span class="svc-mode-tag '+tagCls+'">'+svc.modeTag+'</span>';
+    h += '<span>'+svc.name+'</span>';
+    h += '</div></td></tr>';
+
+    // Base fare row
+    h += '<tr class="tr-data"><td class="td-row-lbl">'+svc.baseFareDesc+'</td>';
+    zkeys.forEach(function(z){
+      h += '<td class="td-price">'+priceCell(svc.base[z], svc.base[z], showGST, svc.isReverse)+'</td>';
+    });
+    h += '</tr>';
+
+    // Every Additional row
+    h += '<tr class="tr-data tr-last"><td class="td-row-lbl">'+svc.addlDesc+'</td>';
+    zkeys.forEach(function(z){
+      h += '<td class="td-price">'+priceCell(svc.addl[z], svc.addl[z], showGST, svc.isReverse)+'</td>';
+    });
+    h += '</tr>';
+  });
+
+  // COD row
+  h += '<tr class="tr-cod"><td colspan="6">';
+  h += 'COD: <span class="cod-highlight">&#8377;'+plan.cod_fixed+' or '+plan.cod_pct+'% (higher applicable)</span>';
+  h += '<span style="margin:0 8px;color:var(--border2)">&#183;</span>';
+  h += showGST ? 'GST-inclusive pricing shown' : 'Ex-GST pricing shown &nbsp;(&#215;1.18 for GST-inclusive)';
+  h += '</td></tr>';
+
+  h += '</tbody></table></div>';
+
+  // T&C section — from PDF (Terms & Conditions page)
+  h += '</div>';
+  document.getElementById('rcTableWrap').innerHTML = h;
+}
+
+// buildServices no longer needed — kept as empty stub for safety
+function buildServices(plan){ return []; }
+
+
+var PS_SERVICEABLE = ['411006','560025','400001','110001','600001','700001','500001','380001','302001','226001','800001'];
+
+function checkServiceability(){
+  var origin = document.getElementById('psOrigin').value.trim();
+  var dest = document.getElementById('psDest').value.trim();
+  if(origin.length!==6||isNaN(origin)){ toast('⚠ Enter valid 6-digit origin pincode'); return; }
+  if(dest.length!==6||isNaN(dest)){ toast('⚠ Enter valid 6-digit destination pincode'); return; }
+
+  var oInfo = PIN_DB[origin];
+  var dInfo = PIN_DB[dest];
+  if(oInfo){
+    document.getElementById('psOriginCity').textContent = oInfo[0]+', '+oInfo[1];
+    document.getElementById('psOriginState').textContent = oInfo[2]; document.getElementById('psOriginState').style.opacity=1;
+  }
+  if(dInfo){
+    document.getElementById('psDestCity').textContent = dInfo[0]+', '+dInfo[1];
+    document.getElementById('psDestState').textContent = dInfo[2]; document.getElementById('psDestState').style.opacity=1;
+  }
+
+  var oServiceable = PS_SERVICEABLE.indexOf(origin)>-1 || oInfo;
+  var dServiceable = PS_SERVICEABLE.indexOf(dest)>-1 || dInfo;
+  var bothOk = oServiceable && dServiceable;
+
+  var zone = detectZone(origin, dest);
+  var zNameMap = {z1:'Zone A — Within City',z2:'Zone B — Regional / Within State',z3:'Zone C — Metro to Metro',z4:'Zone D — Rest of India',z5:'Zone E — Special Destination'};
+  var estMap = {z1:'Same Day / Next Day',z2:'1–2 Business Days',z3:'2–3 Business Days',z4:'3–5 Business Days',z5:'5–7 Business Days'};
+
+  var title = (oInfo?oInfo[0]:'Pincode '+origin)+' → '+(dInfo?dInfo[0]:'Pincode '+dest);
+  document.getElementById('psResultTitle').textContent = title;
+  document.getElementById('psResultBadge').innerHTML = bothOk
+    ? '<span class="ps-pill serviceable">✓ Serviceable</span>'
+    : '<span class="ps-pill unserviceable">✗ Not Serviceable</span>';
+
+  var services = bothOk ? [
+    {name:'Surface Freight', detail:estMap[zone]+' · COD Available', ok:true, icon:'🚚'},
+    {name:'Air Express', detail:(zone==='z4'||zone==='z5'?'2–4 Business Days':'1–2 Business Days')+' · COD Available', ok:true, icon:'✈'},
+    {name:'Same Day Delivery', detail:'Available in select metro cities only', ok:(zone==='z1'), icon:'⚡'},
+    {name:'COD Collection', detail:'Remittance T+'+(zone==='z1'?'1':zone==='z2'?'2':'3')+' business days', ok:true, icon:'💰'},
+  ] : [
+    {name:'Surface Freight', detail:'Pincode not in serviceable zone', ok:false, icon:'🚚'},
+    {name:'Air Express', detail:'Pincode not in serviceable zone', ok:false, icon:'✈'},
+    {name:'COD Collection', detail:'Not available', ok:false, icon:'💰'},
+  ];
+
+  var h = '';
+  if(bothOk){
+    h += '<div style="padding:12px 20px;background:var(--s2);border-bottom:1px solid var(--border);font-size:12px;color:var(--ink2)"><b>'+zNameMap[zone]+'</b> &nbsp;·&nbsp; Est. delivery: <b>'+estMap[zone]+'</b></div>';
+  }
+  services.forEach(function(s){
+    h += '<div class="ps-service-row">';
+    h += '<div><div class="ps-service-name">'+s.icon+' '+s.name+'</div><div class="ps-service-detail">'+s.detail+'</div></div>';
+    if(s.ok){
+      h += '<div class="ps-check-icon ok"><svg viewBox="0 0 12 12" fill="none" stroke="var(--green)" stroke-width="2" width="10" height="10"><path d="M2 6l3 3 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    } else {
+      h += '<div class="ps-check-icon na"><svg viewBox="0 0 12 12" fill="none" stroke="var(--ink3)" stroke-width="1.8" width="10" height="10"><path d="M3 3l6 6M9 3l-6 6" stroke-linecap="round"/></svg></div>';
+    }
+    h += '</div>';
+  });
+  document.getElementById('psResultBody').innerHTML = h;
+  toast('Serviceability checked');
+}
+
+// ═══════════════════════════════════════════════════════
+// SHARED HELPERS
+// ═══════════════════════════════════════════════════════
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.style.transform='translateX(-50%) translateY(60px)';},2800);
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.weight-unit-sel')) document.getElementById('weightUnitSel').classList.remove('open');
+});
+
+// Init
+calcVolumetric();
+renderRateCard();
+</script>
+</body>
+</html>

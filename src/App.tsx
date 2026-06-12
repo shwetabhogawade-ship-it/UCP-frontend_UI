@@ -10,6 +10,9 @@ import EditForwardOrderPage from './features/orders/EditForwardOrderPage';
 import PickupRequestPage from './features/orders/PickupRequestPage';
 import ProfilePage from './features/profile/ProfilePage';
 import NdrPage from './features/ndr/NdrPage';
+import RateCalculatorPage from './features/info-center/RateCalculatorPage';
+import RateCardPage from './features/info-center/RateCardPage';
+import PincodeServiceabilityPage from './features/info-center/PincodeServiceabilityPage';
 import ComingSoonPage from './components/ui/ComingSoonPage';
 import './App.css';
 
@@ -42,10 +45,11 @@ function App() {
 
           <Route path="/ndr" element={<NdrPage />} />
 
+          <Route path="/info/rate-calculator" element={<RateCalculatorPage />} />
+          <Route path="/info/rate-card" element={<RateCardPage />} />
+          <Route path="/info/pincode" element={<PincodeServiceabilityPage />} />
+
           {/* Placeholders — keep paths in sync with `data/navConfig.tsx` */}
-          <Route path="/info/pincode" element={<ComingSoonPage title="Pincode Serviceability" />} />
-          <Route path="/info/rate-calculator" element={<ComingSoonPage title="Rate Calculator" />} />
-          <Route path="/info/rate-card" element={<ComingSoonPage title="Rate Card" />} />
           <Route path="/finance/wallet" element={<ComingSoonPage title="Wallet" />} />
           <Route path="/finance/remittance" element={<ComingSoonPage title="Remittance" />} />
           <Route path="/finance/invoices" element={<ComingSoonPage title="Invoice & Credits" />} />
