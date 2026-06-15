@@ -205,13 +205,6 @@ export const PickupRequestPage: React.FC = () => {
           >
             ← Back to Orders
           </button>
-          <button
-            type="button"
-            className="ord-cta ord-cta-p"
-            onClick={() => showToast('+ New pickup request — coming soon')}
-          >
-            + New Pickup
-          </button>
         </div>
       </div>
 

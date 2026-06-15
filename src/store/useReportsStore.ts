@@ -15,6 +15,13 @@ interface ReportsStoreState {
   deleteConfirm: { open: boolean; id: number | null } | null;
   successModal: { open: boolean; title: string; rtype: string; freq: string } | null;
 
+  /* Wallet recharge popup — surfaced via the topbar wallet pill AND
+     the "+ Recharge Wallet" CTA on the Wallet Transactions screen. A
+     single store slot keeps both call-sites in sync and lets us mount
+     the modal once at the layout root instead of per-page. */
+  walletRecharge: { open: boolean };
+  walletBalance: number;
+
   // Actions
   fetchReports: () => Promise<void>;
   addReport: (report: Omit<ScheduledReport, 'id'>) => void;
@@ -35,6 +42,8 @@ interface ReportsStoreState {
   closeDeleteConfirm: () => void;
   openSuccess: (title: string, rtype: string, freq: string) => void;
   closeSuccess: () => void;
+  openWalletRecharge: () => void;
+  closeWalletRecharge: () => void;
 }
 
 export const useReportsStore = create<ReportsStoreState>((set, get) => ({
@@ -52,6 +61,8 @@ export const useReportsStore = create<ReportsStoreState>((set, get) => ({
   samplePreview: null,
   deleteConfirm: null,
   successModal: null,
+  walletRecharge: { open: false },
+  walletBalance: 1741.32,
 
   fetchReports: async () => {
     set({ loading: true });
@@ -157,5 +168,13 @@ export const useReportsStore = create<ReportsStoreState>((set, get) => ({
 
   closeSuccess: () => {
     set({ successModal: null });
+  },
+
+  openWalletRecharge: () => {
+    set({ walletRecharge: { open: true } });
+  },
+
+  closeWalletRecharge: () => {
+    set({ walletRecharge: { open: false } });
   },
 }));
